@@ -1,0 +1,11 @@
+.program t425_pio_tx
+; T425 PHY TX: canonical 8N1 UART timing based on Raspberry Pi's
+; official PIO UART TX example. One serial bit = 8 PIO cycles.
+.side_set 1 opt
+.wrap_target
+    pull block              side 1 [7] ; stop/idle, stall here
+    set x, 7                side 0 [7] ; start bit for 8 cycles
+bitloop:
+    out pins, 1
+    jmp x-- bitloop         [6]
+.wrap

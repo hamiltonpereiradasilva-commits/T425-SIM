@@ -1,0 +1,12 @@
+PAR {
+  SEQ {
+    OUT(c0,10);
+    OUT(c0,20);
+    END;
+  }
+  SEQ {
+    IN(c0,v0);
+    IN(c0,v1);
+    END;
+  }
+}

@@ -1,0 +1,3 @@
+SUPERVISOR + SCHEDULER: PASS
+Host build: -std=c11 -Wall -Wextra -Werror
+Hardware HAL/PIO integration: pending RP2040 SDK build.

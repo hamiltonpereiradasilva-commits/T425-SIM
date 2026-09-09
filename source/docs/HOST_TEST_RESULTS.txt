@@ -1,0 +1,6 @@
+channels: rc=0; channel rendezvous: PASS
+runtime: rc=0; runtime process/scheduler/channel smoke: PASS
+occam_alt: rc=0; OCCAM IR + ALT selection: PASS
+occam_vm: rc=0; OCCAM VM PAR sender/receiver: PASS
+compiler: rc=0; OCCAM AST + semantic + compiler: PASS
+parallel: rc=0; OCCAM PAR -> process images -> scheduler: PASS

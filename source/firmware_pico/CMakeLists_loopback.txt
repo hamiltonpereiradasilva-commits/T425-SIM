@@ -1,0 +1,14 @@
+cmake_minimum_required(VERSION 3.13)
+include(pico_sdk_import.cmake)
+project(t425_loopback C CXX ASM)
+pico_sdk_init()
+add_executable(t425_loopback
+    t425_loopback_main.c
+    t425_pio_phy.c
+)
+pico_generate_pio_header(t425_loopback ${CMAKE_CURRENT_LIST_DIR}/t425_pio_tx.pio)
+pico_generate_pio_header(t425_loopback ${CMAKE_CURRENT_LIST_DIR}/t425_pio_rx.pio)
+target_link_libraries(t425_loopback pico_stdlib hardware_pio hardware_clocks)
+pico_enable_stdio_usb(t425_loopback 1)
+pico_enable_stdio_uart(t425_loopback 0)
+pico_add_extra_outputs(t425_loopback)

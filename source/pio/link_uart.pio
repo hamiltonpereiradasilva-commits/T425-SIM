@@ -1,0 +1,55 @@
+program link_tx
+.wrap_target
+    pull block
+    set pins, 0 [7]        ; start bit
+    set x, 7
+bitloop:
+    out pins, 1 [7]        ; 8 data bits, LSB first
+    jmp x-- bitloop
+    set pins, 1 [7]        ; stop bit
+.wrap
+
+% c-sdk {
+static inline void link_tx_program_init(PIO pio, uint sm, uint offset,
+                                         uint pin, float baud) {
+    pio_sm_config c = link_tx_program_get_default_config(offset);
+    sm_config_set_out_pins(&c, pin, 1);
+    sm_config_set_out_shift(&c, true, false, 8);
+    sm_config_set_fifo_join(&c, PIO_FIFO_JOIN_TX);
+    float div = (float)clock_get_hz(clk_sys) / (baud * 8.0f);
+    sm_config_set_clkdiv(&c, div);
+    pio_gpio_init(pio, pin);
+    pio_sm_set_consecutive_pindirs(pio, sm, pin, 1, true);
+    pio_sm_set_pins(pio, sm, 1u << pin);
+    pio_sm_init(pio, sm, offset, &c);
+    pio_sm_set_enabled(pio, sm, true);
+}
+%}
+
+program link_rx
+.wrap_target
+    wait 0 pin 0            ; detect start bit
+    nop [3]                 ; middle of start bit
+    set x, 7
+rxloop:
+    in pins, 1 [7]          ; sample data bits
+    jmp x-- rxloop
+    push block
+    wait 1 pin 0            ; require stop/high before next byte
+.wrap
+
+% c-sdk {
+static inline void link_rx_program_init(PIO pio, uint sm, uint offset,
+                                         uint pin, float baud) {
+    pio_sm_config c = link_rx_program_get_default_config(offset);
+    sm_config_set_in_pins(&c, pin);
+    sm_config_set_in_shift(&c, true, true, 8);
+    sm_config_set_fifo_join(&c, PIO_FIFO_JOIN_RX);
+    float div = (float)clock_get_hz(clk_sys) / (baud * 8.0f);
+    sm_config_set_clkdiv(&c, div);
+    pio_gpio_init(pio, pin);
+    pio_sm_set_consecutive_pindirs(pio, sm, pin, 1, false);
+    pio_sm_init(pio, sm, offset, &c);
+    pio_sm_set_enabled(pio, sm, true);
+}
+%}

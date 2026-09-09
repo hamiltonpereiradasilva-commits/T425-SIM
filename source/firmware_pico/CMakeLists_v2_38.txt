@@ -1,0 +1,20 @@
+# Add these sources to the node target.
+# The same binary source is used for every node; only T425_NODE_ID/T425_PEER_ID
+# are compile-time configuration values.
+
+target_sources(t425_firmware PRIVATE
+    t425_two_node_bench.c
+    t425_link_bench.c
+    t425_pio_phy.c
+)
+
+pico_generate_pio_header(t425_firmware ${CMAKE_CURRENT_LIST_DIR}/t425_pio_tx.pio)
+pico_generate_pio_header(t425_firmware ${CMAKE_CURRENT_LIST_DIR}/t425_pio_rx.pio)
+
+target_compile_definitions(t425_firmware PRIVATE
+    T425_NODE_ID=0
+    T425_PEER_ID=1
+    T425_TX_PIN=2
+    T425_RX_PIN=3
+    T425_BAUD=115200u
+)

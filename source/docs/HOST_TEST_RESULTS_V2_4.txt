@@ -1,0 +1,4 @@
+PIO BYTE STREAM 00..FF MODEL: PASS
+Host build: -std=c11 -Wall -Wextra -Werror
+Pico SDK firmware build: requires local Pico SDK/toolchain.
+PIO timing and physical P00<->P01: pending bench validation.

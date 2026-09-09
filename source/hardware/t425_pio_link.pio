@@ -1,0 +1,22 @@
+; T425-SIM v2.2
+; Esqueleto PIO para transporte de bytes.
+; A temporização final deve ser validada no hardware.
+
+.program t425_link_tx
+.wrap_target
+    pull block
+    set x, 7
+tx_bits:
+    out pins, 1
+    jmp x-- tx_bits
+.wrap
+
+.program t425_link_rx
+.wrap_target
+    wait 0 pin 0
+    set x, 7
+rx_bits:
+    in pins, 1
+    jmp x-- rx_bits
+    push block
+.wrap

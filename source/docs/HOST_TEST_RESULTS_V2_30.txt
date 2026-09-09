@@ -1,0 +1,6 @@
+TX PIO source: PASS
+RX PIO source: PASS
+PHY API: PASS
+PHY implementation: PASS
+Bench procedure: PASS
+Electrical validation: NOT PERFORMED.

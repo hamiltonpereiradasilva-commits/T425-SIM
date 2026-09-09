@@ -1,0 +1,3 @@
+OCCAM CHAN OUT/IN: PASS
+Host build: -std=c11 -Wall -Wextra -Werror
+Remote rendezvous semantics: not yet implemented.

@@ -1,0 +1,4 @@
+CRC16/Modbus test vector: PASS
+Host build: -std=c11 -Wall -Wextra -Werror
+RP2040/Pico SDK build: requires local Pico SDK installation.
+Physical PIO/link validation: pending bench.

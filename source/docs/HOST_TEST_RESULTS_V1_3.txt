@@ -1,0 +1,3 @@
+Host configuration sanity: PASS
+Pico SDK firmware: target source prepared; requires a local Pico SDK toolchain for UF2 build.
+Physical PIO: pending bench validation.

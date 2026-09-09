@@ -1,0 +1,2 @@
+t425_onehop_v227: /mnt/data/T425_SIM_Pico_Nodes_v2.27/T425_SIM_Pico_Nodes_v2.23/tests/test_onehop_v227.c:46: main: Assertion `a.rl.state==T425_RL2_RETRY' failed.
+RP2040 SDK/PIO build requires PICO_SDK_PATH.

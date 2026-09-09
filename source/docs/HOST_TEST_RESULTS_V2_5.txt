@@ -1,0 +1,3 @@
+FRAME ENCODE/DECODE + CRC REJECTION: PASS
+Host build: -std=c11 -Wall -Wextra -Werror
+Physical PIO transport: pending bench validation.

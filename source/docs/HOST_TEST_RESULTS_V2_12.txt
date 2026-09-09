@@ -1,0 +1,3 @@
+MULTI-LINK CONFIG: PASS
+Host build: -std=c11 -Wall -Wextra -Werror
+PIO/SDK firmware build: requires RP2040 Pico SDK environment.

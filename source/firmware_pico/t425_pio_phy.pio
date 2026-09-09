@@ -1,0 +1,11 @@
+program t425_pio_phy
+.side_set 1
+
+; 8N1-like byte transport:
+; idle=1, start=0, eight data bits LSB-first, stop=1.
+; Each PIO bit occupies one state-machine clock period.
+.wrap_target
+bitloop:
+    out pins, 1 side 0
+    jmp x-- bitloop side 0
+.wrap

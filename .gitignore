@@ -1,0 +1,57 @@
+# ============================================================
+# T425-SIM — Git ignore
+# ============================================================
+
+# Build trees
+build-firmware/
+build-firmware-pico/
+build-root/
+
+# Generated/exported firmware
+export/*.uf2
+export/*.bin
+export/*.hex
+export/*.elf
+export/*.map
+export/*.dis
+
+# CMake generated files
+CMakeCache.txt
+CMakeFiles/
+cmake_install.cmake
+Makefile
+build.ninja
+.ninja_deps
+.ninja_log
+
+# Generated PIO headers
+*.pio.h
+
+# Temporary/editor files
+*~
+*.swp
+*.swo
+.DS_Store
+
+# Runtime/debug artifacts accidentally generated at project root
+current_pid
+cycles++
+data_tx++
+fault_events++
+timer_events++
+ack_tx++
+state
+high_queue,
+low_queue,
+now=now
+proc[pid]
+runtime.config.node_id,
+timer_events++
+
+# Local backup snapshots
+backups/
+backup_*/
+
+# Python/cache artifacts
+__pycache__/
+*.pyc

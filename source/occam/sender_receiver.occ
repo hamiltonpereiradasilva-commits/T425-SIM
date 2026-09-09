@@ -1,0 +1,10 @@
+-- OCCAM-like reference program for T425-SIM v0.6
+CHAN c:
+PAR
+  SEQ
+    c ! 10
+    c ! 20
+  INT x:
+  SEQ
+    c ? x
+    c ? x

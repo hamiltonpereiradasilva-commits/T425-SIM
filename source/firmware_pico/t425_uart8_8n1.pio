@@ -1,0 +1,32 @@
+.program t425_uart_tx
+.wrap_target
+    pull block
+    set pins, 0 [7]
+    set x, 7
+bitloop:
+    out pins, 1 [6]
+    jmp x-- bitloop
+    set pins, 1 [7]
+.wrap
+
+.program t425_uart_rx
+
+.wrap_target
+
+wait_start:
+    wait 0 pin 0
+
+    ; 1.5 bit-times from start detection to center of data bit 0
+    ; PIO clock = baud * 8
+    nop [7]
+    nop [3]
+
+    set x, 7
+
+rxloop:
+    in pins, 1 [6]
+    jmp x-- rxloop
+
+    push block
+
+.wrap

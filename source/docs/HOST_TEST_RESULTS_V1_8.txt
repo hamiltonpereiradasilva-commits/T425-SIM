@@ -1,0 +1,3 @@
+OCCAM rendezvous OUT/IN ordering: PASS
+Host build: -std=c11 -Wall -Wextra -Werror
+Remote rendezvous transport: pending v1.9.

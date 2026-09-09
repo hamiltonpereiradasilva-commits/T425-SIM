@@ -1,0 +1,3 @@
+HARDWARE PROFILE P00-P03 / 3 LINKS: PASS
+Host build: -std=c11 -Wall -Wextra -Werror
+PIO timing/electrical validation: pending physical bench test.

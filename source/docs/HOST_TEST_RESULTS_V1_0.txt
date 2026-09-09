@@ -1,0 +1,4 @@
+v1.0 packet codec: PASS
+v1.0 ring topology: PASS
+v0.9 regression: PASS (see docs/HOST_TEST_RESULTS.txt)
+Build flags: -std=c11 -Wall -Wextra -Werror

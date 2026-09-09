@@ -1,0 +1,1508 @@
+============================================================
+T425-SIM — FASE 5 — INVENTÁRIO ARQUITETURAL DO CORE
+============================================================
+Projeto: /work/t425-canonical
+
+===== 1. ARQUIVOS T425 / TRANSPUTER =====
+./backup_crc_20260904_142133/t425_crc16.c
+./backup_crc_20260904_142133/t425_crc16.h
+./backup_crc_20260904_142133/t425_link_bench.c
+./backup_crc_20260904_142133/t425_reliable_link.c
+./backup_runtime_trace_20260908_195432/t425_scheduler.c
+./backup_runtime_trace_20260908_195432/t425_scheduler.h
+./backup_runtime_trace_20260908_195432/t425_vm.h
+./backup_runtime_trace_20260908_195449/t425_scheduler.c
+./backup_runtime_trace_20260908_195449/t425_scheduler.h
+./backup_runtime_trace_20260908_195449/t425_vm.h
+./backup_runtime_trace_v2_20260908_195550/t425_scheduler.c
+./backup_runtime_trace_v2_20260908_195550/t425_scheduler.h
+./backup_runtime_trace_v2_20260908_195550/t425_vm.h
+./backup_supervisor_fix/t425_supervisor.c.20260908_195143
+./backup_supervisor_fix/t425_supervisor.h.20260908_195143
+./backup_vm_adapter/t425_vm_scheduler.c.20260908_194656
+./backup_vm_adapter/t425_vm_scheduler.h.20260908_194656
+./backup_vm_integration/t425_scheduler.c.1788896664
+./backup_vm_integration/t425_scheduler.h.1788896664
+./backup_vm_integration/t425_supervisor.c.1788896664
+./backup_vm_integration/t425_supervisor.h.1788896664
+./backup_vm_scheduler_fix_20260908_194950/t425_scheduler.c
+./backup_vm_scheduler_fix_20260908_194950/t425_scheduler.h
+./backup_vm_scheduler_fix_20260908_194950/t425_supervisor.c
+./backup_vm_scheduler_fix_20260908_194950/t425_supervisor.h
+./backup_vm_scheduler_fix_20260908_194950/t425_vm_scheduler.c
+./backup_vm_scheduler_fix_20260908_194950/t425_vm_scheduler.h
+./build-firmware-pico/CMakeFiles/t425_pico_v15.dir/t425_config_canonical.c.o
+./build-firmware-pico/CMakeFiles/t425_pico_v15.dir/t425_config_canonical.c.o.d
+./build-firmware-pico/CMakeFiles/t425_pico_v15.dir/t425_config_staging.c.o
+./build-firmware-pico/CMakeFiles/t425_pico_v15.dir/t425_config_staging.c.o.d
+./build-firmware-pico/CMakeFiles/t425_pico_v15.dir/t425_config_store.c.o
+./build-firmware-pico/CMakeFiles/t425_pico_v15.dir/t425_config_store.c.o.d
+./build-firmware-pico/CMakeFiles/t425_pico_v15.dir/t425_crc16.c.o
+./build-firmware-pico/CMakeFiles/t425_pico_v15.dir/t425_crc16.c.o.d
+./build-firmware-pico/CMakeFiles/t425_pico_v15.dir/t425_flash_hw.c.o
+./build-firmware-pico/CMakeFiles/t425_pico_v15.dir/t425_flash_hw.c.o.d
+./build-firmware-pico/CMakeFiles/t425_pico_v15.dir/t425_flash_layout_check.c.o
+./build-firmware-pico/CMakeFiles/t425_pico_v15.dir/t425_flash_layout_check.c.o.d
+./build-firmware-pico/CMakeFiles/t425_pico_v15.dir/t425_flash_rp2040_real.c.o
+./build-firmware-pico/CMakeFiles/t425_pico_v15.dir/t425_flash_rp2040_real.c.o.d
+./build-firmware-pico/CMakeFiles/t425_pico_v15.dir/t425_flash_slots.c.o
+./build-firmware-pico/CMakeFiles/t425_pico_v15.dir/t425_flash_slots.c.o.d
+./build-firmware-pico/CMakeFiles/t425_pico_v15.dir/t425_flash_transaction.c.o
+./build-firmware-pico/CMakeFiles/t425_pico_v15.dir/t425_flash_transaction.c.o.d
+./build-firmware-pico/CMakeFiles/t425_pico_v15.dir/t425_interfaces.c.o
+./build-firmware-pico/CMakeFiles/t425_pico_v15.dir/t425_interfaces.c.o.d
+./build-firmware-pico/CMakeFiles/t425_pico_v15.dir/t425_link_test.c.o
+./build-firmware-pico/CMakeFiles/t425_pico_v15.dir/t425_link_test.c.o.d
+./build-firmware-pico/CMakeFiles/t425_pico_v15.dir/t425_pio_hw.c.o
+./build-firmware-pico/CMakeFiles/t425_pico_v15.dir/t425_pio_hw.c.o.d
+./build-firmware-pico/CMakeFiles/t425_pico_v15.dir/t425_static_contracts.c.o
+./build-firmware-pico/CMakeFiles/t425_pico_v15.dir/t425_static_contracts.c.o.d
+./build-firmware-pico/CMakeFiles/t425_pico_v15.dir/t425_usb_config_commit.c.o
+./build-firmware-pico/CMakeFiles/t425_pico_v15.dir/t425_usb_config_commit.c.o.d
+./build-firmware-pico/CMakeFiles/t425_pico_v15.dir/t425_usb_config_protocol.c.o
+./build-firmware-pico/CMakeFiles/t425_pico_v15.dir/t425_usb_config_protocol.c.o.d
+./build-firmware-pico/CMakeFiles/t425_pico_v15.dir/t425_usb_config_session.c.o
+./build-firmware-pico/CMakeFiles/t425_pico_v15.dir/t425_usb_config_session.c.o.d
+./build-firmware-pico/CMakeFiles/t425_pico_v15.dir/work/t425-canonical/source/src/t425_ack.c.o
+./build-firmware-pico/CMakeFiles/t425_pico_v15.dir/work/t425-canonical/source/src/t425_ack.c.o.d
+./build-firmware-pico/CMakeFiles/t425_pico_v15.dir/work/t425-canonical/source/src/t425_crc16.c.o
+./build-firmware-pico/CMakeFiles/t425_pico_v15.dir/work/t425-canonical/source/src/t425_crc16.c.o.d
+./build-firmware-pico/CMakeFiles/t425_pico_v15.dir/work/t425-canonical/source/src/t425_frame.c.o
+./build-firmware-pico/CMakeFiles/t425_pico_v15.dir/work/t425-canonical/source/src/t425_frame.c.o.d
+./build-firmware-pico/CMakeFiles/t425_pico_v15.dir/work/t425-canonical/source/src/t425_node_config.c.o
+./build-firmware-pico/CMakeFiles/t425_pico_v15.dir/work/t425-canonical/source/src/t425_node_config.c.o.d
+./build-firmware-pico/CMakeFiles/t425_pico_v15.dir/work/t425-canonical/source/src/t425_runtime.c.o
+./build-firmware-pico/CMakeFiles/t425_pico_v15.dir/work/t425-canonical/source/src/t425_runtime.c.o.d
+./build-firmware-pico/CMakeFiles/t425_pico_v15.dir/work/t425-canonical/source/src/t425_scheduler.c.o
+./build-firmware-pico/CMakeFiles/t425_pico_v15.dir/work/t425-canonical/source/src/t425_scheduler.c.o.d
+./build-firmware-pico/CMakeFiles/t425_pico_v15.dir/work/t425-canonical/source/src/t425_stream.c.o
+./build-firmware-pico/CMakeFiles/t425_pico_v15.dir/work/t425-canonical/source/src/t425_stream.c.o.d
+./build-firmware-pico/CMakeFiles/t425_pico_v15.dir/work/t425-canonical/source/src/t425_supervisor.c.o
+./build-firmware-pico/CMakeFiles/t425_pico_v15.dir/work/t425-canonical/source/src/t425_supervisor.c.o.d
+./build-firmware-pico/CMakeFiles/t425_pico_v15.dir/work/t425-canonical/source/src/t425_vm_scheduler.c.o
+./build-firmware-pico/CMakeFiles/t425_pico_v15.dir/work/t425-canonical/source/src/t425_vm_scheduler.c.o.d
+./build-firmware-pico/t425_pico_v15.bin
+./build-firmware-pico/t425_pico_v15.dis
+./build-firmware-pico/t425_pico_v15.elf
+./build-firmware-pico/t425_pico_v15.elf.map
+./build-firmware-pico/t425_pico_v15.hex
+./build-firmware-pico/t425_pico_v15.uf2
+./build-firmware-pico/t425_uart8_8n1.pio.h
+./export/t425_pico_v15.uf2
+./source/firmware/t425_firmware_config.h
+./source/firmware/t425_link.pio
+./source/firmware/t425_link_driver.c
+./source/firmware/t425_link_driver.h
+./source/firmware/t425_main.c
+./source/firmware/t425_pio_link.c
+./source/firmware/t425_pio_link.h
+./source/firmware_pico/t425_application.c
+./source/firmware_pico/t425_application.h
+./source/firmware_pico/t425_bench_main.c
+./source/firmware_pico/t425_bidirectional_test.c
+./source/firmware_pico/t425_boot_test.c
+./source/firmware_pico/t425_build_integration.c
+./source/firmware_pico/t425_build_integration.h
+./source/firmware_pico/t425_build_selfcheck.c
+./source/firmware_pico/t425_config_address.h
+./source/firmware_pico/t425_config_boot_test.c
+./source/firmware_pico/t425_config_canonical.c
+./source/firmware_pico/t425_config_canonical.h
+./source/firmware_pico/t425_config_cli.c
+./source/firmware_pico/t425_config_cli.h
+./source/firmware_pico/t425_config_cli_test.c
+./source/firmware_pico/t425_config_memory.ld
+./source/firmware_pico/t425_config_region.ld.in
+./source/firmware_pico/t425_config_staging.c
+./source/firmware_pico/t425_config_staging.h
+./source/firmware_pico/t425_config_store.c
+./source/firmware_pico/t425_config_store.h
+./source/firmware_pico/t425_config_symbols.ld.in
+./source/firmware_pico/t425_console.c
+./source/firmware_pico/t425_console.h
+./source/firmware_pico/t425_crc16.c
+./source/firmware_pico/t425_crc16.h
+./source/firmware_pico/t425_e2e.c
+./source/firmware_pico/t425_e2e.h
+./source/firmware_pico/t425_e2e_physical_test.c
+./source/firmware_pico/t425_e2e_test.c
+./source/firmware_pico/t425_failure_test.c
+./source/firmware_pico/t425_firmware_identity.h
+./source/firmware_pico/t425_flash_hw.c
+./source/firmware_pico/t425_flash_hw.h
+./source/firmware_pico/t425_flash_hw_real_contract.c
+./source/firmware_pico/t425_flash_hw_test.c
+./source/firmware_pico/t425_flash_layout.c
+./source/firmware_pico/t425_flash_layout.h
+./source/firmware_pico/t425_flash_layout_check.c
+./source/firmware_pico/t425_flash_layout_test.c
+./source/firmware_pico/t425_flash_physical_test.c
+./source/firmware_pico/t425_flash_rp2040.c
+./source/firmware_pico/t425_flash_rp2040.h
+./source/firmware_pico/t425_flash_rp2040_real.c
+./source/firmware_pico/t425_flash_rp2040_real.h
+./source/firmware_pico/t425_flash_slots.c
+./source/firmware_pico/t425_flash_slots.h
+./source/firmware_pico/t425_flash_slots_test.c
+./source/firmware_pico/t425_flash_transaction.c
+./source/firmware_pico/t425_flash_transaction.h
+./source/firmware_pico/t425_forward.c
+./source/firmware_pico/t425_forward.h
+./source/firmware_pico/t425_forward_engine.c
+./source/firmware_pico/t425_forward_engine.h
+./source/firmware_pico/t425_generic_firmware_test.c
+./source/firmware_pico/t425_interfaces.c
+./source/firmware_pico/t425_interfaces.h
+./source/firmware_pico/t425_interfaces_test.c
+./source/firmware_pico/t425_link_bench.c
+./source/firmware_pico/t425_link_bench.h
+./source/firmware_pico/t425_link_health.c
+./source/firmware_pico/t425_link_health.h
+./source/firmware_pico/t425_link_loopback.c
+./source/firmware_pico/t425_link_loopback.h
+./source/firmware_pico/t425_link_test.c
+./source/firmware_pico/t425_link_test.h
+./source/firmware_pico/t425_link_test_main.c
+./source/firmware_pico/t425_loopback_main.c
+./source/firmware_pico/t425_memory_map_test.c
+./source/firmware_pico/t425_multihop_engine_test.c
+./source/firmware_pico/t425_multihop_physical.c
+./source/firmware_pico/t425_node_config.h.duplicate
+./source/firmware_pico/t425_node_profile.c
+./source/firmware_pico/t425_node_profile.h
+./source/firmware_pico/t425_node_startup.c
+./source/firmware_pico/t425_phy_config.h
+./source/firmware_pico/t425_pico_flash_region.ld.in
+./source/firmware_pico/t425_pio.cmake
+./source/firmware_pico/t425_pio_hw.c
+./source/firmware_pico/t425_pio_hw.h
+./source/firmware_pico/t425_pio_phy.c
+./source/firmware_pico/t425_pio_phy.h
+./source/firmware_pico/t425_pio_phy.pio
+./source/firmware_pico/t425_pio_phy.pio.h
+./source/firmware_pico/t425_pio_phy_host_stub.c
+./source/firmware_pico/t425_pio_pico_sdk.c
+./source/firmware_pico/t425_pio_rx.pio
+./source/firmware_pico/t425_pio_tx.pio
+./source/firmware_pico/t425_prebuild_contracts.h
+./source/firmware_pico/t425_redundant_failover_test.c
+./source/firmware_pico/t425_redundant_topology4.h
+./source/firmware_pico/t425_reliable.c
+./source/firmware_pico/t425_reliable.h
+./source/firmware_pico/t425_reliable_bench.c
+./source/firmware_pico/t425_reliable_link.c
+./source/firmware_pico/t425_reliable_link.h
+./source/firmware_pico/t425_reliable_v2.c
+./source/firmware_pico/t425_reliable_v2.h
+./source/firmware_pico/t425_route_candidates.c
+./source/firmware_pico/t425_route_candidates.h
+./source/firmware_pico/t425_route_failover_test.c
+./source/firmware_pico/t425_router.c
+./source/firmware_pico/t425_router.h
+./source/firmware_pico/t425_router_3node_test.c
+./source/firmware_pico/t425_router_link.c
+./source/firmware_pico/t425_router_link.h
+./source/firmware_pico/t425_router_link_test.c
+./source/firmware_pico/t425_router_test.c
+./source/firmware_pico/t425_runtime_config.c
+./source/firmware_pico/t425_runtime_config.h
+./source/firmware_pico/t425_runtime_state.c
+./source/firmware_pico/t425_runtime_state.h
+./source/firmware_pico/t425_send_command.c
+./source/firmware_pico/t425_send_command.h
+./source/firmware_pico/t425_startup.c
+./source/firmware_pico/t425_startup_policy.md
+./source/firmware_pico/t425_static_contracts.c
+./source/firmware_pico/t425_topology.c
+./source/firmware_pico/t425_topology.h
+./source/firmware_pico/t425_topology4.h
+./source/firmware_pico/t425_topology4_test.c
+./source/firmware_pico/t425_traffic_matrix.h
+./source/firmware_pico/t425_transport.c
+./source/firmware_pico/t425_transport.h
+./source/firmware_pico/t425_two_node_bench.c
+./source/firmware_pico/t425_uart8_8n1.pio
+./source/firmware_pico/t425_uart8_8n1.pio.before_rx_fix
+./source/firmware_pico/t425_uart8_8n1.pio.before_rx_fix_20260908_142107
+./source/firmware_pico/t425_usb_config_commit.c
+./source/firmware_pico/t425_usb_config_commit.h
+./source/firmware_pico/t425_usb_config_protocol.c
+./source/firmware_pico/t425_usb_config_protocol.h
+./source/firmware_pico/t425_usb_config_session.c
+./source/firmware_pico/t425_usb_config_session.h
+./source/hardware/t425_pio_link.pio
+./source/include/t425_ack.h
+./source/include/t425_ack_frame.h
+./source/include/t425_alt.h
+./source/include/t425_channels.h
+./source/include/t425_config.h
+./source/include/t425_crc16.h
+./source/include/t425_debug.h
+./source/include/t425_dist_runtime.h
+./source/include/t425_frame.h
+./source/include/t425_link.h
+./source/include/t425_link_control.h
+./source/include/t425_link_manager.h
+./source/include/t425_link_node.h
+./source/include/t425_link_packet.h
+./source/include/t425_link_stream.h
+./source/include/t425_links.h
+./source/include/t425_network.h
+./source/include/t425_node_config.h
+./source/include/t425_node_config.h.backup
+./source/include/t425_node_config.h.backup.v2
+./source/include/t425_node_sim.h
+./source/include/t425_occam.h
+./source/include/t425_occam_ast.h
+./source/include/t425_occam_chan.h
+./source/include/t425_occam_compile.h
+./source/include/t425_occam_parallel.h
+./source/include/t425_occam_parser.h
+./source/include/t425_occam_runtime.h
+./source/include/t425_occam_semantic.h
+./source/include/t425_occam_text.h
+./source/include/t425_occam_vm.h
+./source/include/t425_parallel_vm.h
+./source/include/t425_pio_links.h
+./source/include/t425_pio_transport.h
+./source/include/t425_process.h
+./source/include/t425_protocol.h
+./source/include/t425_reliable.h
+./source/include/t425_reliable_link.h
+./source/include/t425_remote_rdv.h
+./source/include/t425_rendezvous.h
+./source/include/t425_router.h
+./source/include/t425_runtime.h
+./source/include/t425_scheduler.h
+./source/include/t425_scheduler.h.before_process_scheduler
+./source/include/t425_selftest.h
+./source/include/t425_stream.h
+./source/include/t425_supervisor.h
+./source/include/t425_timer.h
+./source/include/t425_vm.h
+./source/include/t425_vm_scheduler.h
+./source/pio/t425_uart8.pio
+./source/src/t425_ack.c
+./source/src/t425_ack_frame.c
+./source/src/t425_alt.c
+./source/src/t425_channels.c
+./source/src/t425_crc16.c
+./source/src/t425_debug.c
+./source/src/t425_dist_runtime.c
+./source/src/t425_frame.c
+./source/src/t425_frame.c.before_crc_fix
+./source/src/t425_link.c
+./source/src/t425_link_control.c
+./source/src/t425_link_manager.c
+./source/src/t425_link_node.c
+./source/src/t425_link_packet.c
+./source/src/t425_link_stream.c
+./source/src/t425_links.c
+./source/src/t425_network.c
+./source/src/t425_node_config.c
+./source/src/t425_node_config.h.backup.v2
+./source/src/t425_node_config.h.duplicate
+./source/src/t425_node_sim.c
+./source/src/t425_occam.c
+./source/src/t425_occam_ast.c
+./source/src/t425_occam_chan.c
+./source/src/t425_occam_compile.c
+./source/src/t425_occam_parallel.c
+./source/src/t425_occam_parser.c
+./source/src/t425_occam_runtime.c
+./source/src/t425_occam_semantic.c
+./source/src/t425_occam_text.c
+./source/src/t425_occam_vm.c
+./source/src/t425_parallel_vm.c
+./source/src/t425_pio_links.c
+./source/src/t425_pio_transport.c
+./source/src/t425_process.c
+./source/src/t425_protocol.c
+./source/src/t425_reliable.c
+./source/src/t425_reliable_link.c
+./source/src/t425_remote_rdv.c
+./source/src/t425_rendezvous.c
+./source/src/t425_router.c
+./source/src/t425_runtime.c
+./source/src/t425_scheduler.c
+./source/src/t425_scheduler.c.before_process_scheduler
+./source/src/t425_selftest.c
+./source/src/t425_stream.c
+./source/src/t425_supervisor.c
+./source/src/t425_timer.c
+./source/src/t425_vm.c
+./source/src/t425_vm_scheduler.c
+
+===== 2. DOCUMENTAÇÃO ARQUITETURAL RELEVANTE =====
+source/docs/STATUS_V06.md:9:- scheduler e canais;
+source/docs/V1_9_INTEGRATION.md:31:A próxima etapa deve conectar a máquina de estados do rendezvous ao scheduler, de forma que um processo OCCAM bloqueie em `OUT`/`IN` e seja liberado somente pela conclusão do rendezvous local ou remoto.
+source/docs/STATUS_V04.md:4:Integrar VM, scheduler e canais em um runtime único para execução concorrente.
+source/docs/STATUS_V04.md:7:- `STARTP`/criação de processo via API runtime;
+source/docs/STATUS_V04.md:8:- `RUNP`, `STOPP`, `ENDP` via API runtime;
+source/docs/STATUS_V04.md:12:- scheduler integrado ao runtime;
+source/docs/STATUS_V04.md:13:- teste host-side de processo + scheduler + canal.
+source/docs/V2_65_ONE_FIRMWARE_N_NODES.md:17:O protocolo, scheduler, runtime, Router, transportes e PIO continuam sendo
+source/docs/HOST_TEST_RESULTS_V2_14.txt:1:SUPERVISOR + SCHEDULER: PASS
+source/docs/V1_0_PLANO_IMPLEMENTACAO.md:30:4. Scheduler
+source/docs/STATUS_V03.md:9:- estados de processo e scheduler por prioridade;
+source/docs/STATUS_V03.md:18:O codec físico INMOS ainda não é declarado implementado. A camada de link está isolada para que a temporização/handshake INMOS possa ser adicionada sem alterar VM, scheduler ou canais.
+source/docs/V2_14_SUPERVISOR.md:1:# T425-SIM v2.14 — Supervisor e Scheduler
+source/docs/V2_14_SUPERVISOR.md:10:      RUNTIME             SCHEDULER
+source/docs/V2_14_SUPERVISOR.md:24:- inicializa scheduler;
+source/docs/V2_14_SUPERVISOR.md:30:O scheduler é deliberadamente simples nesta etapa. A política de prioridade, filas e budget de CPU será definida depois que o comportamento físico do PIO for validado.
+source/docs/VALIDACAO_V04.md:13:Resultado esperado do teste host-side: `runtime process/scheduler/channel smoke: PASS`.
+source/docs/V1_7_TESTES.md:8:6. Scheduler escolhe maior prioridade READY.
+source/docs/VALIDACAO_V03.md:12:### Scheduler
+source/docs/V2_25_ONE_HOP_CORRECTED.md:7:1. O endpoint agora conhece `node_id`.
+source/docs/V2_14_EXECUTION_MODEL.md:3:Cada ciclo do scheduler deve futuramente seguir:
+source/docs/HOST_TEST_RESULTS.txt:2:runtime: rc=0; runtime process/scheduler/channel smoke: PASS
+source/docs/HOST_TEST_RESULTS.txt:6:parallel: rc=0; OCCAM PAR -> process images -> scheduler: PASS
+source/docs/STATUS_V05.md:7:- scheduler;
+source/docs/V2_87_SOURCE_INVENTORY.txt:79:docs/V1_7_RENDEZVOUS_SCHEDULER.md
+source/docs/V2_87_SOURCE_INVENTORY.txt:506:include/t425_scheduler.h
+source/docs/V2_87_SOURCE_INVENTORY.txt:559:src/t425_scheduler.c
+source/docs/V1_7_RENDEZVOUS_SCHEDULER.md:12:- scheduler por prioridade.
+source/docs/V1_7_RENDEZVOUS_SCHEDULER.md:15:                Scheduler
+source/docs/ARQUITETURA_PICO.md:10:- scheduler inicial;
+source/docs/ARQUITETURA_PICO.md:100:4. fechar o scheduler;
+source/docs/V2_13_RUNTIME.md:12:       Stream           Retry         Scheduler
+source/docs/STATUS.md:8:- Estrutura de scheduler com prioridade e salvamento básico de PC/W.
+source/docs/STATUS.md:13:Os links físicos ainda são transporte de laboratório; scheduler, canais, bootstrap e timers precisam da implementação completa antes de executar software OCCAM real sem adaptação.
+source/docs/STATUS_V09.md:3:`PAR` gera imagens de processo independentes. A AST usa `first_child/next_sibling`. O scheduler executa os processos em round-robin e o runner paralelo possui um rendezvous explícito entre instruções `IN`/`OUT`, evitando dupla entrega do mesmo valor.
+source/docs/V1_6_OCCAM_CHANNELS.md:29:4. scheduler de processos;
+
+===== 3. MICROCODE / UCODE / REGISTRADORES ARQUITETURAIS =====
+./build-firmware-pico/_deps/picotool-src/enc_bootloader/aes.S:891:@ vpermA=Aptr[4]>>30, vpermB=Bptr[4]>>30, and
+./build-firmware-pico/_deps/picotool-src/enc_bootloader/aes.S:893:@ roundkey shareB(i) = Bptr[i+vpermB mod 4] ror ((i+vpermB mod 4)^th byte of Bptr[4])+16
+./build-firmware-pico/_deps/picotool-src/enc_bootloader/aes.S:1018:@ vpermA=Aptr[4]>>30, vpermB=Bptr[4]>>30, and
+./build-firmware-pico/_deps/picotool-src/enc_bootloader/aes.S:1020:@ roundkey shareB(i) = Bptr[i+vpermB mod 4] ror ((i+vpermB mod 4)^th byte of Bptr[4])+16
+./build-firmware-pico/_deps/picotool-src/enc_bootloader/aes.S:1626:@ vpermA=Aptr[4]>>30, vpermB=Bptr[4]>>30, and
+./build-firmware-pico/_deps/picotool-src/enc_bootloader/aes.S:1628:@ roundkey shareB(i) = Bptr[i+vpermB mod 4] ror #((i+vpermB mod 4)^th byte of Bptr[4])+16
+./build-firmware-pico/_deps/picotool-src/enc_bootloader/aes.S:1861: @ r0=chaff+16, r3=statevperm, r4-r11=state, r12=roundkeyBptr
+./build-firmware-pico/_deps/picotool-src/lib/littlefs/lfs.c:5982:            (void*)(uintptr_t)cfg->read, (void*)(uintptr_t)cfg->prog,
+./build-firmware-pico/_deps/picotool-src/lib/littlefs/lfs.c:5983:            (void*)(uintptr_t)cfg->erase, (void*)(uintptr_t)cfg->sync,
+./build-firmware-pico/_deps/picotool-src/lib/littlefs/lfs.c:6012:            (void*)(uintptr_t)cfg->read, (void*)(uintptr_t)cfg->prog,
+./build-firmware-pico/_deps/picotool-src/lib/littlefs/lfs.c:6013:            (void*)(uintptr_t)cfg->erase, (void*)(uintptr_t)cfg->sync,
+./build-firmware-pico/_deps/picotool-src/lib/littlefs/lfs.c:6458:            (void*)lfs, (void*)(uintptr_t)cb, data);
+./build-firmware-pico/_deps/picotool-src/lib/littlefs/lfs.c:6531:            (void*)(uintptr_t)cfg->read, (void*)(uintptr_t)cfg->prog,
+./build-firmware-pico/_deps/picotool-src/lib/littlefs/lfs.c:6532:            (void*)(uintptr_t)cfg->erase, (void*)(uintptr_t)cfg->sync,
+./build-firmware-pico/_deps/picotool-src/lib/nlohmann_json/single_include/nlohmann/json.hpp:2097:#if defined(__INTPTR_TYPE__)
+./build-firmware-pico/_deps/picotool-src/lib/nlohmann_json/single_include/nlohmann/json.hpp:2098:    #define JSON_HEDLEY_IS_CONSTEXPR_(expr) __builtin_types_compatible_p(__typeof__((1 ? (void*) ((__INTPTR_TYPE__) ((expr) * 0)) : (int*) 0)), int*)
+./build-firmware-pico/_deps/picotool-src/lib/nlohmann_json/single_include/nlohmann/json.hpp:2101:    #define JSON_HEDLEY_IS_CONSTEXPR_(expr) __builtin_types_compatible_p(__typeof__((1 ? (void*) ((intptr_t) ((expr) * 0)) : (int*) 0)), int*)
+./build-firmware-pico/_deps/picotool-src/lib/nlohmann_json/single_include/nlohmann/json.hpp:2114:#if defined(__INTPTR_TYPE__)
+./build-firmware-pico/_deps/picotool-src/lib/nlohmann_json/single_include/nlohmann/json.hpp:2115:    #define JSON_HEDLEY_IS_CONSTEXPR_(expr) _Generic((1 ? (void*) ((__INTPTR_TYPE__) ((expr) * 0)) : (int*) 0), int*: 1, void*: 0)
+./build-firmware-pico/_deps/picotool-src/lib/nlohmann_json/single_include/nlohmann/json.hpp:2118:    #define JSON_HEDLEY_IS_CONSTEXPR_(expr) _Generic((1 ? (void*) ((intptr_t) * 0) : (int*) 0), int*: 1, void*: 0)
+./build-firmware-pico/_deps/picotool-src/lib/oofatfs/src/ff.c:3569:            fp->fptr = 0;           /* Set file pointer top of the file */
+./build-firmware-pico/_deps/picotool-src/lib/oofatfs/src/ff.c:3575:                fp->fptr = fp->obj.objsize;         /* Offset to seek */
+./build-firmware-pico/_deps/picotool-src/lib/oofatfs/src/ff.c:3632:    remain = fp->obj.objsize - fp->fptr;
+./build-firmware-pico/_deps/picotool-src/lib/oofatfs/src/ff.c:3636:        btr -= rcnt, *br += rcnt, rbuff += rcnt, fp->fptr += rcnt) {
+./build-firmware-pico/_deps/picotool-src/lib/oofatfs/src/ff.c:3637:        if (fp->fptr % SS(fs) == 0) {           /* On the sector boundary? */
+./build-firmware-pico/_deps/picotool-src/lib/oofatfs/src/ff.c:3638:            csect = (UINT)(fp->fptr / SS(fs) & (fs->csize - 1));    /* Sector offset in the cluster */
+./build-firmware-pico/_deps/picotool-src/lib/oofatfs/src/ff.c:3640:                if (fp->fptr == 0) {            /* On the top of the file? */
+./build-firmware-pico/_deps/picotool-src/lib/oofatfs/src/ff.c:3645:                        clst = clmt_clust(fp, fp->fptr);    /* Get cluster# from the CLMT */
+./build-firmware-pico/_deps/picotool-src/lib/oofatfs/src/ff.c:3692:        rcnt = SS(fs) - (UINT)fp->fptr % SS(fs);    /* Number of bytes left in the sector */
+./build-firmware-pico/_deps/picotool-src/lib/oofatfs/src/ff.c:3696:        mem_cpy(rbuff, fs->win + fp->fptr % SS(fs), rcnt);  /* Extract partial sector */
+./build-firmware-pico/_deps/picotool-src/lib/oofatfs/src/ff.c:3698:        mem_cpy(rbuff, fp->buf + fp->fptr % SS(fs), rcnt);  /* Extract partial sector */
+./build-firmware-pico/_deps/picotool-src/lib/oofatfs/src/ff.c:3732:    /* Check fptr wrap-around (file size cannot reach 4 GiB at FAT volume) */
+./build-firmware-pico/_deps/picotool-src/lib/oofatfs/src/ff.c:3733:    if ((!FF_FS_EXFAT || fs->fs_type != FS_EXFAT) && (DWORD)(fp->fptr + btw) < (DWORD)fp->fptr) {
+./build-firmware-pico/_deps/picotool-src/lib/oofatfs/src/ff.c:3734:        btw = (UINT)(0xFFFFFFFF - (DWORD)fp->fptr);
+./build-firmware-pico/_deps/picotool-src/lib/oofatfs/src/ff.c:3738:        btw -= wcnt, *bw += wcnt, wbuff += wcnt, fp->fptr += wcnt, fp->obj.objsize = (fp->fptr > fp->obj.objsize) ? fp->fptr : fp->obj.objsize) {
+./build-firmware-pico/_deps/picotool-src/lib/oofatfs/src/ff.c:3739:        if (fp->fptr % SS(fs) == 0) {       /* On the sector boundary? */
+./build-firmware-pico/_deps/picotool-src/lib/oofatfs/src/ff.c:3740:            csect = (UINT)(fp->fptr / SS(fs)) & (fs->csize - 1);    /* Sector offset in the cluster */
+./build-firmware-pico/_deps/picotool-src/lib/oofatfs/src/ff.c:3742:                if (fp->fptr == 0) {        /* On the top of the file? */
+./build-firmware-pico/_deps/picotool-src/lib/oofatfs/src/ff.c:3750:                        clst = clmt_clust(fp, fp->fptr);    /* Get cluster# from the CLMT */
+./build-firmware-pico/_deps/picotool-src/lib/oofatfs/src/ff.c:3797:            if (fp->fptr >= fp->obj.objsize) {  /* Avoid silly cache filling on the growing edge */
+./build-firmware-pico/_deps/picotool-src/lib/oofatfs/src/ff.c:3803:                fp->fptr < fp->obj.objsize &&
+./build-firmware-pico/_deps/picotool-src/lib/oofatfs/src/ff.c:3810:        wcnt = SS(fs) - (UINT)fp->fptr % SS(fs);    /* Number of bytes left in the sector */
+./build-firmware-pico/_deps/picotool-src/lib/oofatfs/src/ff.c:3814:        mem_cpy(fs->win + fp->fptr % SS(fs), wbuff, wcnt);  /* Fit data to the sector */
+./build-firmware-pico/_deps/picotool-src/lib/oofatfs/src/ff.c:3817:        mem_cpy(fp->buf + fp->fptr % SS(fs), wbuff, wcnt);  /* Fit data to the sector */
+./build-firmware-pico/_deps/picotool-src/lib/oofatfs/src/ff.c:4121:    FSIZE_t ifptr;
+./build-firmware-pico/_deps/picotool-src/lib/oofatfs/src/ff.c:4164:            fp->fptr = ofs;             /* Set file pointer */
+./build-firmware-pico/_deps/picotool-src/lib/oofatfs/src/ff.c:4170:                if (fp->fptr % SS(fs) && dsc != fp->sect) { /* Refill sector cache if needed */
+./build-firmware-pico/_deps/picotool-src/lib/oofatfs/src/ff.c:4195:        ifptr = fp->fptr;
+./build-firmware-pico/_deps/picotool-src/lib/oofatfs/src/ff.c:4196:        fp->fptr = nsect = 0;
+./build-firmware-pico/_deps/picotool-src/lib/oofatfs/src/ff.c:4199:            if (ifptr > 0 &&
+./build-firmware-pico/_deps/picotool-src/lib/oofatfs/src/ff.c:4200:                (ofs - 1) / bcs >= (ifptr - 1) / bcs) { /* When seek to same or following cluster, */
+./build-firmware-pico/_deps/picotool-src/lib/oofatfs/src/ff.c:4201:                fp->fptr = (ifptr - 1) & ~(FSIZE_t)(bcs - 1);   /* start from the current cluster */
+./build-firmware-pico/_deps/picotool-src/lib/oofatfs/src/ff.c:4202:                ofs -= fp->fptr;
+./build-firmware-pico/_deps/picotool-src/lib/oofatfs/src/ff.c:4218:                    ofs -= bcs; fp->fptr += bcs;
+./build-firmware-pico/_deps/picotool-src/lib/oofatfs/src/ff.c:4221:                        if (FF_FS_EXFAT && fp->fptr > fp->obj.objsize) {    /* No FAT chain object needs correct objsize to generate FAT value */
+./build-firmware-pico/_deps/picotool-src/lib/oofatfs/src/ff.c:4222:                            fp->obj.objsize = fp->fptr;
+./build-firmware-pico/_deps/picotool-src/lib/oofatfs/src/ff.c:4238:                fp->fptr += ofs;
+./build-firmware-pico/_deps/picotool-src/lib/oofatfs/src/ff.c:4246:        if (!FF_FS_READONLY && fp->fptr > fp->obj.objsize) {    /* Set file change flag if the file size is extended */
+./build-firmware-pico/_deps/picotool-src/lib/oofatfs/src/ff.c:4247:            fp->obj.objsize = fp->fptr;
+./build-firmware-pico/_deps/picotool-src/lib/oofatfs/src/ff.c:4250:        if (fp->fptr % SS(fs) && nsect != fp->sect) {   /* Fill sector cache if needed */
+./build-firmware-pico/_deps/picotool-src/lib/oofatfs/src/ff.c:4594:    if (fp->fptr < fp->obj.objsize) {   /* Process when fptr is not on the eof */
+./build-firmware-pico/_deps/picotool-src/lib/oofatfs/src/ff.c:4595:        if (fp->fptr == 0) {    /* When set file size to zero, remove entire cluster chain */
+./build-firmware-pico/_deps/picotool-src/lib/oofatfs/src/ff.c:4607:        fp->obj.objsize = fp->fptr; /* Set file size to current read/write point */
+./build-firmware-pico/_deps/picotool-src/lib/oofatfs/src/ff.c:5336:    remain = fp->obj.objsize - fp->fptr;
+./build-firmware-pico/_deps/picotool-src/lib/oofatfs/src/ff.c:5340:        fp->fptr += rcnt, *bf += rcnt, btf -= rcnt) {
+./build-firmware-pico/_deps/picotool-src/lib/oofatfs/src/ff.c:5341:        csect = (UINT)(fp->fptr / SS(fs) & (fs->csize - 1));    /* Sector offset in the cluster */
+./build-firmware-pico/_deps/picotool-src/lib/oofatfs/src/ff.c:5342:        if (fp->fptr % SS(fs) == 0) {               /* On the sector boundary? */
+./build-firmware-pico/_deps/picotool-src/lib/oofatfs/src/ff.c:5344:                clst = (fp->fptr == 0) ?            /* On the top of the file? */
+./build-firmware-pico/_deps/picotool-src/lib/oofatfs/src/ff.c:5370:        rcnt = SS(fs) - (UINT)fp->fptr % SS(fs);    /* Number of bytes left in the sector */
+./build-firmware-pico/_deps/picotool-src/lib/oofatfs/src/ff.c:5372:        rcnt = (*func)(dbuf + ((UINT)fp->fptr % SS(fs)), rcnt); /* Forward the file data */
+./build-firmware-pico/_deps/picotool-src/lib/oofatfs/src/ff.h:201:    FSIZE_t fptr;           /* File read/write pointer (Zeroed on file open) */
+./build-firmware-pico/_deps/picotool-src/lib/oofatfs/src/ff.h:202:    DWORD   clust;          /* Current cluster of fpter (invalid when fptr is 0) */
+./build-firmware-pico/_deps/picotool-src/lib/oofatfs/src/ff.h:316:#define f_eof(fp) ((int)((fp)->fptr == (fp)->obj.objsize))
+./build-firmware-pico/_deps/picotool-src/lib/oofatfs/src/ff.h:318:#define f_tell(fp) ((fp)->fptr)
+./build-firmware-pico/_deps/picotool-src/lib/whereami/whereami.c:277:        uint64_t addr = (uintptr_t)WAI_RETURN_ADDRESS();
+./source/firmware_pico/t425_flash_rp2040_real.c:14:static uintptr_t cfg_start(void) { return (uintptr_t)&__t425_config_start__; }
+./source/firmware_pico/t425_flash_rp2040_real.c:15:static uintptr_t cfg_end(void)   { return (uintptr_t)&__t425_config_end__; }
+./source/firmware_pico/t425_flash_rp2040_real.c:18:    uintptr_t s=cfg_start(), e=cfg_end();
+./source/firmware_pico/t425_flash_rp2040_real.c:25:static uintptr_t slot_addr(uint8_t slot) {
+./source/firmware_pico/t425_flash_rp2040_real.c:26:    return cfg_start() + ((uintptr_t)slot * T425_FLASH_SLOT_SIZE);
+./source/firmware_pico/t425_flash_rp2040_real.c:31:    uintptr_t s=slot_addr(slot);
+./source/firmware_pico/t425_config_address.h:7:static inline uintptr_t t425_config_flash_base(void) {
+./source/firmware_pico/t425_config_address.h:8:    return (uintptr_t)&__t425_config_start__;
+./source/firmware_pico/t425_config_address.h:11:static inline uintptr_t t425_config_flash_end(void) {
+./source/firmware_pico/t425_config_address.h:12:    return (uintptr_t)&__t425_config_end__;
+./source/firmware_pico/t425_flash_hw_real_contract.c:12:    uintptr_t start=t425_config_flash_base();
+./source/firmware_pico/t425_flash_hw_real_contract.c:13:    uintptr_t end=t425_config_flash_end();
+./source/firmware_pico/t425_memory_map_test.c:8:    uintptr_t a=t425_config_flash_base();
+./source/firmware_pico/t425_memory_map_test.c:9:    uintptr_t b=t425_config_flash_end();
+./source/firmware_pico/t425_flash_layout_check.c:15:    uintptr_t s=(uintptr_t)&__t425_config_start__;
+./source/firmware_pico/t425_flash_layout_check.c:16:    uintptr_t e=(uintptr_t)&__t425_config_end__;
+./analysis/F05_saida.txt:374:===== 3. MICROCODE / UCODE / REGISTRADORES ARQUITETURAIS =====
+./analysis/F05_saida.txt:375:./build-firmware-pico/_deps/picotool-src/enc_bootloader/aes.S:891:@ vpermA=Aptr[4]>>30, vpermB=Bptr[4]>>30, and
+./analysis/F05_saida.txt:376:./build-firmware-pico/_deps/picotool-src/enc_bootloader/aes.S:893:@ roundkey shareB(i) = Bptr[i+vpermB mod 4] ror ((i+vpermB mod 4)^th byte of Bptr[4])+16
+./analysis/F05_saida.txt:377:./build-firmware-pico/_deps/picotool-src/enc_bootloader/aes.S:1018:@ vpermA=Aptr[4]>>30, vpermB=Bptr[4]>>30, and
+./analysis/F05_saida.txt:378:./build-firmware-pico/_deps/picotool-src/enc_bootloader/aes.S:1020:@ roundkey shareB(i) = Bptr[i+vpermB mod 4] ror ((i+vpermB mod 4)^th byte of Bptr[4])+16
+./analysis/F05_saida.txt:379:./build-firmware-pico/_deps/picotool-src/enc_bootloader/aes.S:1626:@ vpermA=Aptr[4]>>30, vpermB=Bptr[4]>>30, and
+./analysis/F05_saida.txt:380:./build-firmware-pico/_deps/picotool-src/enc_bootloader/aes.S:1628:@ roundkey shareB(i) = Bptr[i+vpermB mod 4] ror #((i+vpermB mod 4)^th byte of Bptr[4])+16
+./analysis/F05_saida.txt:381:./build-firmware-pico/_deps/picotool-src/enc_bootloader/aes.S:1861: @ r0=chaff+16, r3=statevperm, r4-r11=state, r12=roundkeyBptr
+./analysis/F05_saida.txt:382:./build-firmware-pico/_deps/picotool-src/lib/littlefs/lfs.c:5982:            (void*)(uintptr_t)cfg->read, (void*)(uintptr_t)cfg->prog,
+./analysis/F05_saida.txt:383:./build-firmware-pico/_deps/picotool-src/lib/littlefs/lfs.c:5983:            (void*)(uintptr_t)cfg->erase, (void*)(uintptr_t)cfg->sync,
+./analysis/F05_saida.txt:384:./build-firmware-pico/_deps/picotool-src/lib/littlefs/lfs.c:6012:            (void*)(uintptr_t)cfg->read, (void*)(uintptr_t)cfg->prog,
+./analysis/F05_saida.txt:385:./build-firmware-pico/_deps/picotool-src/lib/littlefs/lfs.c:6013:            (void*)(uintptr_t)cfg->erase, (void*)(uintptr_t)cfg->sync,
+./analysis/F05_saida.txt:386:./build-firmware-pico/_deps/picotool-src/lib/littlefs/lfs.c:6458:            (void*)lfs, (void*)(uintptr_t)cb, data);
+./analysis/F05_saida.txt:387:./build-firmware-pico/_deps/picotool-src/lib/littlefs/lfs.c:6531:            (void*)(uintptr_t)cfg->read, (void*)(uintptr_t)cfg->prog,
+./analysis/F05_saida.txt:388:./build-firmware-pico/_deps/picotool-src/lib/littlefs/lfs.c:6532:            (void*)(uintptr_t)cfg->erase, (void*)(uintptr_t)cfg->sync,
+./analysis/F05_saida.txt:389:./build-firmware-pico/_deps/picotool-src/lib/nlohmann_json/single_include/nlohmann/json.hpp:2097:#if defined(__INTPTR_TYPE__)
+./analysis/F05_saida.txt:390:./build-firmware-pico/_deps/picotool-src/lib/nlohmann_json/single_include/nlohmann/json.hpp:2098:    #define JSON_HEDLEY_IS_CONSTEXPR_(expr) __builtin_types_compatible_p(__typeof__((1 ? (void*) ((__INTPTR_TYPE__) ((expr) * 0)) : (int*) 0)), int*)
+./analysis/F05_saida.txt:391:./build-firmware-pico/_deps/picotool-src/lib/nlohmann_json/single_include/nlohmann/json.hpp:2101:    #define JSON_HEDLEY_IS_CONSTEXPR_(expr) __builtin_types_compatible_p(__typeof__((1 ? (void*) ((intptr_t) ((expr) * 0)) : (int*) 0)), int*)
+./analysis/F05_saida.txt:392:./build-firmware-pico/_deps/picotool-src/lib/nlohmann_json/single_include/nlohmann/json.hpp:2114:#if defined(__INTPTR_TYPE__)
+./analysis/F05_saida.txt:393:./build-firmware-pico/_deps/picotool-src/lib/nlohmann_json/single_include/nlohmann/json.hpp:2115:    #define JSON_HEDLEY_IS_CONSTEXPR_(expr) _Generic((1 ? (void*) ((__INTPTR_TYPE__) ((expr) * 0)) : (int*) 0), int*: 1, void*: 0)
+./analysis/F05_saida.txt:394:./build-firmware-pico/_deps/picotool-src/lib/nlohmann_json/single_include/nlohmann/json.hpp:2118:    #define JSON_HEDLEY_IS_CONSTEXPR_(expr) _Generic((1 ? (void*) ((intptr_t) * 0) : (int*) 0), int*: 1, void*: 0)
+./analysis/F05_saida.txt:395:./build-firmware-pico/_deps/picotool-src/lib/oofatfs/src/ff.c:3569:            fp->fptr = 0;           /* Set file pointer top of the file */
+./analysis/F05_saida.txt:396:./build-firmware-pico/_deps/picotool-src/lib/oofatfs/src/ff.c:3575:                fp->fptr = fp->obj.objsize;         /* Offset to seek */
+./analysis/F05_saida.txt:397:./build-firmware-pico/_deps/picotool-src/lib/oofatfs/src/ff.c:3632:    remain = fp->obj.objsize - fp->fptr;
+./analysis/F05_saida.txt:398:./build-firmware-pico/_deps/picotool-src/lib/oofatfs/src/ff.c:3636:        btr -= rcnt, *br += rcnt, rbuff += rcnt, fp->fptr += rcnt) {
+./analysis/F05_saida.txt:399:./build-firmware-pico/_deps/picotool-src/lib/oofatfs/src/ff.c:3637:        if (fp->fptr % SS(fs) == 0) {           /* On the sector boundary? */
+./analysis/F05_saida.txt:400:./build-firmware-pico/_deps/picotool-src/lib/oofatfs/src/ff.c:3638:            csect = (UINT)(fp->fptr / SS(fs) & (fs->csize - 1));    /* Sector offset in the cluster */
+./analysis/F05_saida.txt:401:./build-firmware-pico/_deps/picotool-src/lib/oofatfs/src/ff.c:3640:                if (fp->fptr == 0) {            /* On the top of the file? */
+./analysis/F05_saida.txt:402:./build-firmware-pico/_deps/picotool-src/lib/oofatfs/src/ff.c:3645:                        clst = clmt_clust(fp, fp->fptr);    /* Get cluster# from the CLMT */
+./analysis/F05_saida.txt:403:./build-firmware-pico/_deps/picotool-src/lib/oofatfs/src/ff.c:3692:        rcnt = SS(fs) - (UINT)fp->fptr % SS(fs);    /* Number of bytes left in the sector */
+./analysis/F05_saida.txt:404:./build-firmware-pico/_deps/picotool-src/lib/oofatfs/src/ff.c:3696:        mem_cpy(rbuff, fs->win + fp->fptr % SS(fs), rcnt);  /* Extract partial sector */
+./analysis/F05_saida.txt:405:./build-firmware-pico/_deps/picotool-src/lib/oofatfs/src/ff.c:3698:        mem_cpy(rbuff, fp->buf + fp->fptr % SS(fs), rcnt);  /* Extract partial sector */
+./analysis/F05_saida.txt:406:./build-firmware-pico/_deps/picotool-src/lib/oofatfs/src/ff.c:3732:    /* Check fptr wrap-around (file size cannot reach 4 GiB at FAT volume) */
+./analysis/F05_saida.txt:407:./build-firmware-pico/_deps/picotool-src/lib/oofatfs/src/ff.c:3733:    if ((!FF_FS_EXFAT || fs->fs_type != FS_EXFAT) && (DWORD)(fp->fptr + btw) < (DWORD)fp->fptr) {
+./analysis/F05_saida.txt:408:./build-firmware-pico/_deps/picotool-src/lib/oofatfs/src/ff.c:3734:        btw = (UINT)(0xFFFFFFFF - (DWORD)fp->fptr);
+./analysis/F05_saida.txt:409:./build-firmware-pico/_deps/picotool-src/lib/oofatfs/src/ff.c:3738:        btw -= wcnt, *bw += wcnt, wbuff += wcnt, fp->fptr += wcnt, fp->obj.objsize = (fp->fptr > fp->obj.objsize) ? fp->fptr : fp->obj.objsize) {
+./analysis/F05_saida.txt:410:./build-firmware-pico/_deps/picotool-src/lib/oofatfs/src/ff.c:3739:        if (fp->fptr % SS(fs) == 0) {       /* On the sector boundary? */
+./analysis/F05_saida.txt:411:./build-firmware-pico/_deps/picotool-src/lib/oofatfs/src/ff.c:3740:            csect = (UINT)(fp->fptr / SS(fs)) & (fs->csize - 1);    /* Sector offset in the cluster */
+./analysis/F05_saida.txt:412:./build-firmware-pico/_deps/picotool-src/lib/oofatfs/src/ff.c:3742:                if (fp->fptr == 0) {        /* On the top of the file? */
+./analysis/F05_saida.txt:413:./build-firmware-pico/_deps/picotool-src/lib/oofatfs/src/ff.c:3750:                        clst = clmt_clust(fp, fp->fptr);    /* Get cluster# from the CLMT */
+./analysis/F05_saida.txt:414:./build-firmware-pico/_deps/picotool-src/lib/oofatfs/src/ff.c:3797:            if (fp->fptr >= fp->obj.objsize) {  /* Avoid silly cache filling on the growing edge */
+./analysis/F05_saida.txt:415:./build-firmware-pico/_deps/picotool-src/lib/oofatfs/src/ff.c:3803:                fp->fptr < fp->obj.objsize &&
+./analysis/F05_saida.txt:416:./build-firmware-pico/_deps/picotool-src/lib/oofatfs/src/ff.c:3810:        wcnt = SS(fs) - (UINT)fp->fptr % SS(fs);    /* Number of bytes left in the sector */
+./analysis/F05_saida.txt:417:./build-firmware-pico/_deps/picotool-src/lib/oofatfs/src/ff.c:3814:        mem_cpy(fs->win + fp->fptr % SS(fs), wbuff, wcnt);  /* Fit data to the sector */
+./analysis/F05_saida.txt:418:./build-firmware-pico/_deps/picotool-src/lib/oofatfs/src/ff.c:3817:        mem_cpy(fp->buf + fp->fptr % SS(fs), wbuff, wcnt);  /* Fit data to the sector */
+./analysis/F05_saida.txt:419:./build-firmware-pico/_deps/picotool-src/lib/oofatfs/src/ff.c:4121:    FSIZE_t ifptr;
+./analysis/F05_saida.txt:420:./build-firmware-pico/_deps/picotool-src/lib/oofatfs/src/ff.c:4164:            fp->fptr = ofs;             /* Set file pointer */
+./analysis/F05_saida.txt:421:./build-firmware-pico/_deps/picotool-src/lib/oofatfs/src/ff.c:4170:                if (fp->fptr % SS(fs) && dsc != fp->sect) { /* Refill sector cache if needed */
+./analysis/F05_saida.txt:422:./build-firmware-pico/_deps/picotool-src/lib/oofatfs/src/ff.c:4195:        ifptr = fp->fptr;
+./analysis/F05_saida.txt:423:./build-firmware-pico/_deps/picotool-src/lib/oofatfs/src/ff.c:4196:        fp->fptr = nsect = 0;
+./analysis/F05_saida.txt:424:./build-firmware-pico/_deps/picotool-src/lib/oofatfs/src/ff.c:4199:            if (ifptr > 0 &&
+./analysis/F05_saida.txt:425:./build-firmware-pico/_deps/picotool-src/lib/oofatfs/src/ff.c:4200:                (ofs - 1) / bcs >= (ifptr - 1) / bcs) { /* When seek to same or following cluster, */
+./analysis/F05_saida.txt:426:./build-firmware-pico/_deps/picotool-src/lib/oofatfs/src/ff.c:4201:                fp->fptr = (ifptr - 1) & ~(FSIZE_t)(bcs - 1);   /* start from the current cluster */
+./analysis/F05_saida.txt:427:./build-firmware-pico/_deps/picotool-src/lib/oofatfs/src/ff.c:4202:                ofs -= fp->fptr;
+./analysis/F05_saida.txt:428:./build-firmware-pico/_deps/picotool-src/lib/oofatfs/src/ff.c:4218:                    ofs -= bcs; fp->fptr += bcs;
+./analysis/F05_saida.txt:429:./build-firmware-pico/_deps/picotool-src/lib/oofatfs/src/ff.c:4221:                        if (FF_FS_EXFAT && fp->fptr > fp->obj.objsize) {    /* No FAT chain object needs correct objsize to generate FAT value */
+./analysis/F05_saida.txt:430:./build-firmware-pico/_deps/picotool-src/lib/oofatfs/src/ff.c:4222:                            fp->obj.objsize = fp->fptr;
+./analysis/F05_saida.txt:431:./build-firmware-pico/_deps/picotool-src/lib/oofatfs/src/ff.c:4238:                fp->fptr += ofs;
+./analysis/F05_saida.txt:432:./build-firmware-pico/_deps/picotool-src/lib/oofatfs/src/ff.c:4246:        if (!FF_FS_READONLY && fp->fptr > fp->obj.objsize) {    /* Set file change flag if the file size is extended */
+./analysis/F05_saida.txt:433:./build-firmware-pico/_deps/picotool-src/lib/oofatfs/src/ff.c:4247:            fp->obj.objsize = fp->fptr;
+./analysis/F05_saida.txt:434:./build-firmware-pico/_deps/picotool-src/lib/oofatfs/src/ff.c:4250:        if (fp->fptr % SS(fs) && nsect != fp->sect) {   /* Fill sector cache if needed */
+./analysis/F05_saida.txt:435:./build-firmware-pico/_deps/picotool-src/lib/oofatfs/src/ff.c:4594:    if (fp->fptr < fp->obj.objsize) {   /* Process when fptr is not on the eof */
+./analysis/F05_saida.txt:436:./build-firmware-pico/_deps/picotool-src/lib/oofatfs/src/ff.c:4595:        if (fp->fptr == 0) {    /* When set file size to zero, remove entire cluster chain */
+./analysis/F05_saida.txt:437:./build-firmware-pico/_deps/picotool-src/lib/oofatfs/src/ff.c:4607:        fp->obj.objsize = fp->fptr; /* Set file size to current read/write point */
+./analysis/F05_saida.txt:438:./build-firmware-pico/_deps/picotool-src/lib/oofatfs/src/ff.c:5336:    remain = fp->obj.objsize - fp->fptr;
+./analysis/F05_saida.txt:439:./build-firmware-pico/_deps/picotool-src/lib/oofatfs/src/ff.c:5340:        fp->fptr += rcnt, *bf += rcnt, btf -= rcnt) {
+./analysis/F05_saida.txt:440:./build-firmware-pico/_deps/picotool-src/lib/oofatfs/src/ff.c:5341:        csect = (UINT)(fp->fptr / SS(fs) & (fs->csize - 1));    /* Sector offset in the cluster */
+./analysis/F05_saida.txt:441:./build-firmware-pico/_deps/picotool-src/lib/oofatfs/src/ff.c:5342:        if (fp->fptr % SS(fs) == 0) {               /* On the sector boundary? */
+./analysis/F05_saida.txt:442:./build-firmware-pico/_deps/picotool-src/lib/oofatfs/src/ff.c:5344:                clst = (fp->fptr == 0) ?            /* On the top of the file? */
+./analysis/F05_saida.txt:443:./build-firmware-pico/_deps/picotool-src/lib/oofatfs/src/ff.c:5370:        rcnt = SS(fs) - (UINT)fp->fptr % SS(fs);    /* Number of bytes left in the sector */
+./analysis/F05_saida.txt:444:./build-firmware-pico/_deps/picotool-src/lib/oofatfs/src/ff.c:5372:        rcnt = (*func)(dbuf + ((UINT)fp->fptr % SS(fs)), rcnt); /* Forward the file data */
+./analysis/F05_saida.txt:445:./build-firmware-pico/_deps/picotool-src/lib/oofatfs/src/ff.h:201:    FSIZE_t fptr;           /* File read/write pointer (Zeroed on file open) */
+./analysis/F05_saida.txt:446:./build-firmware-pico/_deps/picotool-src/lib/oofatfs/src/ff.h:202:    DWORD   clust;          /* Current cluster of fpter (invalid when fptr is 0) */
+./analysis/F05_saida.txt:447:./build-firmware-pico/_deps/picotool-src/lib/oofatfs/src/ff.h:316:#define f_eof(fp) ((int)((fp)->fptr == (fp)->obj.objsize))
+./analysis/F05_saida.txt:448:./build-firmware-pico/_deps/picotool-src/lib/oofatfs/src/ff.h:318:#define f_tell(fp) ((fp)->fptr)
+./analysis/F05_saida.txt:449:./build-firmware-pico/_deps/picotool-src/lib/whereami/whereami.c:277:        uint64_t addr = (uintptr_t)WAI_RETURN_ADDRESS();
+./analysis/F05_saida.txt:450:./source/firmware_pico/t425_flash_rp2040_real.c:14:static uintptr_t cfg_start(void) { return (uintptr_t)&__t425_config_start__; }
+./analysis/F05_saida.txt:451:./source/firmware_pico/t425_flash_rp2040_real.c:15:static uintptr_t cfg_end(void)   { return (uintptr_t)&__t425_config_end__; }
+./analysis/F05_saida.txt:452:./source/firmware_pico/t425_flash_rp2040_real.c:18:    uintptr_t s=cfg_start(), e=cfg_end();
+./analysis/F05_saida.txt:453:./source/firmware_pico/t425_flash_rp2040_real.c:25:static uintptr_t slot_addr(uint8_t slot) {
+./analysis/F05_saida.txt:454:./source/firmware_pico/t425_flash_rp2040_real.c:26:    return cfg_start() + ((uintptr_t)slot * T425_FLASH_SLOT_SIZE);
+./analysis/F05_saida.txt:455:./source/firmware_pico/t425_flash_rp2040_real.c:31:    uintptr_t s=slot_addr(slot);
+./analysis/F05_saida.txt:456:./source/firmware_pico/t425_config_address.h:7:static inline uintptr_t t425_config_flash_base(void) {
+./analysis/F05_saida.txt:457:./source/firmware_pico/t425_config_address.h:8:    return (uintptr_t)&__t425_config_start__;
+./analysis/F05_saida.txt:458:./source/firmware_pico/t425_config_address.h:11:static inline uintptr_t t425_config_flash_end(void) {
+./analysis/F05_saida.txt:459:./source/firmware_pico/t425_config_address.h:12:    return (uintptr_t)&__t425_config_end__;
+./analysis/F05_saida.txt:460:./source/firmware_pico/t425_flash_hw_real_contract.c:12:    uintptr_t start=t425_config_flash_base();
+./analysis/F05_saida.txt:461:./source/firmware_pico/t425_flash_hw_real_contract.c:13:    uintptr_t end=t425_config_flash_end();
+./analysis/F05_saida.txt:462:./source/firmware_pico/t425_memory_map_test.c:8:    uintptr_t a=t425_config_flash_base();
+./analysis/F05_saida.txt:463:./source/firmware_pico/t425_memory_map_test.c:9:    uintptr_t b=t425_
+./build-firmware/_deps/picotool-src/enc_bootloader/aes.S:891:@ vpermA=Aptr[4]>>30, vpermB=Bptr[4]>>30, and
+./build-firmware/_deps/picotool-src/enc_bootloader/aes.S:893:@ roundkey shareB(i) = Bptr[i+vpermB mod 4] ror ((i+vpermB mod 4)^th byte of Bptr[4])+16
+./build-firmware/_deps/picotool-src/enc_bootloader/aes.S:1018:@ vpermA=Aptr[4]>>30, vpermB=Bptr[4]>>30, and
+./build-firmware/_deps/picotool-src/enc_bootloader/aes.S:1020:@ roundkey shareB(i) = Bptr[i+vpermB mod 4] ror ((i+vpermB mod 4)^th byte of Bptr[4])+16
+./build-firmware/_deps/picotool-src/enc_bootloader/aes.S:1626:@ vpermA=Aptr[4]>>30, vpermB=Bptr[4]>>30, and
+./build-firmware/_deps/picotool-src/enc_bootloader/aes.S:1628:@ roundkey shareB(i) = Bptr[i+vpermB mod 4] ror #((i+vpermB mod 4)^th byte of Bptr[4])+16
+./build-firmware/_deps/picotool-src/enc_bootloader/aes.S:1861: @ r0=chaff+16, r3=statevperm, r4-r11=state, r12=roundkeyBptr
+./build-firmware/_deps/picotool-src/lib/littlefs/lfs.c:5982:            (void*)(uintptr_t)cfg->read, (void*)(uintptr_t)cfg->prog,
+./build-firmware/_deps/picotool-src/lib/littlefs/lfs.c:5983:            (void*)(uintptr_t)cfg->erase, (void*)(uintptr_t)cfg->sync,
+./build-firmware/_deps/picotool-src/lib/littlefs/lfs.c:6012:            (void*)(uintptr_t)cfg->read, (void*)(uintptr_t)cfg->prog,
+./build-firmware/_deps/picotool-src/lib/littlefs/lfs.c:6013:            (void*)(uintptr_t)cfg->erase, (void*)(uintptr_t)cfg->sync,
+./build-firmware/_deps/picotool-src/lib/littlefs/lfs.c:6458:            (void*)lfs, (void*)(uintptr_t)cb, data);
+./build-firmware/_deps/picotool-src/lib/littlefs/lfs.c:6531:            (void*)(uintptr_t)cfg->read, (void*)(uintptr_t)cfg->prog,
+./build-firmware/_deps/picotool-src/lib/littlefs/lfs.c:6532:            (void*)(uintptr_t)cfg->erase, (void*)(uintptr_t)cfg->sync,
+./build-firmware/_deps/picotool-src/lib/nlohmann_json/single_include/nlohmann/json.hpp:2097:#if defined(__INTPTR_TYPE__)
+./build-firmware/_deps/picotool-src/lib/nlohmann_json/single_include/nlohmann/json.hpp:2098:    #define JSON_HEDLEY_IS_CONSTEXPR_(expr) __builtin_types_compatible_p(__typeof__((1 ? (void*) ((__INTPTR_TYPE__) ((expr) * 0)) : (int*) 0)), int*)
+./build-firmware/_deps/picotool-src/lib/nlohmann_json/single_include/nlohmann/json.hpp:2101:    #define JSON_HEDLEY_IS_CONSTEXPR_(expr) __builtin_types_compatible_p(__typeof__((1 ? (void*) ((intptr_t) ((expr) * 0)) : (int*) 0)), int*)
+./build-firmware/_deps/picotool-src/lib/nlohmann_json/single_include/nlohmann/json.hpp:2114:#if defined(__INTPTR_TYPE__)
+./build-firmware/_deps/picotool-src/lib/nlohmann_json/single_include/nlohmann/json.hpp:2115:    #define JSON_HEDLEY_IS_CONSTEXPR_(expr) _Generic((1 ? (void*) ((__INTPTR_TYPE__) ((expr) * 0)) : (int*) 0), int*: 1, void*: 0)
+./build-firmware/_deps/picotool-src/lib/nlohmann_json/single_include/nlohmann/json.hpp:2118:    #define JSON_HEDLEY_IS_CONSTEXPR_(expr) _Generic((1 ? (void*) ((intptr_t) * 0) : (int*) 0), int*: 1, void*: 0)
+./build-firmware/_deps/picotool-src/lib/oofatfs/src/ff.c:3569:            fp->fptr = 0;           /* Set file pointer top of the file */
+./build-firmware/_deps/picotool-src/lib/oofatfs/src/ff.c:3575:                fp->fptr = fp->obj.objsize;         /* Offset to seek */
+./build-firmware/_deps/picotool-src/lib/oofatfs/src/ff.c:3632:    remain = fp->obj.objsize - fp->fptr;
+./build-firmware/_deps/picotool-src/lib/oofatfs/src/ff.c:3636:        btr -= rcnt, *br += rcnt, rbuff += rcnt, fp->fptr += rcnt) {
+./build-firmware/_deps/picotool-src/lib/oofatfs/src/ff.c:3637:        if (fp->fptr % SS(fs) == 0) {           /* On the sector boundary? */
+./build-firmware/_deps/picotool-src/lib/oofatfs/src/ff.c:3638:            csect = (UINT)(fp->fptr / SS(fs) & (fs->csize - 1));    /* Sector offset in the cluster */
+./build-firmware/_deps/picotool-src/lib/oofatfs/src/ff.c:3640:                if (fp->fptr == 0) {            /* On the top of the file? */
+./build-firmware/_deps/picotool-src/lib/oofatfs/src/ff.c:3645:                        clst = clmt_clust(fp, fp->fptr);    /* Get cluster# from the CLMT */
+./build-firmware/_deps/picotool-src/lib/oofatfs/src/ff.c:3692:        rcnt = SS(fs) - (UINT)fp->fptr % SS(fs);    /* Number of bytes left in the sector */
+./build-firmware/_deps/picotool-src/lib/oofatfs/src/ff.c:3696:        mem_cpy(rbuff, fs->win + fp->fptr % SS(fs), rcnt);  /* Extract partial sector */
+./build-firmware/_deps/picotool-src/lib/oofatfs/src/ff.c:3698:        mem_cpy(rbuff, fp->buf + fp->fptr % SS(fs), rcnt);  /* Extract partial sector */
+./build-firmware/_deps/picotool-src/lib/oofatfs/src/ff.c:3732:    /* Check fptr wrap-around (file size cannot reach 4 GiB at FAT volume) */
+./build-firmware/_deps/picotool-src/lib/oofatfs/src/ff.c:3733:    if ((!FF_FS_EXFAT || fs->fs_type != FS_EXFAT) && (DWORD)(fp->fptr + btw) < (DWORD)fp->fptr) {
+./build-firmware/_deps/picotool-src/lib/oofatfs/src/ff.c:3734:        btw = (UINT)(0xFFFFFFFF - (DWORD)fp->fptr);
+./build-firmware/_deps/picotool-src/lib/oofatfs/src/ff.c:3738:        btw -= wcnt, *bw += wcnt, wbuff += wcnt, fp->fptr += wcnt, fp->obj.objsize = (fp->fptr > fp->obj.objsize) ? fp->fptr : fp->obj.objsize) {
+./build-firmware/_deps/picotool-src/lib/oofatfs/src/ff.c:3739:        if (fp->fptr % SS(fs) == 0) {       /* On the sector boundary? */
+./build-firmware/_deps/picotool-src/lib/oofatfs/src/ff.c:3740:            csect = (UINT)(fp->fptr / SS(fs)) & (fs->csize - 1);    /* Sector offset in the cluster */
+./build-firmware/_deps/picotool-src/lib/oofatfs/src/ff.c:3742:                if (fp->fptr == 0) {        /* On the top of the file? */
+./build-firmware/_deps/picotool-src/lib/oofatfs/src/ff.c:3750:                        clst = clmt_clust(fp, fp->fptr);    /* Get cluster# from the CLMT */
+./build-firmware/_deps/picotool-src/lib/oofatfs/src/ff.c:3797:            if (fp->fptr >= fp->obj.objsize) {  /* Avoid silly cache filling on the growing edge */
+./build-firmware/_deps/picotool-src/lib/oofatfs/src/ff.c:3803:                fp->fptr < fp->obj.objsize &&
+./build-firmware/_deps/picotool-src/lib/oofatfs/src/ff.c:3810:        wcnt = SS(fs) - (UINT)fp->fptr % SS(fs);    /* Number of bytes left in the sector */
+./build-firmware/_deps/picotool-src/lib/oofatfs/src/ff.c:3814:        mem_cpy(fs->win + fp->fptr % SS(fs), wbuff, wcnt);  /* Fit data to the sector */
+./build-firmware/_deps/picotool-src/lib/oofatfs/src/ff.c:3817:        mem_cpy(fp->buf + fp->fptr % SS(fs), wbuff, wcnt);  /* Fit data to the sector */
+./build-firmware/_deps/picotool-src/lib/oofatfs/src/ff.c:4121:    FSIZE_t ifptr;
+./build-firmware/_deps/picotool-src/lib/oofatfs/src/ff.c:4164:            fp->fptr = ofs;             /* Set file pointer */
+./build-firmware/_deps/picotool-src/lib/oofatfs/src/ff.c:4170:                if (fp->fptr % SS(fs) && dsc != fp->sect) { /* Refill sector cache if needed */
+./build-firmware/_deps/picotool-src/lib/oofatfs/src/ff.c:4195:        ifptr = fp->fptr;
+./build-firmware/_deps/picotool-src/lib/oofatfs/src/ff.c:4196:        fp->fptr = nsect = 0;
+./build-firmware/_deps/picotool-src/lib/oofatfs/src/ff.c:4199:            if (ifptr > 0 &&
+./build-firmware/_deps/picotool-src/lib/oofatfs/src/ff.c:4200:                (ofs - 1) / bcs >= (ifptr - 1) / bcs) { /* When seek to same or following cluster, */
+./build-firmware/_deps/picotool-src/lib/oofatfs/src/ff.c:4201:                fp->fptr = (ifptr - 1) & ~(FSIZE_t)(bcs - 1);   /* start from the current cluster */
+./build-firmware/_deps/picotool-src/lib/oofatfs/src/ff.c:4202:                ofs -= fp->fptr;
+./build-firmware/_deps/picotool-src/lib/oofatfs/src/ff.c:4218:                    ofs -= bcs; fp->fptr += bcs;
+./build-firmware/_deps/picotool-src/lib/oofatfs/src/ff.c:4221:                        if (FF_FS_EXFAT && fp->fptr > fp->obj.objsize) {    /* No FAT chain object needs correct objsize to generate FAT value */
+./build-firmware/_deps/picotool-src/lib/oofatfs/src/ff.c:4222:                            fp->obj.objsize = fp->fptr;
+./build-firmware/_deps/picotool-src/lib/oofatfs/src/ff.c:4238:                fp->fptr += ofs;
+./build-firmware/_deps/picotool-src/lib/oofatfs/src/ff.c:4246:        if (!FF_FS_READONLY && fp->fptr > fp->obj.objsize) {    /* Set file change flag if the file size is extended */
+./build-firmware/_deps/picotool-src/lib/oofatfs/src/ff.c:4247:            fp->obj.objsize = fp->fptr;
+./build-firmware/_deps/picotool-src/lib/oofatfs/src/ff.c:4250:        if (fp->fptr % SS(fs) && nsect != fp->sect) {   /* Fill sector cache if needed */
+./build-firmware/_deps/picotool-src/lib/oofatfs/src/ff.c:4594:    if (fp->fptr < fp->obj.objsize) {   /* Process when fptr is not on the eof */
+./build-firmware/_deps/picotool-src/lib/oofatfs/src/ff.c:4595:        if (fp->fptr == 0) {    /* When set file size to zero, remove entire cluster chain */
+./build-firmware/_deps/picotool-src/lib/oofatfs/src/ff.c:4607:        fp->obj.objsize = fp->fptr; /* Set file size to current read/write point */
+./build-firmware/_deps/picotool-src/lib/oofatfs/src/ff.c:5336:    remain = fp->obj.objsize - fp->fptr;
+./build-firmware/_deps/picotool-src/lib/oofatfs/src/ff.c:5340:        fp->fptr += rcnt, *bf += rcnt, btf -= rcnt) {
+./build-firmware/_deps/picotool-src/lib/oofatfs/src/ff.c:5341:        csect = (UINT)(fp->fptr / SS(fs) & (fs->csize - 1));    /* Sector offset in the cluster */
+./build-firmware/_deps/picotool-src/lib/oofatfs/src/ff.c:5342:        if (fp->fptr % SS(fs) == 0) {               /* On the sector boundary? */
+./build-firmware/_deps/picotool-src/lib/oofatfs/src/ff.c:5344:                clst = (fp->fptr == 0) ?            /* On the top of the file? */
+./build-firmware/_deps/picotool-src/lib/oofatfs/src/ff.c:5370:        rcnt = SS(fs) - (UINT)fp->fptr % SS(fs);    /* Number of bytes left in the sector */
+./build-firmware/_deps/picotool-src/lib/oofatfs/src/ff.c:5372:        rcnt = (*func)(dbuf + ((UINT)fp->fptr % SS(fs)), rcnt); /* Forward the file data */
+./build-firmware/_deps/picotool-src/lib/oofatfs/src/ff.h:201:    FSIZE_t fptr;           /* File read/write pointer (Zeroed on file open) */
+./build-firmware/_deps/picotool-src/lib/oofatfs/src/ff.h:202:    DWORD   clust;          /* Current cluster of fpter (invalid when fptr is 0) */
+./build-firmware/_deps/picotool-src/lib/oofatfs/src/ff.h:316:#define f_eof(fp) ((int)((fp)->fptr == (fp)->obj.objsize))
+./build-firmware/_deps/picotool-src/lib/oofatfs/src/ff.h:318:#define f_tell(fp) ((fp)->fptr)
+./build-firmware/_deps/picotool-src/lib/whereami/whereami.c:277:        uint64_t addr = (uintptr_t)WAI_RETURN_ADDRESS();
+
+===== 4. MODELO DE PROCESSO / WORKSPACE =====
+source/docs/V2_17_PHYSICAL_LINK.md:21:envia um frame de teste no LINK1. O receptor valida CRC e responde com `ACK`.
+source/docs/V2_17_PHYSICAL_LINK.md:58:Isso evita mascarar falhas de hardware com a complexidade do protocolo completo.
+source/docs/V2_81_ACCEPTANCE.md:15:- [ ] hardware boot
+source/docs/V2_81_ACCEPTANCE.md:17:- [ ] power-loss
+source/docs/V2_43_TEST_PLAN.md:7:Esperado:
+source/docs/V2_43_TEST_PLAN.md:27:Esperado:
+source/docs/V2_43_TEST_PLAN.md:30:ACTION = FORWARD
+source/docs/V2_43_TEST_PLAN.md:41:Esperado:
+source/docs/V2_78_BUILD_GATE.md:10:Comandos esperados:
+source/docs/V2_78_BUILD_GATE.md:13:cmake -S firmware_pico -B build -DPICO_BOARD=pico
+source/docs/V2_78_BUILD_GATE.md:25:O `.map` deve mostrar firmware limitado a 2 MiB - 8192 e os símbolos:
+source/docs/V2_41_SEQUENCE_DUPLICATES.md:38:A versão ainda usa stop-and-wait, portanto OOO deve ser zero em operação normal.
+source/docs/HOST_TEST_RESULTS_V2_21.txt:2:FORWARDED=0 DELIVERED=0 DROP_TTL=0 DROP_NOROUTE=0
+source/docs/HOST_TEST_RESULTS_V2_21.txt:8:SEND DEST=3 SOURCE=0 SEQ=1 LEN=5 WIRE=16
+source/docs/HOST_TEST_RESULTS_V2_21.txt:10:ERR UNKNOWN
+source/docs/V2_83_ACCEPTANCE.md:15:- [ ] hardware;
+source/docs/V2_83_ACCEPTANCE.md:16:- [ ] power-loss.
+source/docs/V2_62_ACCEPTANCE.md:14:- [ ] power-loss.
+source/docs/V2_78_FLASH_SEMANTICS.md:16:espaço não ocupado pelo registro.
+source/docs/V2_63_VERIFY_AND_POWERFAIL.md:1:# V2.63 — verificação e power-fail
+source/docs/V2_63_VERIFY_AND_POWERFAIL.md:26:Resultado esperado:
+source/docs/V2_46_PHYSICAL_MULTIHOP.md:12:Cada Pico usa o mesmo firmware. Apenas `T425_NODE_ID` muda no build.
+source/docs/V2_46_PHYSICAL_MULTIHOP.md:70:telemetria. Não se deve usar os sinais USB como transporte entre os Pico.
+source/docs/V2_45_TEST_PLAN.md:5:Esperado:
+source/docs/V2_45_TEST_PLAN.md:18:Esperado: DROP no segundo encaminhamento.
+source/docs/V2_45_TEST_PLAN.md:24:Esperado: ROUTE DROP.
+source/docs/V2_45_TEST_PLAN.md:31:forward engine
+source/docs/V2_29_PIO_PHY.md:13:Recommended first bench test uses short wires and one dedicated GPIO pair per direction.
+source/docs/V2_29_PIO_PHY.md:20:Transport + CRC
+source/docs/V2_29_PIO_PHY.md:29:The PIO layer is intentionally isolated. It accepts the already serialized Transport frame; it does not interpret routing, ACKs, or OCCAM channels.
+source/docs/V2_29_PIO_PHY.md:33:v2.29 adds the RP2040-facing API and PIO program, but this environment does not have a connected RP2040 board available for electrical validation. Therefore this version is **source-integrated, not hardware-validated**.
+source/docs/V2_29_PIO_PHY.md:35:The RX path remains a stable API placeholder until the TX waveform and framing are validated on the bench. Do not claim a P00↔P01 physical link is operational until that test is performed.
+source/docs/V2_46_BUILD_AND_RUN.md:5:Usar o mesmo firmware com:
+source/docs/V2_46_BUILD_AND_RUN.md:28:t425_forward.c
+source/docs/V2_46_BUILD_AND_RUN.md:31:e os headers correspondentes.
+source/docs/V2_46_BUILD_AND_RUN.md:46:FWD > 0
+source/docs/HOST_TEST_RESULTS_V2_12.txt:2:Host build: -std=c11 -Wall -Wextra -Werror
+source/docs/HOST_TEST_RESULTS_V2_12.txt:3:PIO/SDK firmware build: requires RP2040 Pico SDK environment.
+source/docs/V2_7_LINK_STACK.md:38:A entrega atual é um modelo de host determinístico. O transporte físico PIO será conectado a estas funções após a validação do enlace P00↔P01.
+source/docs/V2_84_LINKER_ARITHMETIC.md:7:- Flash de firmware: `2,088,960` bytes = `0x1FE000`
+source/docs/V2_79_BUILD_RESULT.md:42:cmake -S firmware_pico -B build -DPICO_BOARD=pico
+source/docs/V2_79_BUILD_RESULT.md:61:e que nenhum `.text`, `.rodata`, `.data` ou outra seção do firmware ocupa
+source/docs/HOST_TEST_RESULTS_V2_25.txt:1:t425_onehop_v225: /mnt/data/T425_SIM_Pico_Nodes_v2.25/T425_SIM_Pico_Nodes_v2.23/tests/test_onehop.c:29: main: Assertion `a.rl.state==T425_RL2_WAIT_ACK' failed.
+source/docs/V2_54_INTERFACE_MANAGER.md:44:Se IF1 estiver DOWN:
+source/docs/V2_54_INTERFACE_MANAGER.md:56:Ela responde somente:
+source/docs/V2_54_INTERFACE_MANAGER.md:60:Isso mantém Router e hardware desacoplados.
+source/docs/V2_2_HARDWARE_BRINGUP.md:1:# v2.2 — Bring-up de hardware
+source/docs/V2_2_HARDWARE_BRINGUP.md:6:PC/Mac
+source/docs/V2_78_ACCEPTANCE.md:7:- [x] geração sem overflow silencioso;
+source/docs/V2_78_ACCEPTANCE.md:19:- [ ] power-loss.
+source/docs/V2_67_HARDWARE_INTEGRATION.md:1:# V2.67 — integração de hardware
+source/docs/V2_67_HARDWARE_INTEGRATION.md:7:Não foi inventado comportamento de hardware que não esteja presente nos
+source/docs/V2_62_BUILD_INTEGRATION.md:17:firmware
+source/docs/V2_62_BUILD_INTEGRATION.md:33:automática do linker script oficial. A integração final deve respeitar a
+source/docs/STATUS_V04.md:9:- processo com PC, W e prioridade;
+source/docs/STATUS_V04.md:16:A API runtime reproduz o modelo conceitual das operações de processo/canal. A codificação binária completa das instruções OPR e a organização exata dos descritores de workspace do T425 ainda precisam ser fechadas antes de afirmar compatibilidade binária com toolchains INMOS.
+source/docs/V2_65_ONE_FIRMWARE_N_NODES.md:1:# V2.65 — um firmware para N nós
+source/docs/V2_65_ONE_FIRMWARE_N_NODES.md:6:             SAME FIRMWARE IMAGE
+source/docs/V2_65_ONE_FIRMWARE_N_NODES.md:15:Somente parâmetros de hardware/configuração variam por unidade.
+source/docs/V2_65_ONE_FIRMWARE_N_NODES.md:17:O protocolo, scheduler, runtime, Router, transportes e PIO continuam sendo
+source/docs/V2_65_ONE_FIRMWARE_N_NODES.md:18:componentes do mesmo firmware.
+source/docs/HOST_TEST_RESULTS_V2_8.txt:2:Host build: -std=c11 -Wall -Wextra -Werror
+source/docs/V1_8_PLANO_REMOTO.md:21:O transporte deverá reutilizar o reliable link existente, sem duplicar a lógica de ACK/retry.
+source/docs/V2_73_LINKER_AUDIT.md:8:| firmware / rodata / etc.    |
+source/docs/V1_8_RENDEZVOUS.md:8: ├── OUT ──► WAIT_OUT ── IN ──► TRANSFER
+source/docs/V1_8_RENDEZVOUS.md:10: └── IN  ──► WAIT_IN  ── OUT ─► TRANSFER
+source/docs/HOST_TEST_RESULTS_V2_5.txt:2:Host build: -std=c11 -Wall -Wextra -Werror
+source/docs/HOST_TEST_RESULTS_V2_5.txt:3:Physical PIO transport: pending bench validation.
+source/docs/V2_31_BUILD.md:6:pico_generate_pio_header(t425_firmware ${CMAKE_CURRENT_LIST_DIR}/t425_pio_tx.pio)
+source/docs/V2_31_BUILD.md:7:pico_generate_pio_header(t425_firmware ${CMAKE_CURRENT_LIST_DIR}/t425_pio_rx.pio)
+source/docs/HOST_TEST_RESULTS_V2_14.txt:2:Host build: -std=c11 -Wall -Wextra -Werror
+source/docs/HOST_TEST_RESULTS_V2_14.txt:3:Hardware HAL/PIO integration: pending RP2040 SDK build.
+source/docs/V2_33_TIMING_CORRECTION.md:25:O firmware USB também imprime `PIO_CYCLES` para que a configuração possa ser conferida na bancada.
+source/docs/V2_33_TIMING_CORRECTION.md:29:Esta é uma correção de modelo temporal de software. Ainda não constitui validação elétrica. O sinal deve ser medido no analisador lógico antes de declarar o PHY aprovado.
+source/docs/V2_42_RELIABLE_LINK_BASELINE.md:3:A v2.42 consolida a máquina stop-and-wait antes da introdução do Router.
+source/docs/V2_42_RELIABLE_LINK_BASELINE.md:25:WAIT_ACK
+source/docs/V2_21_USB_CONSOLE.md:38:e o serializa através do Transport.
+source/docs/V2_74_MEMORY_MODEL.md:8:    | firmware linkado
+source/docs/V2_74_MEMORY_MODEL.md:21:O firmware não é linkado sobre os últimos 8192 bytes.
+source/docs/V2_74_MEMORY_MODEL.md:23:A Flash física continua sendo 2 MiB; apenas o espaço disponível para o
+source/docs/V2_74_MEMORY_MODEL.md:24:firmware é reduzido em 8192 bytes.
+source/docs/V2_68_TEST_MATRIX.md:3:| Cenário | Resultado esperado |
+source/docs/V2_77_ACCEPTANCE.md:18:- [ ] power-loss.
+source/docs/V2_56_ONE_FIRMWARE_N_NODES.md:1:# T425-SIM v2.56 — um firmware, N nós
+source/docs/V2_56_ONE_FIRMWARE_N_NODES.md:5:> O protocolo não deve conter lógica específica para P00, P01, P02 ou P03.
+source/docs/V2_56_ONE_FIRMWARE_N_NODES.md:7:O firmware comum recebe uma configuração de inicialização:
+source/docs/V2_56_ONE_FIRMWARE_N_NODES.md:25:O mesmo firmware pode ser carregado em:
+source/docs/V2_56_ONE_FIRMWARE_N_NODES.md:43:O firmware pode ser genericamente N-nodes, mas cada nó continua limitado por:
+source/docs/V2_56_ONE_FIRMWARE_N_NODES.md:47:- GPIO disponíveis;
+source/docs/V2_56_ONE_FIRMWARE_N_NODES.md:56:mesmo firmware != recursos físicos infinitos
+source/docs/V2_11_GENERIC_NODE.md:1:# T425-SIM v2.11 — Generic Node Firmware
+source/docs/V2_11_GENERIC_NODE.md:8:                 T425 Generic Firmware
+source/docs/V2_20_NEXT_PHYSICAL_TEST.md:3:Depois de compilar o firmware RP2040 com o Pico SDK:
+source/docs/V1_1_BRINGUP.md:9:4. Carregar firmware de loopback/echo.
+source/docs/V1_1_BRINGUP.md:13:Enviar `PING` P00→P01 e esperar `PONG`.
+source/docs/V2_50_TEST_PROTOCOL.md:9:Esperado:
+source/docs/V2_50_TEST_PROTOCOL.md:21:Esperado:
+source/docs/V2_12_LINK_MANAGER.md:3:A v2.12 introduz o `Link Manager`, responsável por tratar os links habilitados pela tabela de configuração.
+source/docs/V2_12_LINK_MANAGER.md:18:O manager não conhece P00, P01, P02 ou P03 como casos especiais.
+source/docs/V2_12_LINK_MANAGER.md:24:O módulo `t425_link_manager.c` já define a interface de inicialização e de byte I/O para os PIOs. A compilação final como firmware RP2040 exige o Pico SDK e a inclusão correta dos headers/arquivos PIO no projeto de firmware.
+source/docs/V2_12_LINK_MANAGER.md:26:O teste fornecido nesta etapa valida a configuração multi-link no host. A validação elétrica e temporal dos PIOs continua sendo responsabilidade do bring-up de bancada.
+source/docs/V2_64_BUILD_AUDIT.md:3:A v2.64 não inventa valores do hardware.
+source/docs/V2_64_BUILD_AUDIT.md:22:um número mágico espalhado pelo código.
+source/docs/STATUS_V07.md:8:- estados READY/WAIT_IN/WAIT_OUT/WAIT_TIMER/DONE/ERROR;
+source/docs/HOST_TEST_RESULTS_V1_6.txt:2:Host build: -std=c11 -Wall -Wextra -Werror
+source/docs/V1_0_PLANO_IMPLEMENTACAO.md:11:    │ USB/Wi-Fi (controle)
+source/docs/V1_0_PLANO_IMPLEMENTACAO.md:34:8. PIO byte transport
+source/docs/V1_0_PLANO_IMPLEMENTACAO.md:48:## Separação Host/Firmware
+source/docs/V1_0_PLANO_IMPLEMENTACAO.md:50:A codificação/decodificação de pacotes é compilável no host e testável sem hardware. O driver PIO fica isolado atrás de `t425_pio_links.*`.
+source/docs/V1_0_PLANO_IMPLEMENTACAO.md:62:A implementação entregue nesta etapa **não declara o link PIO como eletricamente validado**. O `pio/link_uart.pio` existente é a base de byte transport; a validação elétrica depende da placa, pinagem, nível lógico, cabeamento e osciloscópio/analisador lógico.
+source/docs/V2_74_BUILD_GATE.md:12:`.uf2` foi gerado nesta sessão se o SDK/toolchain não estiver disponível.
+source/docs/V2_71_ACCEPTANCE.md:11:- [ ] teste de power-loss;
+source/docs/STATUS_V08.md:21:`gcc -std=c11 -Wall -Wextra -Werror`
+source/docs/STATUS_V08.md:26:O `PAR` ainda é estruturalmente linearizado na IR atual; portanto, a compilação de paralelismo real continua sendo responsabilidade do runtime até a v0.9. `ALT` ainda não foi incorporado ao parser/compilador textual completo.
+source/docs/STATUS_V1_1.md:15:O transporte elétrico entre dois Pico ainda depende de teste em bancada. A pinagem documentada é uma proposta e deve ser conferida contra a revisão exata da placa.
+source/docs/STATUS_V1_1.md:19:Implementar o driver PIO real no firmware Pico, com SM TX/RX por link, DMA/FIFO quando necessário, e telemetria USB para o MacBook.
+source/docs/V2_31_PIOASM_CLOCK_FIX.md:17:- Hardware P00↔P01: ainda não medido.
+source/docs/V2_31_PIOASM_CLOCK_FIX.md:19:A próxima etapa deve ser um firmware de bancada mínimo, sem Router/OCCAM, que produza e receba um padrão conhecido e permita verificar o enlace com analisador lógico.
+source/docs/V2_73_BUILD_AUDIT.md:3:Antes de considerar o firmware físico pronto:
+source/docs/V2_73_BUILD_AUDIT.md:7:3. inspecionar `.map`;
+source/docs/V2_73_BUILD_AUDIT.md:9:5. confirmar que nenhum código/dado do firmware invade os 8192 bytes;
+source/docs/V2_73_BUILD_AUDIT.md:12:8. testar read/write/reboot;
+source/docs/V2_87_ENVIRONMENT_PROBE.txt:5:CMake suite maintained and supported by Kitware (kitware.com/cmake).
+source/docs/HOST_TEST_RESULTS_V2_29.txt:5:Hardware PIO validation: NOT PERFORMED (no RP2040 board attached to this runtime).
+source/docs/STATUS_V03.md:10:- salvamento básico de PC/W;
+source/docs/HOST_TEST_RESULTS_V2_3.txt:2:Host build: -std=c11 -Wall -Wextra -Werror
+source/docs/HOST_TEST_RESULTS_V1_0.txt:4:Build flags: -std=c11 -Wall -Wextra -Werror
+source/docs/V2_82_CANONICAL_HEADER_AUDIT.md:3:The v2.81 audit exposed a more fundamental problem: there were multiple
+source/docs/V2_82_CANONICAL_HEADER_AUDIT.md:5:`firmware_pico`, with incompatible structures.
+source/docs/V2_82_CANONICAL_HEADER_AUDIT.md:11:The current interface-based contract is now canonical:
+source/docs/V2_82_CANONICAL_HEADER_AUDIT.md:19:with:
+source/docs/V2_82_CANONICAL_HEADER_AUDIT.md:31:The physical baud remains a build/runtime hardware parameter
+source/docs/V2_3_RP2040_FIRMWARE.md:1:# T425-SIM v2.3 — Firmware RP2040
+source/docs/V2_3_RP2040_FIRMWARE.md:3:A v2.3 inicia a transição do modelo de host para o firmware executável no RP2040.
+source/docs/V2_3_RP2040_FIRMWARE.md:25:O firmware desta entrega:
+source/docs/V2_3_RP2040_FIRMWARE.md:26:- compila como projeto Pico SDK quando o SDK estiver disponível;
+source/docs/V2_3_RP2040_FIRMWARE.md:31:A temporização física do PIO e o driver de frames ainda precisam de validação no hardware.
+source/docs/V2_60_FLASH_MAP.md:8:FIRMWARE
+source/docs/V2_60_FLASH_MAP.md:16:- imagem do firmware;
+source/docs/V2_60_FLASH_MAP.md:18:- espaço reservado pelo linker;
+source/docs/V2_72_ACCEPTANCE.md:12:- [ ] teste em hardware;
+source/docs/V2_72_ACCEPTANCE.md:13:- [ ] power-loss durante erase/program;
+source/docs/V2_38_TWO_NODE_LINK.md:5:A PHY continua baseada nos exemplos oficiais de PIO UART da Raspberry Pi: TX 8N1 a 1 bit por 8 ciclos PIO e RX com autopush em 8 bits. citeturn0search1turn0search2
+source/docs/V2_38_TWO_NODE_LINK.md:15:## Mesmo firmware
+source/docs/V2_38_TWO_NODE_LINK.md:42:- janela/stop-and-wait;
+source/docs/V2_45_MULTIHOP_FORWARD_ENGINE.md:1:# T425-SIM v2.45 — motor de forwarding multi-hop
+source/docs/V2_45_MULTIHOP_FORWARD_ENGINE.md:3:A v2.45 fecha a primeira integração lógica entre Router e cabeçalho de forwarding.
+source/docs/V2_45_MULTIHOP_FORWARD_ENGINE.md:14:P00: FORWARD -> HOP 1
+source/docs/V2_45_MULTIHOP_FORWARD_ENGINE.md:15:P01: FORWARD -> HOP 2
+source/docs/V2_45_MULTIHOP_FORWARD_ENGINE.md:21:` t425_forward_engine.* ` separa a decisão de encaminhamento da PHY.
+source/docs/V2_45_MULTIHOP_FORWARD_ENGINE.md:28:4. consulta `NEXT_HOP` para forwarding;
+source/docs/V2_45_MULTIHOP_FORWARD_ENGINE.md:39:mantendo a mesma interface de forwarding.
+source/docs/VALIDACAO_V02.md:3:Os três testes de fumaça incorporados ao firmware reproduzem exemplos de codificação do manual T425:
+source/docs/V2_43_ROUTER_MINIMO.md:15:e responde:
+source/docs/V2_43_ROUTER_MINIMO.md:19:FORWARD
+source/docs/V2_43_ROUTER_MINIMO.md:23:Para FORWARD também fornece:
+source/docs/V2_14_SUPERVISOR.md:34:O supervisor não deve acessar GPIO ou registradores diretamente. A futura camada RP2040 HAL será responsável pelo hardware.
+source/docs/V2_57_PERSISTENT_CONFIGURATION.md:34:O firmware continua comum.
+source/docs/V2_57_PERSISTENT_CONFIGURATION.md:36:A Flash passa a conter os parâmetros específicos do nó.
+source/docs/V2_57_PERSISTENT_CONFIGURATION.md:49: FIRMWARE COMUM
+source/docs/V2_82_ACCEPTANCE.md:16:- [ ] hardware validation
+source/docs/V2_79_ACCEPTANCE.md:8:- [x] generation overflow protegido;
+source/docs/V2_79_ACCEPTANCE.md:20:- [ ] power-loss.
+source/docs/V2_35_PIO_LOOPBACK_CORRECTED.md:12:6. Foi criado um firmware de loopback independente de Router/OCCAM.
+source/docs/V2_35_PIO_LOOPBACK_CORRECTED.md:23:O firmware transmite:
+source/docs/HOST_TEST_RESULTS_V2_7.txt:2:Host build: -std=c11 -Wall -Wextra -Werror
+source/docs/V2_60_ACCEPTANCE.md:3:- [x] fronteira entre política e hardware;
+source/docs/V2_76_BUILD_COMMANDS.md:7:cmake -S firmware_pico -B build -DPICO_BOARD=pico
+source/docs/V2_15_BRINGUP.md:7:   `HW=OK RUNTIME=OK START=OK`
+source/docs/V2_9_STREAM_PARSER.md:33:- `WAIT_SOF`
+source/docs/VALIDACAO_V04.md:7:4. executar IN(c) sem escritor e verificar WAIT_CHAN;
+source/docs/VALIDACAO_V04.md:13:Resultado esperado do teste host-side: `runtime process/scheduler/channel smoke: PASS`.
+source/docs/V1_7_TESTES.md:10:Resultado esperado: PASS.
+source/docs/V2_50_BIDIRECTIONAL.md:22:O mesmo firmware continua sendo usado em todos os nós.
+source/docs/V2_44_FORWARDING_3NODE.md:17:## Cabeçalho de forwarding
+source/docs/V2_44_FORWARDING_3NODE.md:35:O cabeçalho de forwarding fica acima do Reliable Link:
+source/docs/V2_44_FORWARDING_3NODE.md:41:FORWARDING HEADER        v2.44
+source/docs/V2_44_FORWARDING_3NODE.md:56:O teste v2.44 ainda é determinístico e local ao firmware de teste: ele comprova a decisão e a evolução do cabeçalho sem alegar que três Pico já estejam encaminhando fisicamente o frame.
+source/docs/V1_9_REMOTE_RENDEZVOUS.md:26:A confirmação de transporte continua sendo responsabilidade do reliable link. O ACK do rendezvous confirma a operação lógica no canal; são semânticas diferentes e devem permanecer separadas.
+source/docs/V2_54_ROUTER_INTERFACE_CONTRACT.md:21:Se a interface estiver DOWN:
+source/docs/V2_54_ROUTER_INTERFACE_CONTRACT.md:27:O Router não deve transmitir por uma interface DOWN.
+source/docs/V2_18_RELIABLE_LINK.md:9:          WAIT_ACK
+source/docs/V2_18_RELIABLE_LINK.md:43:A v2.18 ainda não transforma o PIO em um protocolo completo de janela deslizante. Há **uma transação confiável pendente por link**. Isso simplifica o primeiro bring-up físico e deixa espaço para posteriormente implementar pipeline/windowing semelhante ao comportamento de enlaces Transputer.
+source/docs/V2_20_TRANSPORT_ROUTER_INTEGRATION.md:1:# T425-SIM v2.20 — Transport + Router
+source/docs/V2_20_TRANSPORT_ROUTER_INTEGRATION.md:5:## Wire format
+source/docs/V2_20_TRANSPORT_ROUTER_INTEGRATION.md:11:O `Transport` serializa/desserializa e valida CRC. O `Router` decide o próximo enlace.
+source/docs/V2_20_TRANSPORT_ROUTER_INTEGRATION.md:20:Transport encode
+source/docs/V2_20_TRANSPORT_ROUTER_INTEGRATION.md:32:Transport decode
+source/docs/V2_20_TRANSPORT_ROUTER_INTEGRATION.md:61:A v2.20 é ainda uma integração de software. A confirmação elétrica continua sendo realizada no hardware quando os quatro Pico estiverem conectados.
+source/docs/V2_18_TEST_PLAN.md:4:P00 envia PING(seq=N), P01 valida CRC e responde ACK(seq=N).
+source/docs/V2_18_TEST_PLAN.md:6:Esperado:
+source/docs/V2_18_TEST_PLAN.md:17:Esperado:
+source/docs/V2_18_TEST_PLAN.md:26:Impedir temporariamente a resposta.
+source/docs/V2_18_TEST_PLAN.md:28:Esperado:
+source/docs/V2_18_TEST_PLAN.md:30:WAIT_ACK
+source/docs/V2_65_ARCHITECTURAL_CORRECTION.md:12:Isso contradizia a arquitetura desejada de um único firmware para N nós.
+source/docs/V2_65_ARCHITECTURAL_CORRECTION.md:31:O firmware passa a carregar a identidade a partir da configuração persistente.
+source/docs/V2_65_ARCHITECTURAL_CORRECTION.md:35:Não é necessário recompilar o firmware para trocar P00 por P07.
+source/docs/V2_15_RP2040_HAL.md:3:Esta versão conecta o núcleo genérico ao Raspberry Pi Pico por PIO e USB CDC.
+source/docs/V2_15_RP2040_HAL.md:5:A documentação oficial do Pico SDK confirma o uso de CMake, APIs de hardware, PIO, timers e USB; no RP2040 existem dois blocos PIO, cada um com quatro state machines. citeturn0search0turn0search3
+source/docs/V2_15_RP2040_HAL.md:20:cmake -S firmware_pico -B build -DT425_NODE_ID=0
+source/docs/VALIDACAO_V03.md:7:- OUT sem leitor: processo fica WAIT_OUT;
+source/docs/VALIDACAO_V03.md:8:- IN sem escritor: processo fica WAIT_IN;
+source/docs/VALIDACAO_V03.md:13:Seleciona processo READY de maior prioridade e salva PC/W do processo corrente.
+source/docs/VALIDACAO_V03.md:16:Cada L0..L3 possui contadores independentes. O transporte físico INMOS é o próximo marco.
+source/docs/V2_68_INVARIANTS.md:12:Essas invariantes são a base dos testes de power-loss.
+source/docs/HOST_TEST_RESULTS_V1_5.txt:2:Host build: -std=c11 -Wall -Wextra -Werror
+source/docs/RELEASE_NOTE_V05.md:8:Os três testes host-side foram recompilados e executados com `-Wall -Wextra`.
+source/docs/V2_40_TEST_MATRIX.md:3:| Teste | Intervenção | Resultado esperado |
+source/docs/V2_25_ONE_HOP_CORRECTED.md:10:4. O pacote pendente permanece no cache durante `WAIT_ACK`.
+source/docs/HOST_TEST_RESULTS_V1_4.txt:2:Host build: -std=c11 -Wall -Wextra -Werror
+source/docs/HOST_TEST_RESULTS_V2_13.txt:2:Host build: -std=c11 -Wall -Wextra -Werror
+source/docs/HOST_TEST_RESULTS_V2_13.txt:3:RP2040 HAL/PIO/timer integration: pending hardware build.
+source/docs/V2_10_ACK_RETRY.md:10:WAIT_ACK
+source/docs/V2_10_ACK_RETRY.md:19:       ├── retry < MAX ─► WAIT_ACK
+source/docs/V2_10_ACK_RETRY.md:30:O timeout é representado por ticks monotônicos. A integração do tick com o timer real do RP2040 será feita na etapa de firmware.
+source/docs/V2_82_BUILD_GATE.md:4:depend on Pico SDK headers was repeated after canonicalization.
+source/docs/V2_55_ROUTER_INTERFACE_LINK_INTEGRATION.md:7:2. qual interface física corresponde ao NEXT_HOP?
+source/docs/V2_55_ROUTER_INTERFACE_LINK_INTEGRATION.md:48:Se IF0 estiver DOWN, P01 deixa de ser utilizável e P02 é selecionado.
+source/docs/V2_55_ROUTER_INTERFACE_LINK_INTEGRATION.md:50:Se IF0 e IF1 estiverem DOWN:
+source/docs/V2_55_ROUTER_INTERFACE_LINK_INTEGRATION.md:57:transmitir quando existe uma interface física UP correspondente ao next-hop.
+source/docs/V2_11_CONFIG_EXAMPLES.md:39:sem alterar o modelo de firmware: somente a configuração dos nós muda.
+source/docs/V2_34_RX_SHIFT_AND_GENERIC_NODE.md:1:# T425-SIM v2.34 — RX shift correction + firmware genérico
+source/docs/V2_34_RX_SHIFT_AND_GENERIC_NODE.md:27:## Firmware único
+source/docs/V2_34_RX_SHIFT_AND_GENERIC_NODE.md:47:A mesma regra permite P04...Pnn sem criar um firmware diferente.
+source/docs/V2_61_RP2040_FLASH_DRIVER.md:16:A leitura pode ocorrer através do espaço XIP; escrita/erase exige a sequência
+source/docs/V2_51_FAILURE_RECOVERY.md:8:UP -> DEGRADED -> DOWN
+source/docs/V2_51_FAILURE_RECOVERY.md:14:DOWN -> UP
+source/docs/V2_51_FAILURE_RECOVERY.md:28:TIMEOUT 3 -> DOWN
+source/docs/V2_51_FAILURE_RECOVERY.md:42:ficar DOWN durante:
+source/docs/V2_53_FAILOVER_PROCEDURE.md:24:Esperado:
+source/docs/V2_53_FAILOVER_PROCEDURE.md:39:O estado do peer P01 deve chegar a DOWN.
+source/docs/V1_5_TEST_MATRIX.md:3:| Teste | Esperado |
+source/docs/V1_5_TEST_MATRIX.md:5:| DATA + ACK | waiting_ack → false |
+source/docs/V2_75_PREBUILD_AUDIT.md:22:7. **Hardware facade**: incluído explicitamente `t425_flash_transaction.h`
+source/docs/HOST_TEST_RESULTS_V2_0.txt:2:Host build: -std=c11 -Wall -Wextra -Werror
+source/docs/V2_65_BUILD_AUDIT_RESULT.md:6:- `firmware_pico/CMakeLists.txt`;
+source/docs/V2_65_BUILD_AUDIT_RESULT.md:16:tratados como variantes/testes e não como fonte de verdade do firmware final.
+source/docs/V2_65_BUILD_AUDIT_RESULT.md:18:A partir daqui, o CMake oficial do diretório `firmware_pico` deve ser a referência
+source/docs/V2_65_BUILD_AUDIT_RESULT.md:19:para o firmware persistente.
+source/docs/V2_61_ACCEPTANCE.md:13:- [ ] power-loss test.
+source/docs/V2_19_ROUTER.md:40:## Separação de responsabilidades
+source/docs/V2_19_ROUTER.md:60:Essa separação será importante quando introduzirmos OCCAM: processos OCCAM deverão produzir/consumir mensagens, enquanto o runtime de comunicação cuida do transporte.
+source/docs/VALIDACAO.md:33:- AJW
+source/docs/VALIDACAO.md:54:O MacBook/ESP32 deverá executar:
+source/docs/V2_57_ACCEPTANCE.md:3:1. O mesmo firmware deve aceitar configurações com NODE_ID diferentes.
+source/docs/V2_71_CANONICAL_COMMIT.md:18:erase/program/verify via HW
+source/docs/V2_71_CANONICAL_COMMIT.md:20:new active generation
+source/docs/V2_77_CONTRACT_AUDIT.md:12:   esse seja o estado esperado de uma unidade virgem. A primeira gravação
+source/docs/V2_77_CONTRACT_AUDIT.md:15:   mas essas funções não estavam implementadas no módulo correspondente.
+source/docs/VALIDACAO_V05.md:7:- PC/workspace inicial;
+source/docs/VALIDACAO_V05.md:9:- disparo temporal;
+source/docs/V2_36_PIO_AUDIT.md:22:1. espera o start `0`;
+source/docs/V2_36_PIO_AUDIT.md:26:5. espera o retorno ao nível idle.
+source/docs/BUILD.md:5:- Raspberry Pi Pico SDK
+source/docs/BUILD.md:37:Coloque o Pico em BOOTSEL e copie o UF2 correspondente.
+source/docs/V2_40_ERROR_INSTRUMENTATION.md:43:O comportamento esperado é:
+source/docs/V2_14_EXECUTION_MODEL.md:8:3. frame dispatch
+source/docs/V2_85_REAL_BUILD_RESULT.txt:6:PWD: /mnt/data/T425_SIM_Pico_Nodes_v2.85/T425_SIM_Pico_Nodes_v2.23/firmware_pico
+source/docs/V2_60_FLASH_HW.md:3:A v2.60 cria a fronteira entre a política transacional e o hardware.
+source/docs/V2_60_FLASH_HW.md:13:## Hardware
+source/docs/V2_60_FLASH_HW.md:18:t425_flash_hw.c
+source/docs/V2_60_FLASH_HW.md:38:Isso evita corromper o firmware existente enquanto o mapa de memória do projeto
+source/docs/V2_9_PIO_INTEGRATION.md:31:Nesta entrega o parser está validado no host. A leitura/escrita efetiva das FIFOs do PIO ainda deve ser feita no firmware RP2040 e medida no hardware.
+source/docs/BUGFIX_V07.md:3:A validação encontrou uma incompatibilidade entre o teste legado do canal, que espera `CH_READY` após a segunda metade do rendezvous, e a primeira implementação, que liberava imediatamente para `CH_FREE`.
+source/docs/V2_63_PHYSICAL_FLASH.md:20:NEW ACTIVE
+source/docs/V2_63_PHYSICAL_FLASH.md:23:A rotina `t425_flash_real_write_slot()` não executa erase/program enquanto a
+source/docs/V2_63_PHYSICAL_FLASH.md:28:do firmware.
+source/docs/HOST_TEST_RESULTS_V2_2.txt:1:HARDWARE PROFILE P00-P03 / 3 LINKS: PASS
+source/docs/HOST_TEST_RESULTS_V2_2.txt:2:Host build: -std=c11 -Wall -Wextra -Werror
+source/docs/V2_37_CANONICAL_PIO_UART.md:3:A v2.37 abandona a lógica experimental das versões anteriores e passa a usar como referência direta os exemplos oficiais `pio/uart_tx` e `pio/uart_rx` do `raspberrypi/pico-examples`.
+source/docs/V2_37_CANONICAL_PIO_UART.md:16:- espera o start bit
+source/docs/V2_37_CANONICAL_PIO_UART.md:17:- espera o centro do primeiro bit com `[10]`
+source/docs/V2_37_CANONICAL_PIO_UART.md:24:## Correção crítica do software
+source/docs/V2_37_CANONICAL_PIO_UART.md:32:Isso evita o erro das versões anteriores, que convertiam diretamente o word de 32 bits para `uint8_t`.
+source/docs/V2_37_CANONICAL_PIO_UART.md:36:A estrutura temporal segue os exemplos oficiais da Raspberry Pi para UART em PIO.
+source/docs/V2_53_ARCHITECTURE.md:31:ricas, sem misturar descoberta, roteamento e transporte.
+source/docs/V2_52_MULTI_NEXT_HOP.md:37:P02 DOWN
+source/docs/V2_52_MULTI_NEXT_HOP.md:43:Se ambos estiverem DOWN:
+source/docs/V2_52_MULTI_NEXT_HOP.md:65:O failover só pode ser validado em hardware depois que for adicionada uma ligação
+source/docs/V2_62_LINKER_RESERVATION.md:3:A v2.62 transforma a região de configuração em uma responsabilidade explícita
+source/docs/V2_62_LINKER_RESERVATION.md:15:região de Flash disponibilizada ao aplicativo:
+source/docs/V2_62_LINKER_RESERVATION.md:28:A reserva deve ser integrada ao linker script oficial do firmware.
+source/docs/V2_59_BOOT_RECOVERY.md:22:Ele deverá permanecer disponível para reconfiguração pelo USB.
+source/docs/V2_0_DISTRIBUTED_RUNTIME.md:19:O transporte remoto usa a camada RDV da v1.9, que por sua vez pode usar o reliable link.
+source/docs/V2_0_DISTRIBUTED_RUNTIME.md:27:Adicionar uma tabela de encaminhamento e permitir que P01 encaminhe tráfego destinado a P02/P03, aproximando a rede da estrutura de links do Transputer.
+source/docs/V2_16_SINGLE_UF2_CONFIG.md:38:A região usada é o último setor da Flash (`PICO_FLASH_SIZE_BYTES - 4096`). Isso deve ser reservado ao firmware e não utilizado por outro armazenamento.
+source/docs/V2_65_ACCEPTANCE.md:6:- [x] firmware passa a ter identidade de runtime;
+source/docs/V2_77_BOOT_AND_SAVE.md:1:# V2.77 — comportamento esperado
+source/docs/V2_58_USB_CONFIG_CLI.md:3:A v2.58 cria a camada de comandos que será transportada pelo USB CDC do Pico.
+source/docs/V2_58_USB_CONFIG_CLI.md:33:configuração ativa de hardware sem validação.
+source/docs/V2_56_N_PLUS_ONE.md:8:firmware_P04
+source/docs/V2_56_N_PLUS_ONE.md:24:e executar o mesmo firmware.
+source/docs/V2_53_REDUNDANT_PHYSICAL_TOPOLOGY.md:40:Se o enlace P00-P01 ficar DOWN:
+source/docs/V2_53_REDUNDANT_PHYSICAL_TOPOLOGY.md:48:## Observação de hardware
+source/docs/V2_80_MEMORY_AUDIT.md:8:firmware:        0x1FE000
+source/docs/V2_81_INTEGRATION_AUDIT.md:16:O source antigo esperava:
+source/docs/V2_81_INTEGRATION_AUDIT.md:22:A v2.81 usa `firmware_pico/t425_node_config.c`, que implementa a API atual.
+source/docs/V2_81_INTEGRATION_AUDIT.md:26:Foi adaptado para `config.interfaces.items[]` e `T425_IF_DOWN`.
+source/docs/V2_81_INTEGRATION_AUDIT.md:45:-Wall -Wextra -Werror -fsyntax-only
+source/docs/V2_47_FOUR_NODE_TOPOLOGY.md:3:A v2.47 prepara o salto de três para quatro Pico mantendo **um único firmware**.
+source/docs/V2_47_FOUR_NODE_TOPOLOGY.md:32:A tabela de roteamento pode ser parametrizada pelo `NODE_ID`, sem criar um firmware
+source/docs/V2_47_FOUR_NODE_TOPOLOGY.md:42:Integrar o motor de forwarding físico da v2.46 com a topologia de quatro nós e
+source/docs/HOST_TEST_RESULTS_V2_31.txt:7:PIO hardware validation: NOT PERFORMED.
+source/docs/V2_66_BOOT_CONFIG.md:31:## Um firmware / N nós
+source/docs/V2_66_BOOT_CONFIG.md:45:Sem recompilar o firmware.
+source/docs/BENCH_TEST_V2_30.md:3:1. Gravar o mesmo firmware nos dois Pico, diferenciando apenas `node_id`.
+source/docs/BENCH_TEST_V2_30.md:12:7. Só então ligar Transport/CRC.
+source/docs/V2_4_PIO_DRIVER.md:3:A v2.4 começa a integração do transporte com as máquinas de estado PIO do RP2040.
+source/docs/V2_4_PIO_DRIVER.md:25:- `t425_link_write_byte()`
+source/docs/V2_4_PIO_DRIVER.md:30:O programa PIO e a API estão preparados para bring-up, mas a temporização, polaridade e sincronismo ainda precisam ser medidos no hardware. Não considerar a v2.4 como enlace de produção.
+source/docs/PINOUT_PICO_LINKS_V1_1.md:12:**Importante:** esta é uma proposta lógica de pinagem, não uma confirmação da placa/carrier específica. Antes de conectar fisicamente, conferir o pinout exato do Pico utilizado e os níveis elétricos.
+source/docs/V2_84_SOURCE_MANIFEST.txt:40:t425_firmware_identity.h
+source/docs/V2_84_SOURCE_MANIFEST.txt:41:t425_flash_hw.c
+source/docs/V2_84_SOURCE_MANIFEST.txt:42:t425_flash_hw.h
+source/docs/V2_84_SOURCE_MANIFEST.txt:43:t425_flash_hw_real_contract.c
+source/docs/V2_84_SOURCE_MANIFEST.txt:44:t425_flash_hw_test.c
+source/docs/V2_84_SOURCE_MANIFEST.txt:59:t425_forward.c
+source/docs/V2_84_SOURCE_MANIFEST.txt:60:t425_forward.h
+source/docs/V2_84_SOURCE_MANIFEST.txt:61:t425_forward_engine.c
+source/docs/V2_84_SOURCE_MANIFEST.txt:62:t425_forward_engine.h
+source/docs/V2_84_SOURCE_MANIFEST.txt:63:t425_generic_firmware_test.c
+source/docs/V2_84_SOURCE_MANIFEST.txt:88:t425_pio_hw.c
+source/docs/V2_84_SOURCE_MANIFEST.txt:89:t425_pio_hw.h
+source/docs/V2_84_SOURCE_MANIFEST.txt:132:t425_transport.c
+source/docs/V2_84_SOURCE_MANIFEST.txt:133:t425_transport.h
+source/docs/V2_84_SOURCE_MANIFEST.txt:134:t425_two_node_bench.c
+source/docs/STATUS_V05.md:8:- descritores de processo com PC/W/SP/prioridade/workspace;
+source/docs/STATUS_V05.md:16:Os testes host-side devem compilar e terminar com código 0. Isso valida a camada de software portátil; ainda não substitui síntese/execução no RP2040.
+source/docs/STATUS_V05.md:19:v0.6: workspace real integrado à VM, ALT canal+timer, primitivas de processo em nível de instrução, e primeiro programa OCCAM distribuído.
+source/docs/V2_24_ONE_HOP_INTEGRATION.md:3:A v2.24 integra Transport, Reliable Link e uma interface PHY abstrata em um teste de um salto.
+source/docs/V2_24_ONE_HOP_INTEGRATION.md:14: Transport + CRC
+source/docs/V2_24_ONE_HOP_INTEGRATION.md:25: Transport + CRC
+source/docs/V2_61_LINKER_INTEGRATION.md:9:| firmware/application | slot A | slot B |
+source/docs/V2_61_LINKER_INTEGRATION.md:20:Depois de reservado o espaço, o código pode obter ou receber a base dos slots
+source/docs/V1_6_ARQUITETURA.md:26:A separação entre canal lógico e transporte físico é deliberada: permite testar a semântica OCCAM sem depender inicialmente da velocidade final do PIO.
+source/docs/V2_28_RELIABLE_DEADLINE_FIX.md:10:tx_time = now
+source/docs/V2_28_RELIABLE_DEADLINE_FIX.md:11:deadline = now + ACK_TIMEOUT
+source/docs/V2_28_RELIABLE_DEADLINE_FIX.md:12:state = WAIT_ACK
+source/docs/V2_28_RELIABLE_DEADLINE_FIX.md:15:O `poll(now)` permanece em `WAIT_ACK` enquanto:
+source/docs/V2_28_RELIABLE_DEADLINE_FIX.md:18:now < deadline
+source/docs/V2_28_RELIABLE_DEADLINE_FIX.md:24:now >= deadline
+source/docs/V2_28_RELIABLE_DEADLINE_FIX.md:32:state = WAIT_ACK
+source/docs/V2_28_RELIABLE_DEADLINE_FIX.md:39:- 109 < 110 → WAIT_ACK
+source/docs/V2_28_RELIABLE_DEADLINE_FIX.md:42:- 119 < 120 → WAIT_ACK
+source/docs/V2_28_RELIABLE_DEADLINE_FIX.md:44:- ACK correspondente → IDLE
+source/docs/V2_28_RELIABLE_DEADLINE_FIX.md:45:- ACK incorreto → permanece WAIT_ACK
+source/docs/V2_28_RELIABLE_DEADLINE_FIX.md:48:A comparação é feita de forma compatível com overflow de `uint32_t` por comparação signed-difference.
+source/docs/NODE_SCALING.md:6:              T425 network
+source/docs/NODE_SCALING.md:11:O firmware não deve conter lógica específica de P00/P01/P02/P03. O nó é identificado por `T425_NODE_ID`.
+source/docs/V2_8_BENCH_CHECKLIST.md:9:[ ] versão do firmware confirmada
+source/docs/HOST_TEST_RESULTS_V2_4.txt:2:Host build: -std=c11 -Wall -Wextra -Werror
+source/docs/HOST_TEST_RESULTS_V2_4.txt:3:Pico SDK firmware build: requires local Pico SDK/toolchain.
+source/docs/V2_0_TEST_PLAN.md:11:2. ACK de transporte não pode ser confundido com RDV_ACK;
+source/docs/HOST_TEST_RESULTS_V2_11.txt:2:Host build: -std=c11 -Wall -Wextra -Werror
+source/docs/HOST_TEST_RESULTS_V2_11.txt:3:Hardware-specific PIO integration remains pending.
+source/docs/V2_54_NODE_ABSTRACTION.md:3:Todo Pico executa a mesma arquitetura de firmware:
+source/docs/V1_2_PIO_IMPLEMENTACAO.md:3:A etapa define o transporte UART-like em PIO, 8 bits, full-duplex e dois links por nó. O alvo inicial é 2 Mbaud.
+source/docs/V1_2_PIO_IMPLEMENTACAO.md:13:O `t425_uart8.pio` é a especificação inicial das state machines. A adaptação Pico SDK está isolada em `firmware_pico/`.
+source/docs/V2_58_ACCEPTANCE.md:10:8. O mesmo firmware deve aceitar NODE_ID diferente em cada Pico.
+source/docs/V2_74_ACCEPTANCE.md:17:- [ ] power-loss.
+source/docs/V2_8_BRINGUP.md:17:1. Gravar firmware de bring-up.
+source/docs/V2_39_TEST.md:16:Esperado em condições normais:
+source/docs/V2_57_USB_CONFIGURATION_PROTOCOL.md:16:Fluxo esperado:
+source/docs/V2_57_USB_CONFIGURATION_PROTOCOL.md:27: write inactive Flash slot
+source/docs/V1_4_PROCEDIMENTO.md:3:1. Compilar firmware para P00 (`T425_NODE_ID=0`).
+source/docs/V1_4_PROCEDIMENTO.md:4:2. Compilar firmware para P01 (`T425_NODE_ID=1`).
+source/docs/HOST_TEST_RESULTS_V2_6.txt:2:Host build: -std=c11 -Wall -Wextra -Werror
+source/docs/V2_87_SOURCE_INVENTORY.txt:72:docs/V1_3_FIRMWARE_PICO.md
+source/docs/V2_87_SOURCE_INVENTORY.txt:110:docs/V2_20_TRANSPORT_ROUTER_INTEGRATION.md
+source/docs/V2_87_SOURCE_INVENTORY.txt:120:docs/V2_2_HARDWARE_BRINGUP.md
+source/docs/V2_87_SOURCE_INVENTORY.txt:124:docs/V2_32_BENCH_FIRMWARE.md
+source/docs/V2_87_SOURCE_INVENTORY.txt:132:docs/V2_38_TWO_NODE_LINK.md
+source/docs/V2_87_SOURCE_INVENTORY.txt:133:docs/V2_38_WIRING.md
+source/docs/V2_87_SOURCE_INVENTORY.txt:138:docs/V2_3_RP2040_FIRMWARE.md
+source/docs/V2_87_SOURCE_INVENTORY.txt:148:docs/V2_44_FORWARDING_3NODE.md
+source/docs/V2_87_SOURCE_INVENTORY.txt:151:docs/V2_45_MULTIHOP_FORWARD_ENGINE.md
+source/docs/V2_87_SOURCE_INVENTORY.txt:157:docs/V2_47_WIRING.md
+source/docs/V2_87_SOURCE_INVENTORY.txt:184:docs/V2_56_ONE_FIRMWARE_N_NODES.md
+source/docs/V2_87_SOURCE_INVENTORY.txt:196:docs/V2_59_POWER_FAIL.md
+source/docs/V2_87_SOURCE_INVENTORY.txt:200:docs/V2_60_FLASH_HW.md
+source/docs/V2_87_SOURCE_INVENTORY.txt:214:docs/V2_63_VERIFY_AND_POWERFAIL.md
+source/docs/V2_87_SOURCE_INVENTORY.txt:223:docs/V2_65_ONE_FIRMWARE_N_NODES.md
+source/docs/V2_87_SOURCE_INVENTORY.txt:228:docs/V2_67_HARDWARE_INTEGRATION.md
+source/docs/V2_87_SOURCE_INVENTORY.txt:237:docs/V2_69_PROTOCOL_REVIEW.md
+source/docs/V2_87_SOURCE_INVENTORY.txt:311:firmware/CMakeLists.txt
+source/docs/V2_87_SOURCE_INVENTORY.txt:312:firmware/README.md
+source/docs/V2_87_SOURCE_INVENTORY.txt:313:firmware/t425_firmware_config.h
+source/docs/V2_87_SOURCE_INVENTORY.txt:314:firmware/t425_link.pio
+source/docs/V2_87_SOURCE_INVENTORY.txt:315:firmware/t425_link_driver.c
+source/docs/V2_87_SOURCE_INVENTORY.txt:316:firmware/t425_link_driver.h
+source/docs/V2_87_SOURCE_INVENTORY.txt:317:firmware/t425_main.c
+source/docs/V2_87_SOURCE_INVENTORY.txt:318:firmware/t425_pio_link.c
+source/docs/V2_87_SOURCE_INVENTORY.txt:319:firmware/t425_pio_link.h
+source/docs/V2_87_SOURCE_INVENTORY.txt:320:firmware_pico/CMakeLists.txt
+source/docs/V2_87_SOURCE_INVENTORY.txt:321:firmware_pico/CMakeLists_bench.txt
+source/docs/V2_87_SOURCE_INVENTORY.txt:322:firmware_pico/CMakeLists_loopback.txt
+source/docs/V2_87_SOURCE_INVENTORY.txt:323:firmware_pico/CMakeLists_v2_38.txt
+source/docs/V2_87_SOURCE_INVENTORY.txt:324:firmware_pico/build_gate.sh
+source/docs/V2_87_SOURCE_INVENTORY.txt:325:firmware_pico/main.c
+source/docs/V2_87_SOURCE_INVENTORY.txt:326:firmware_pico/node_profiles.cmake
+source/docs/V2_87_SOURCE_INVENTORY.txt:327:firmware_pico/pico_sdk_import.cmake
+source/docs/V2_87_SOURCE_INVENTORY.txt:328:firmware_pico/t425_application.c
+source/docs/V2_87_SOURCE_INVENTORY.txt:329:firmware_pico/t425_application.h
+source/docs/V2_87_SOURCE_INVENTORY.txt:330:firmware_pico/t425_bench_main.c
+source/docs/V2_87_SOURCE_INVENTORY.txt:331:firmware_pico/t425_bidirectional_test.c
+source/docs/V2_87_SOURCE_INVENTORY.txt:332:firmware_pico/t425_boot_test.c
+source/docs/V2_87_SOURCE_INVENTORY.txt:333:firmware_pico/t425_build_integration.c
+source/docs/V2_87_SOURCE_INVENTORY.txt:334:firmware_pico/t425_build_integration.h
+source/docs/V2_87_SOURCE_INVENTORY.txt:335:firmware_pico/t425_build_selfcheck.c
+source/docs/V2_87_SOURCE_INVENTORY.txt:336:firmware_pico/t425_config_address.h
+source/docs/V2_87_SOURCE_INVENTORY.txt:337:firmware_pico/t425_config_boot_test.c
+source/docs/V2_87_SOURCE_INVENTORY.txt:338:firmware_pico/t425_config_canonical.c
+source/docs/V2_87_SOURCE_INVENTORY.txt:339:firmware_pico/t425_config_canonical.h
+source/docs/V2_87_SOURCE_INVENTORY.txt:340:firmware_pico/t425_config_cli.c
+source/docs/V2_87_SOURCE_INVENTORY.txt:341:firmware_pico/t425_config_cli.h
+source/docs/V2_87_SOURCE_INVENTORY.txt:342:firmware_pico/t425_config_cli_test.c
+source/docs/V2_87_SOURCE_INVENTORY.txt:343:firmware_pico/t425_config_memory.ld
+source/docs/V2_87_SOURCE_INVENTORY.txt:344:firmware_pico/t425_config_region.ld.in
+source/docs/V2_87_SOURCE_INVENTORY.txt:345:firmware_pico/t425_config_staging.c
+source/docs/V2_87_SOURCE_INVENTORY.txt:346:firmware_pico/t425_config_staging.h
+source/docs/V2_87_SOURCE_INVENTORY.txt:347:firmware_pico/t425_config_store.c
+source/docs/V2_87_SOURCE_INVENTORY.txt:348:firmware_pico/t425_config_store.h
+source/docs/V2_87_SOURCE_INVENTORY.txt:349:firmware_pico/t425_config_symbols.ld.in
+source/docs/V2_87_SOURCE_INVENTORY.txt:350:firmware_pico/t425_console.c
+source/docs/V2_87_SOURCE_INVENTORY.txt:351:firmware_pico/t425_console.h
+source/docs/V2_87_SOURCE_INVENTORY.txt:352:firmware_pico/t425_crc16.c
+source/docs/V2_87_SOURCE_INVENTORY.txt:353:firmware_pico/t425_crc16.h
+source/docs/V2_87_SOURCE_INVENTORY.txt:354:firmware_pico/t425_e2e.c
+source/docs/V2_87_SOURCE_INVENTORY.txt:355:firmware_pico/t425_e2e.h
+source/docs/V2_87_SOURCE_INVENTORY.txt:356:firmware_pico/t425_e2e_physical_test.c
+source/docs/V2_87_SOURCE_INVENTORY.txt:357:firmware_pico/t425_e2e_test.c
+source/docs/V2_87_SOURCE_INVENTORY.txt:358:firmware_pico/t425_failure_test.c
+source/docs/V2_87_SOURCE_INVENTORY.txt:359:firmware_pico/t425_firmware_identity.h
+source/docs/V2_87_SOURCE_INVENTORY.txt:360:firmware_pico/t425_flash_hw.c
+source/docs/V2_87_SOURCE_INVENTORY.txt:361:firmware_pico/t425_flash_hw.h
+source/docs/V2_87_SOURCE_INVENTORY.txt:362:firmware_pico/t425_flash_hw_real_contract.c
+source/docs/V2_87_SOURCE_INVENTORY.txt:363:firmware_pico/t425_flash_hw_test.c
+source/docs/V2_87_SOURCE_INVENTORY.txt:364:firmware_pico/t425_flash_layout.c
+source/docs/V2_87_SOURCE_INVENTORY.txt:365:firmware_pico/t425_flash_layout.h
+source/docs/V2_87_SOURCE_INVENTORY.txt:366:firmware_pico/t425_flash_layout_check.c
+source/docs/V2_87_SOURCE_INVENTORY.txt:367:firmware_pico/t425_flash_layout_test.c
+source/docs/V2_87_SOURCE_INVENTORY.txt:368:firmware_pico/t425_flash_physical_test.c
+source/docs/V2_87_SOURCE_INVENTORY.txt:369:firmware_pico/t425_flash_rp2040.c
+source/docs/V2_87_SOURCE_INVENTORY.txt:370:firmware_pico/t425_flash_rp2040.h
+source/docs/V2_87_SOURCE_INVENTORY.txt:371:firmware_pico/t425_flash_rp2040_real.c
+source/docs/V2_87_SOURCE_INVENTORY.txt:372:firmware_pico/t425_flash_rp2040_real.h
+source/docs/V2_87_SOURCE_INVENTORY.txt:373:firmware_pico/t425_flash_slots.c
+source/docs/V2_87_SOURCE_INVENTORY.txt:374:firmware_pico/t425_flash_slots.h
+source/docs/V2_87_SOURCE_INVENTORY.txt:375:firmware_pico/t425_flash_slots_test.c
+source/docs/V2_87_SOURCE_INVENTORY.txt:376:firmware_pico/t425_flash_transaction.c
+source/docs/V2_87_SOURCE_INVENTORY.txt:377:firmware_pico/t425_flash_transaction.h
+source/docs/V2_87_SOURCE_INVENTORY.txt:378:firmware_pico/t425_forward.c
+source/docs/V2_87_SOURCE_INVENTORY.txt:379:firmware_pico/t425_forward.h
+source/docs/V2_87_SOURCE_INVENTORY.txt:380:firmware_pico/t425_forward_engine.c
+source/docs/V2_87_SOURCE_INVENTORY.txt:381:firmware_pico/t425_forward_engine.h
+source/docs/V2_87_SOURCE_INVENTORY.txt:382:firmware_pico/t425_generic_firmware_test.c
+source/docs/V2_87_SOURCE_INVENTORY.txt:383:firmware_pico/t425_interfaces.c
+source/docs/V2_87_SOURCE_INVENTORY.txt:384:firmware_pico/t425_interfaces.h
+source/docs/V2_87_SOURCE_INVENTORY.txt:385:firmware_pico/t425_interfaces_test.c
+source/docs/V2_87_SOURCE_INVENTORY.txt:386:firmware_pico/t425_link_bench.c
+source/docs/V2_87_SOURCE_INVENTORY.txt:387:firmware_pico/t425_link_bench.h
+source/docs/V2_87_SOURCE_INVENTORY.txt:388:firmware_pico/t425_link_health.c
+source/docs/V2_87_SOURCE_INVENTORY.txt:389:firmware_pico/t425_link_health.h
+source/docs/V2_87_SOURCE_INVENTORY.txt:390:firmware_pico/t425_link_loopback.c
+source/docs/V2_87_SOURCE_INVENTORY.txt:391:firmware_pico/t425_link_loopback.h
+source/docs/V2_87_SOURCE_INVENTORY.txt:392:firmware_pico/t425_link_test.c
+source/docs/V2_87_SOURCE_INVENTORY.txt:393:firmware_pico/t425_link_test.h
+source/docs/V2_87_SOURCE_INVENTORY.txt:394:firmware_pico/t425_link_test_main.c
+source/docs/V2_87_SOURCE_INVENTORY.txt:395:firmware_pico/t425_loopback_main.c
+source/docs/V2_87_SOURCE_INVENTORY.txt:396:firmware_pico/t425_memory_map_test.c
+source/docs/V2_87_SOURCE_INVENTORY.txt:397:firmware_pico/t425_multihop_engine_test.c
+source/docs/V2_87_SOURCE_INVENTORY.txt:398:firmware_pico/t425_multihop_physical.c
+source/docs/V2_87_SOURCE_INVENTORY.txt:399:firmware_pico/t425_node_config.c
+source/docs/V2_87_SOURCE_INVENTORY.txt:400:firmware_pico/t425_node_config.h
+source/docs/V2_87_SOURCE_INVENTORY.txt:401:firmware_pico/t425_node_profile.c
+source/docs/V2_87_SOURCE_INVENTORY.txt:402:firmware_pico/t425_node_profile.h
+source/docs/V2_87_SOURCE_INVENTORY.txt:403:firmware_pico/t425_node_startup.c
+source/docs/V2_87_SOURCE_INVENTORY.txt:404:firmware_pico/t425_phy_config.h
+source/docs/V2_87_SOURCE_INVENTORY.txt:405:firmware_pico/t425_pico_flash_region.ld.in
+source/docs/V2_87_SOURCE_INVENTORY.txt:406:firmware_pico/t425_pio.cmake
+source/docs/V2_87_SOURCE_INVENTORY.txt:407:firmware_pico/t425_pio_hw.c
+source/docs/V2_87_SOURCE_INVENTORY.txt:408:firmware_pico/t425_pio_hw.h
+source/docs/V2_87_SOURCE_INVENTORY.txt:409:firmware_pico/t425_pio_phy.c
+source/docs/V2_87_SOURCE_INVENTORY.txt:410:firmware_pico/t425_pio_phy.h
+source/docs/V2_87_SOURCE_INVENTORY.txt:411:firmware_pico/t425_pio_phy.pio
+source/docs/V2_87_SOURCE_INVENTORY.txt:412:firmware_pico/t425_pio_phy.pio.h
+source/docs/V2_87_SOURCE_INVENTORY.txt:413:firmware_pico/t425_pio_phy_host_stub.c
+source/docs/V2_87_SOURCE_INVENTORY.txt:414:firmware_pico/t425_pio_pico_sdk.c
+source/docs/V2_87_SOURCE_INVENTORY.txt:415:firmware_pico/t425_pio_rx.pio
+source/docs/V2_87_SOURCE_INVENTORY.txt:416:firmware_pico/t425_pio_tx.pio
+source/docs/V2_87_SOURCE_INVENTORY.txt:417:firmware_pico/t425_prebuild_contracts.h
+source/docs/V2_87_SOURCE_INVENTORY.txt:418:firmware_pico/t425_redundant_failover_test.c
+source/docs/V2_87_SOURCE_INVENTORY.txt:419:firmware_pico/t425_redundant_topology4.h
+source/docs/V2_87_SOURCE_INVENTORY.txt:420:firmware_pico/t425_reliable.c
+source/docs/V2_87_SOURCE_INVENTORY.txt:421:firmware_pico/t425_reliable.h
+source/docs/V2_87_SOURCE_INVENTORY.txt:422:firmware_pico/t425_reliable_bench.c
+source/docs/V2_87_SOURCE_INVENTORY.txt:423:firmware_pico/t425_reliable_link.c
+source/docs/V2_87_SOURCE_INVENTORY.txt:424:firmware_pico/t425_reliable_link.h
+source/docs/V2_87_SOURCE_INVENTORY.txt:425:firmware_pico/t425_reliable_v2.c
+source/docs/V2_87_SOURCE_INVENTORY.txt:426:firmware_pico/t425_reliable_v2.h
+source/docs/V2_87_SOURCE_INVENTORY.txt:427:firmware_pico/t425_route_candidates.c
+source/docs/V2_87_SOURCE_INVENTORY.txt:428:firmware_pico/t425_route_candidates.h
+source/docs/V2_87_SOURCE_INVENTORY.txt:429:firmware_pico/t425_route_failover_test.c
+source/docs/V2_87_SOURCE_INVENTORY.txt:430:firmware_pico/t425_router.c
+source/docs/V2_87_SOURCE_INVENTORY.txt:431:firmware_pico/t425_router.h
+source/docs/V2_87_SOURCE_INVENTORY.txt:432:firmware_pico/t425_router_3node_test.c
+source/docs/V2_87_SOURCE_INVENTORY.txt:433:firmware_pico/t425_router_link.c
+source/docs/V2_87_SOURCE_INVENTORY.txt:434:firmware_pico/t425_router_link.h
+source/docs/V2_87_SOURCE_INVENTORY.txt:435:firmware_pico/t425_router_link_test.c
+source/docs/V2_87_SOURCE_INVENTORY.txt:436:firmware_pico/t425_router_test.c
+source/docs/V2_87_SOURCE_INVENTORY.txt:437:firmware_pico/t425_runtime_config.c
+source/docs/V2_87_SOURCE_INVENTORY.txt:438:firmware_pico/t425_runtime_config.h
+source/docs/V2_87_SOURCE_INVENTORY.txt:439:firmware_pico/t425_runtime_state.c
+source/docs/V2_87_SOURCE_INVENTORY.txt:440:firmware_pico/t425_runtime_state.h
+source/docs/V2_87_SOURCE_INVENTORY.txt:441:firmware_pico/t425_send_command.c
+source/docs/V2_87_SOURCE_INVENTORY.txt:442:firmware_pico/t425_send_command.h
+source/docs/V2_87_SOURCE_INVENTORY.txt:443:firmware_pico/t425_startup.c
+source/docs/V2_87_SOURCE_INVENTORY.txt:444:firmware_pico/t425_startup_policy.md
+source/docs/V2_87_SOURCE_INVENTORY.txt:445:firmware_pico/t425_static_contracts.c
+source/docs/V2_87_SOURCE_INVENTORY.txt:446:firmware_pico/t425_topology.c
+source/docs/V2_87_SOURCE_INVENTORY.txt:447:firmware_pico/t425_topology.h
+source/docs/V2_87_SOURCE_INVENTORY.txt:448:firmware_pico/t425_topology4.h
+source/docs/V2_87_SOURCE_INVENTORY.txt:449:firmware_pico/t425_topology4_test.c
+source/docs/V2_87_SOURCE_INVENTORY.txt:450:firmware_pico/t425_traffic_matrix.h
+source/docs/V2_87_SOURCE_INVENTORY.txt:451:firmware_pico/t425_transport.c
+source/docs/V2_87_SOURCE_INVENTORY.txt:452:firmware_pico/t425_transport.h
+source/docs/V2_87_SOURCE_INVENTORY.txt:453:firmware_pico/t425_two_node_bench.c
+source/docs/V2_87_SOURCE_INVENTORY.txt:454:firmware_pico/t425_uart8_8n1.pio
+source/docs/V2_87_SOURCE_INVENTORY.txt:455:firmware_pico/t425_usb_config_commit.c
+source/docs/V2_87_SOURCE_INVENTORY.txt:456:firmware_pico/t425_usb_config_commit.h
+source/docs/V2_87_SOURCE_INVENTORY.txt:457:firmware_pico/t425_usb_config_protocol.c
+source/docs/V2_87_SOURCE_INVENTORY.txt:458:firmware_pico/t425_usb_config_protocol.h
+source/docs/V2_87_SOURCE_INVENTORY.txt:459:firmware_pico/t425_usb_config_session.c
+source/docs/V2_87_SOURCE_INVENTORY.txt:460:firmware_pico/t425_usb_config_session.h
+source/docs/V2_87_SOURCE_INVENTORY.txt:461:hardware/PINOUT_V2_8.md
+source/docs/V2_87_SOURCE_INVENTORY.txt:462:hardware/README_HARDWARE.md
+source/docs/V2_87_SOURCE_INVENTORY.txt:463:hardware/physical_link_spec_v2.2.md
+source/docs/V2_87_SOURCE_INVENTORY.txt:464:hardware/pinout_pico_p00_p03.md
+source/docs/V2_87_SOURCE_INVENTORY.txt:465:hardware/t425_pio_link.pio
+source/docs/V2_87_SOURCE_INVENTORY.txt:482:include/t425_network.h
+source/docs/V2_87_SOURCE_INVENTORY.txt:497:include/t425_pio_transport.h
+source/docs/V2_87_SOURCE_INVENTORY.txt:534:src/t425_network.c
+source/docs/V2_87_SOURCE_INVENTORY.txt:550:src/t425_pio_transport.c
+source/docs/V2_87_SOURCE_INVENTORY.txt:573:tests/test_hardware_profile.c
+source/docs/V2_87_SOURCE_INVENTORY.txt:581:tests/test_network.c
+source/docs/V2_87_SOURCE_INVENTORY.txt:593:tests/test_pio_transport.c
+source/docs/V2_87_SOURCE_INVENTORY.txt:605:tests/test_transport_router.c
+source/docs/HOST_TEST_RESULTS_V2_20.txt:1:T425 E2E TRANSPORT/ROUTER: PASS
+source/docs/V2_83_CORRECTIONS.md:15:- estado somente DOWN/UP;
+source/docs/V2_83_CORRECTIONS.md:27:Após programação, o slot alvo é lido novamente do hardware e somente então
+source/docs/V2_83_CORRECTIONS.md:29:estado efetivamente confirmado no hardware.
+source/docs/V2_6_RELIABLE_LINK.md:19:wait ACK
+source/docs/V2_6_RELIABLE_LINK.md:30:A v2.6 fornece o modelo de estado e contadores. O temporizador baseado no hardware e a fila de frames serão ligados ao PIO na próxima etapa.
+source/docs/V2_42_TEST_PLAN.md:8:Esperado: RETX>0; receptor contabiliza DUP; entrega única.
+source/docs/V2_42_TEST_PLAN.md:12:Esperado: CRC>0; RETX>0.
+source/docs/V2_42_TEST_PLAN.md:16:Esperado: TIMEOUT>0.
+source/docs/V2_42_TEST_PLAN.md:20:Esperado: novos frames/ACKs e sequência continuar.
+source/docs/V2_42_TEST_PLAN.md:23:Injetar SEQ não esperado.
+source/docs/V2_42_TEST_PLAN.md:24:Esperado: OOO>0 e nenhuma entrega duplicada.
+source/docs/V2_44_TEST_PLAN.md:15:Esperado:
+source/docs/V2_44_TEST_PLAN.md:18:P00 FORWARD HOP=1
+source/docs/V2_44_TEST_PLAN.md:19:P01 FORWARD HOP=2
+source/docs/V2_44_TEST_PLAN.md:28:Esperado: o frame não deve permanecer encaminhando indefinidamente.
+source/docs/V2_44_TEST_PLAN.md:36:Esperado: decisões simétricas.
+source/docs/V2_44_TEST_PLAN.md:40:Depois da prova de cabeçalho/decisão, integrar o forwarding ao transporte físico,
+source/docs/V2_83_NEXT_BUILD.md:6:cmake -S firmware_pico -B build -DPICO_BOARD=pico
+source/docs/HOST_TEST_RESULTS_V1_9.txt:2:Host build: -std=c11 -Wall -Wextra -Werror
+source/docs/V2_3_BUILD_MATRIX.md:12:A configuração do nó deve ser feita no build, evitando duplicação do firmware.
+source/docs/V2_49_E2E_DUPLICATE_SAFE.md:54:- at-least-once no transporte lógico;
+source/docs/V2_80_ACCEPTANCE.md:9:- [x] generation overflow guard
+source/docs/V2_80_ACCEPTANCE.md:11:- [ ] real CMake configure with Pico SDK
+source/docs/V2_80_ACCEPTANCE.md:18:- [ ] power-loss test
+source/docs/V2_22_APPLICATION_INTEGRATION.md:5:## Fluxo real no software
+source/docs/V2_22_APPLICATION_INTEGRATION.md:27:                 Transport
+source/docs/V2_22_APPLICATION_INTEGRATION.md:33:O teste unitário confirma que `SEND DEST=3` originado em P00 seleciona LINK1 e produz um wire frame de 16 bytes.
+source/docs/V2_22_APPLICATION_INTEGRATION.md:39:Isso evita declarar ACK/retry ponta a ponta antes de existir o frame real disponível para retransmissão.
+source/docs/V2_71_END_TO_END.md:33:A camada física do RP2040 continua sendo o último gate de hardware.
+source/docs/V2_41_TEST.md:5:Esperado:
+source/docs/V2_41_TEST.md:18:Esperado:
+source/docs/V2_41_TEST.md:31:Esperado:
+source/docs/V2_41_TEST.md:40:Injetar manualmente um DATA com SEQ diferente do esperado.
+source/docs/V2_41_TEST.md:42:Esperado:
+source/docs/V2_33_CHECKLIST.md:13:11. Somente depois integrar Transport/CRC.
+source/docs/V2_63_ACCEPTANCE.md:6:- [x] write exige verificação;
+source/docs/V2_80_FIRST_BUILD_AUDIT.md:3:A source-level build gate was performed before attempting the RP2040 build.
+source/docs/V2_80_FIRST_BUILD_AUDIT.md:18:`main.c` was still using:
+source/docs/V2_80_FIRST_BUILD_AUDIT.md:31:It now uses:
+source/docs/V2_80_FIRST_BUILD_AUDIT.md:51:but `t425_interfaces.c` was not in the CMake target.
+source/docs/V2_80_FIRST_BUILD_AUDIT.md:53:It is now explicitly compiled.
+source/docs/V2_80_FIRST_BUILD_AUDIT.md:57:All CMake-listed sources that do not require Pico SDK headers were passed through:
+source/docs/V2_80_FIRST_BUILD_AUDIT.md:60:gcc -std=c11 -Wall -Wextra -Werror -fsyntax-only
+source/docs/V2_80_FIRST_BUILD_AUDIT.md:63:No errors were found in that subset.
+source/docs/ARQUITETURA_PICO.md:1:# T425-SIM — Firmware dos Raspberry Pi Pico 0–3
+source/docs/ARQUITETURA_PICO.md:9:- registradores A, B, C, W, I e PC;
+source/docs/ARQUITETURA_PICO.md:17:O manual do IMS T425 especifica 32 bits, 4 KiB de RAM interna, quatro links
+source/docs/ARQUITETURA_PICO.md:23:| Firmware | ID | Função |
+source/docs/ARQUITETURA_PICO.md:52:A implementação atual usa 1 Mbit/s no transporte PIO experimental. A
+source/docs/ARQUITETURA_PICO.md:54:uma etapa específica de validação; não se deve confundir este transporte
+source/docs/ARQUITETURA_PICO.md:64:- W/I/PC;
+source/docs/ARQUITETURA_PICO.md:86:- WRITE_MEM
+source/docs/ARQUITETURA_PICO.md:97:1. validar os quatro firmwares individualmente;
+source/docs/ARQUITETURA_PICO.md:103:7. substituir o transporte PIO de laboratório pela implementação do link
+source/docs/ARQUITETURA_PICO.md:105:8. integrar ESP32;
+source/docs/V2_76_ACCEPTANCE.md:16:- [ ] hardware.
+source/docs/HOST_TEST_RESULTS_V2_10.txt:2:Host build: -std=c11 -Wall -Wextra -Werror
+source/docs/HOST_TEST_RESULTS_V2_10.txt:3:RP2040 timer/PIO physical integration: pending hardware bring-up.
+source/docs/V2_72_CRITICAL_SECTION.md:4:comum, porque o RP2040 executa normalmente a partir do espaço XIP.
+source/docs/V2_72_CRITICAL_SECTION.md:8:O projeto deverá ainda validar no hardware a política de interrupções e
+source/docs/V2_72_CRITICAL_SECTION.md:9:concorrência específica do firmware final, especialmente se houver IRQs/PIO
+source/docs/V2_13_RUNTIME.md:3:A v2.13 integra as camadas de transporte em uma máquina de execução de nó.
+source/docs/STATUS.md:5:- Primárias J, LDLP, PFIX, LDNL, LDC, LDNLP, NFIX, LDL, ADC, CALL, CJ, AJW, EQC, STL, STNL.
+source/docs/STATUS.md:8:- Estrutura de scheduler com prioridade e salvamento básico de PC/W.
+source/docs/STATUS.md:13:Os links físicos ainda são transporte de laboratório; scheduler, canais, bootstrap e timers precisam da implementação completa antes de executar software OCCAM real sem adaptação.
+source/docs/STATUS_V09.md:12:Todos os testes selecionados são compilados com `-Wall -Wextra -Werror` e retornam 0.
+source/docs/V2_78_PREBUILD_AUDIT.md:15:espaço XIP. Para leitura, o ponteiro XIP é usado diretamente.
+source/docs/V2_78_PREBUILD_AUDIT.md:23:Isso corresponde ao contrato de `flash_range_erase()` e
+source/docs/V2_78_PREBUILD_AUDIT.md:37:Foi adicionada proteção contra overflow de `generation` em `UINT32_MAX`.
+source/docs/V2_74_CORRECTIONS.md:21:enquanto o hardware continua sendo reconhecido como Flash física de 2 MiB.
+source/docs/V2_74_CORRECTIONS.md:34:firmware normalmente executa em XIP.
+source/docs/V2_32_BENCH_FIRMWARE.md:1:# T425-SIM v2.32 — firmware de bancada PIO
+source/docs/V2_32_BENCH_FIRMWARE.md:3:Esta versão cria o primeiro firmware mínimo de bancada.
+source/docs/V2_32_BENCH_FIRMWARE.md:23:O firmware imprime:
+source/docs/V2_32_BENCH_FIRMWARE.md:48:Esta versão é software-preparada; a validação elétrica continua dependente dos Pico físicos.
+source/docs/V2_68_ACCEPTANCE.md:5:- [x] hardware isolado;
+source/docs/V2_68_ACCEPTANCE.md:12:- [ ] power-loss;
+source/docs/V2_67_STARTUP_ORDER.md:8:POWER ON
+source/docs/V2_67_ACCEPTANCE.md:4:- [x] identidade disponível em runtime;
+source/docs/V2_45_LAYER_CONTRACT.md:4:FORWARD ENGINE
+source/docs/V2_45_LAYER_CONTRACT.md:17:O endereço final permanece no cabeçalho de forwarding.
+source/docs/HOST_TEST_RESULTS_V1_7.txt:2:Host build: -std=c11 -Wall -Wextra -Werror
+source/docs/PINOUT_V2_29.md:3:Use any GPIOs that are convenient and available on the chosen Pico carrier. The firmware API does not hard-code a board-specific connector.
+source/docs/PINOUT_V2_29.md:13:This is a point-to-point TTL/CMOS GPIO connection. Keep the first test short and use a common ground. Do not connect two outputs directly to each other.
+source/docs/V1_3_FIRMWARE_PICO.md:1:# T425-SIM v1.3 — Firmware RP2040/Pico SDK
+source/docs/V1_3_FIRMWARE_PICO.md:5:Criar o primeiro alvo de firmware real para RP2040 usando Pico SDK, PIO, GPIO e USB stdio.
+source/docs/V1_3_FIRMWARE_PICO.md:16:Definir `PICO_SDK_PATH` no ambiente e executar CMake no diretório `firmware_pico`.
+source/docs/V1_3_FIRMWARE_PICO.md:22:A implementação usa duas state machines por link, mas o divisor de clock/baud e o programa PIO ainda precisam de calibração no osciloscópio/analisador lógico. O firmware é o primeiro bring-up, não uma declaração de conformidade elétrica.
+source/docs/V2_27_ONE_HOP_TIMED_VALIDATION.md:5:Cada evento recebe `now` explicitamente.
+source/docs/V2_27_ONE_HOP_TIMED_VALIDATION.md:16:t=209  P00 permanece WAIT_ACK
+source/docs/V2_27_ONE_HOP_TIMED_VALIDATION.md:19:       WAIT_ACK → RETRY
+source/docs/V2_23_RETRANSMISSION_CACHE.md:11:WAIT_ACK
+source/docs/V2_23_RETRANSMISSION_CACHE.md:24:                WAIT_ACK
+source/docs/STATUS_V1_0.md:7:- `t425_network.*`: topologia lógica de quatro nós;
+source/docs/STATUS_V1_0.md:8:- `t425_pio_links.*`: fronteira de hardware;
+source/docs/STATUS_V1_0.md:12:Importante: a v1.0 é o marco de arquitetura de rede; o transporte PIO/GPIO ainda requer bring-up físico.
+source/docs/V2_80_BUILD_PROCEDURE.md:12:cmake -S firmware_pico -B build -DPICO_BOARD=pico
+source/docs/V2_80_BUILD_PROCEDURE.md:33:After the build, the `.map` must be inspected rather than trusting the CMake
+source/docs/HOST_TEST_RESULTS_V1_8.txt:2:Host build: -std=c11 -Wall -Wextra -Werror
+source/docs/HOST_TEST_RESULTS_V1_8.txt:3:Remote rendezvous transport: pending v1.9.
+source/docs/V2_85_VERIFICATION_CHECKLIST.md:12:10. Firmware size <= 0x1FE000.
+source/docs/V2_85_VERIFICATION_CHECKLIST.md:13:11. Hardware boot.
+source/docs/V2_85_VERIFICATION_CHECKLIST.md:15:13. Power-loss A/B.
+source/docs/HOST_TEST_RESULTS_V2_9.txt:2:Host build: -std=c11 -Wall -Wextra -Werror
+source/docs/V2_77_TEST_MATRIX.md:3:| Teste | Resultado esperado |
+source/docs/V2_77_TEST_MATRIX.md:16:| Power-loss antes do commit | slot anterior permanece válido |
+source/docs/V2_77_TEST_MATRIX.md:17:| Power-loss após commit | pelo menos um slot válido |
+source/docs/V2_77_TEST_MATRIX.md:19:O teste de power-loss precisa ser executado em hardware.
+source/docs/HOST_TEST_RESULTS_V2_17.txt:2:RP2040 SDK hardware build requires PICO_SDK_PATH.
+source/docs/V2_61_FLASH_LAYOUT.md:24:Ambos devem respeitar alinhamento de 4096 bytes.
+source/docs/V2_61_FLASH_LAYOUT.md:29:projeto. Escolher um endereço arbitrário pode fazer o firmware sobrescrever a
+source/docs/V2_58_USB_MACBOOK.md:25:Depois disso poderá ser criada uma ferramenta específica para macOS que esconda
+source/docs/HOST_TEST_RESULTS_V1_2.txt:1:PIO transport API host test: PASS
+source/docs/HOST_TEST_RESULTS_V1_2.txt:2:Build: -std=c11 -Wall -Wextra -Werror
+source/docs/HOST_TEST_RESULTS_V1_2.txt:3:Physical PIO/GPIO: NOT YET VALIDATED on RP2040 hardware.
+source/docs/V1_4_PING_PONG.md:15:P00 envia `PING` para P01. P01 responde `PONG` usando o mesmo `SEQ`.
+source/docs/V1_4_PING_PONG.md:19:## Firmware
+source/docs/V1_4_PING_PONG.md:21:`firmware_pico/main.c` pode ser compilado para cada nó definindo:
+source/docs/V1_4_PING_PONG.md:28:O firmware entregue é um bring-up inicial. O RX/TX ainda deve ser instrumentado e validado em bancada antes de transformar o teste em uma implementação de produção.
+source/docs/V2_39_RELIABLE_LINK.md:15:É deliberadamente **stop-and-wait ARQ**:
+source/docs/V2_39_RELIABLE_LINK.md:25:Isto ainda não é uma janela deslizante. A janela será introduzida somente depois que o stop-and-wait estiver comprovado.
+source/docs/V2_4_TEST_PROCEDURE.md:20:Inserir perda/atraso no teste de host antes de depender do hardware.
+source/docs/HOST_TEST_RESULTS_V2_1.txt:2:Host build: -std=c11 -Wall -Wextra -Werror
+source/docs/V2_59_FLASH_TRANSACTION.md:3:A v2.59 implementa a política de dois slots em software:
+source/docs/V2_86_BUILD_BLOCKER.md:3:A execução real da v2.85 mostrou ausência de `arm-none-eabi-gcc`. A inspeção
+source/docs/V2_86_BUILD_BLOCKER.md:19:mensagem específica se o arquivo não estiver presente.
+source/docs/V2_86_NEXT_STEP.md:5:1. obter uma cópia compatível do Raspberry Pi Pico SDK;
+source/docs/V2_86_NEXT_STEP.md:7:3. disponibilizar `PICO_SDK_PATH`;
+source/docs/V2_86_NEXT_STEP.md:8:4. disponibilizar `arm-none-eabi-gcc`;
+source/docs/V2_86_NEXT_STEP.md:11:O próprio Raspberry Pi recomenda CMake + GCC cross compiler e `PICO_SDK_PATH`
+source/docs/V2_86_NEXT_STEP.md:17:- tamanho do firmware;
+source/docs/V2_75_ACCEPTANCE.md:18:- [ ] power-loss;
+source/docs/V2_1_ROUTER_MULTIHOP.md:22:A v2.1 usa rotas estáticas. Ainda não há descoberta automática de vizinhos, algoritmo de roteamento dinâmico ou detecção de loops. Esses mecanismos só devem entrar depois que o transporte físico estiver validado.
+source/docs/RELEASE_NOTE_V06.md:5:A versão final também valida a precedência configurada: enquanto o guard de canal está habilitado e pronto, ele é selecionado; quando desabilitado, o guard temporal já disparado é selecionado.
+source/docs/V2_26_ONE_HOP_VALIDATED.md:17:2. ACK perdido → `WAIT_ACK`
+source/docs/V2_26_ONE_HOP_VALIDATED.md:24:Este teste valida a máquina de transporte de um salto sem ainda fingir que a PIO foi exercitada no hardware.
+source/docs/V2_66_RECOVERY.md:12:O dispositivo deve permanecer acessível pelo canal de manutenção/USB para
+source/docs/V2_50_STATE_MACHINE.md:25:route forwarding
+source/docs/V2_4_PINOUT_AND_SIGNALING.md:14:Antes da conexão, verificar a revisão exata da placa Pico e o esquema correspondente. Não aplicar 5 V aos GPIO.
+source/docs/V2_55_TEST_CRITERIA.md:5:Esperado:
+source/docs/V2_55_TEST_CRITERIA.md:12:## Teste B — interface primária DOWN
+source/docs/V2_55_TEST_CRITERIA.md:14:Esperado:
+source/docs/V2_55_TEST_CRITERIA.md:21:## Teste C — todas as interfaces candidatas DOWN
+source/docs/V2_55_TEST_CRITERIA.md:23:Esperado:
+source/docs/HOST_TEST_RESULTS_V1_3.txt:2:Pico SDK firmware: target source prepared; requires a local Pico SDK toolchain for UF2 build.
+source/docs/V2_58_TRANSACTION.md:17:   FLASH NEW SLOT
+source/docs/V2_51_TEST_MATRIX.md:9:Esperado:
+source/docs/V2_51_TEST_MATRIX.md:20:Esperado:
+source/docs/V2_51_TEST_MATRIX.md:32:Esperado:
+source/docs/V2_51_TEST_MATRIX.md:35:DOWN
+source/docs/V2_68_FLASH_TRANSACTION.md:20:HW: erase target
+source/docs/V2_68_FLASH_TRANSACTION.md:22:HW: program target
+source/docs/V2_68_FLASH_TRANSACTION.md:24:HW: read-back / validate
+source/docs/V2_68_FLASH_TRANSACTION.md:26:accept new generation
+source/docs/V2_68_FLASH_TRANSACTION.md:34:t425_flash_hw.c
+source/docs/V2_68_FLASH_TRANSACTION.md:39:Isso permite testar a política independentemente do hardware.
+source/docs/V2_56_ACCEPTANCE.md:29:carregar o mesmo firmware
+source/docs/V1_6_OCCAM_CHANNELS.md:22:A camada ainda não é um compilador OCCAM completo. É a ABI mínima para que o runtime possa transportar `OUT` remoto e, posteriormente, implementar `IN`, rendezvous e bloqueio.
+source/docs/HOST_TEST_RESULTS_V2_15.txt:2:RP2040 SDK/PIO build was not executed here; requires PICO_SDK_PATH.
+
+===== 5. t425_vm.h — DEFINIÇÃO ATUAL DA VM =====
+#pragma once
+#include <stdint.h>
+#include <stdbool.h>
+#include "t425_config.h"
+
+typedef struct {
+    uint32_t A, B, C;
+    uint32_t W, I, PC;
+    uint32_t OPR;
+    uint8_t error, halted, prefix_valid, prefix_negative;
+} t425_cpu_t;
+
+typedef enum {
+    PROC_FREE=0, PROC_READY, PROC_RUNNING, PROC_WAIT_CHAN,
+    PROC_WAIT_TIMER, PROC_STOPPED, PROC_TERMINATED
+} t425_proc_state_t;
+
+typedef struct {
+    uint32_t pid, pc, w, priority;
+    t425_proc_state_t state;
+} t425_process_t;
+
+typedef struct {
+    t425_cpu_t cpu;
+    uint8_t ram[T425_RAM_BYTES];
+    t425_process_t proc[T425_MAX_PROCESSES];
+    uint32_t current_pid;
+    uint32_t current_priority;
+    uint64_t instructions;
+    uint32_t timer;
+    uint8_t analyse;
+} t425_vm_t;
+
+void t425_vm_reset(t425_vm_t *vm);
+bool t425_vm_load(t425_vm_t *vm, uint32_t addr, const uint8_t *data, uint32_t len);
+bool t425_vm_read_mem(t425_vm_t *vm, uint32_t addr, uint8_t *out, uint32_t len);
+bool t425_vm_write_mem(t425_vm_t *vm, uint32_t addr, const uint8_t *data, uint32_t len);
+bool t425_vm_step(t425_vm_t *vm);
+void t425_vm_run_slice(t425_vm_t *vm, uint32_t budget);
+void t425_vm_get_regs(const t425_vm_t *vm, uint32_t out[6]);
+void t425_vm_tick(t425_vm_t *vm);
+void t425_vm_halt(t425_vm_t *vm);
+void t425_vm_run(t425_vm_t *vm);
+
+===== 6. t425_vm.c — TRECHO DE EXECUÇÃO / SCHEDULING =====
+static void prefix_nfix(t425_vm_t *vm,uint8_t n) {
+    vm->cpu.OPR=~((vm->cpu.OPR<<4)|n);
+    vm->cpu.prefix_valid=1;
+    vm->cpu.prefix_negative=1;
+}
+
+static void operate(t425_vm_t *vm,uint32_t op) {
+    t425_cpu_t *c=&vm->cpu; uint32_t x;
+    switch(op) {
+    case 0x00: x=c->A;c->A=c->B;c->B=x;break;             /* rev */
+    case 0x01: {uint32_t a=c->A;if(in_ram(a,1))c->A=vm->ram[a-T425_INT_RAM_BASE];else c->error=1;}break;
+    case 0x02: c->A=c->A-c->B; break;                     /* bsub */
+    case 0x04: x=pop(c);c->A=x-c->A;break;                /* diff */
+    case 0x05: x=pop(c);c->A=x+c->A;break;                /* add */
+    case 0x09: x=pop(c);c->A=(x>c->A);break;              /* gt */
+    case 0x0A: c->A=(c->A>>2);break;                     /* wsub: word index */
+    case 0x0C: x=pop(c);c->A=x-c->A;break;                /* sub */
+    case 0x0D: {                                          /* startp: phase-2 model */
+        uint32_t pid=pop(c);
+        if(pid<T425_MAX_PROCESSES){
+            vm->proc[pid].state=PROC_READY;
+            vm->proc[pid].pc=vm->proc[pid].pc?vm->proc[pid].pc:c->A;
+        }
+        break;
+    }
+    case 0x0F: c->A=~c->A; break;                         /* placeholder safety */
+    case 0x12: c->error=1; break;                         /* resetch hook */
+    case 0x18: c->A=vm->proc[0].pc;break;
+    case 0x19: {                                          /* norm */
+        uint32_t v=c->A,n=0;if(v==0){c->A=32;break;}
+        while((v&0x80000000u)==0){v<<=1;n++;}
+        c->A=n;break;
+    }
+    case 0x1A: x=pop(c);c->A=(c->A==0)?0:(uint32_t)((int32_t)x/(int32_t)c->A);break;
+    case 0x1B: c->A=c->I;break;                           /* ldpi */
+    case 0x1D: break;                                     /* xdble hook */
+    case 0x1E: c->A=vm->current_priority;break;           /* ldpri */
+    case 0x1F: x=pop(c);c->A=(c->A==0)?0:(uint32_t)((int32_t)x%(int32_t)c->A);break;
+    case 0x20:                                             /* ret: return address in A */
+        c->PC=c->A; c->A=c->B;c->B=c->C;c->C=0; break;
+    case 0x21: break;                                     /* lend hook */
+    case 0x22: c->A=vm->timer;break;                      /* ldtimer */
+    case 0x29: c->error=0; c->A=0;break;                  /* testerr */
+    case 0x2A: c->A=vm->analyse?1:0;break;
+    case 0x2B: break;                                     /* tin hook */
+    case 0x2C: x=pop(c);c->A=(c->A==0)?0:(uint32_t)((int32_t)x/(int32_t)c->A);break;
+    case 0x2E: break;                                     /* dist hook */
+    case 0x30: break;                                     /* diss */
+    case 0x32: c->A=~c->A;break;                          /* not */
+    case 0x33: x=pop(c);c->A=x^c->A;break;                /* xor */
+    case 0x35: x=pop(c);c->A=x>>c->A;break;               /* lshr approximation */
+    case 0x36: x=pop(c);c->A=x<<c->A;break;               /* lshl approximation */
+    case 0x38: x=pop(c);c->A=x-c->A;break;                /* lsub */
+    case 0x39: vm->proc[vm->current_pid].state=PROC_READY;break; /* runp hook */
+    case 0x3A: break;                                     /* xword */
+    case 0x3B: {uint32_t a=c->B;if(in_ram(a,1))vm->ram[a-T425_INT_RAM_BASE]=(uint8_t)c->A;else c->error=1;}break;
+    case 0x3D: break; case 0x3E: break;
+    case 0x40: x=pop(c);c->A=x>>c->A;break;               /* shr */
+    case 0x41: x=pop(c);c->A=x<<c->A;break;               /* shl */
+    case 0x42: c->A=(int32_t)c->A < 0 ? c->A : 0x7fffffff;break; /* mint model */
+    case 0x46: x=pop(c);c->A=x&c->A;break;                /* and */
+    case 0x4B: x=pop(c);c->A=x|c->A;break;                /* or */
+    case 0x4E: break; case 0x4F: break;
+    case 0x50: break; case 0x51: break;
+    case 0x52: x=pop(c);c->A=x+c->A;break;                /* sum */
+    case 0x53: x=pop(c);c->A=(uint32_t)((int32_t)x*(int32_t)c->A);break;
+    case 0x54: vm->timer=0;break;                         /* sttimer */
+    case 0x5A: push(c,c->A);break;                        /* dup */
+    case 0x63: break; case 0x72: x=pop(c);c->A=x*c->A;break;
+    case 0x73: break; case 0x74: break; case 0x75: break;
+    case 0x76: {uint32_t v=c->A,n=0;while(v){n+=v&1;v>>=1;}c->A=n;}break;
+
+===== 7. REFERÊNCIAS AO DESCRITOR E WORKSPACE NO CORE =====
+source/include/t425_scheduler.h.before_process_scheduler:30:     * baseados integralmente em workspace.
+source/include/t425_scheduler.h.before_process_scheduler:43:    uint32_t current_pid;
+source/include/t425_vm.h:27:    uint32_t current_pid;
+source/include/t425_vm.h:28:    uint32_t current_priority;
+source/include/t425_scheduler.h:30:     * baseados integralmente em workspace.
+source/include/t425_scheduler.h:43:    uint32_t current_pid;
+source/include/t425_process.h:6:#ifndef T425_WORKSPACE_WORDS
+source/include/t425_process.h:7:#define T425_WORKSPACE_WORDS 64
+source/include/t425_process.h:10:/* Extended process descriptor used by the runtime layer.
+source/include/t425_process.h:18:    uint32_t workspace[T425_WORKSPACE_WORDS];
+source/src/t425_vm.c:81:    case 0x1E: c->A=vm->current_priority;break;           /* ldpri */
+source/src/t425_vm.c:98:    case 0x39: vm->proc[vm->current_pid].state=PROC_READY;break; /* runp hook */
+source/src/t425_vm.c:132:    vm->current_pid=0; vm->current_priority=0;
+source/src/t425_scheduler.c.before_process_scheduler:62:    s->current_pid =
+source/src/t425_scheduler.c:64:    s->current_pid =
+source/src/t425_process.c:6:        p[i].pid=i;p[i].state=PROC_FREE;p[i].sp=T425_WORKSPACE_WORDS;
+source/src/t425_process.c:11:    p[pid].pc=pc;p[pid].w=0;p[pid].sp=T425_WORKSPACE_WORDS;
+source/src/t425_vm_scheduler.c:6: *     vm->current_pid
+source/src/t425_vm_scheduler.c:40:    vm->current_pid = pid;
+
+===== 8. REFERÊNCIAS ÀS OPERAÇÕES DE PROCESSO =====
+source/include/t425_occam_runtime.h:11:    T425_PROC_READY=0,
+source/include/t425_occam_runtime.h:12:    T425_PROC_RUNNING,
+source/include/t425_vm.h:14:    PROC_FREE=0, PROC_READY, PROC_RUNNING, PROC_WAIT_CHAN,
+source/include/t425_vm.h:15:    PROC_WAIT_TIMER, PROC_STOPPED, PROC_TERMINATED
+source/src/t425_vm.c:62:    case 0x0D: {                                          /* startp: phase-2 model */
+source/src/t425_vm.c:65:            vm->proc[pid].state=PROC_READY;
+source/src/t425_vm.c:81:    case 0x1E: c->A=vm->current_priority;break;           /* ldpri */
+source/src/t425_vm.c:98:    case 0x39: vm->proc[vm->current_pid].state=PROC_READY;break; /* runp hook */
+source/src/t425_vm.c:129:        vm->proc[i].pid=i; vm->proc[i].state=(i==0)?PROC_READY:PROC_FREE;
+source/src/t425_process.c:12:    p[pid].priority=priority;p[pid].state=PROC_READY;return true;
+source/src/t425_process.c:16:    p[pid].state=PROC_STOPPED;return true;
+source/src/t425_process.c:19:    if(pid>=T425_MAX_PROCESSES||p[pid].state!=PROC_STOPPED)return false;
+source/src/t425_process.c:20:    p[pid].state=PROC_READY;return true;
+source/src/t425_process.c:24:    p[pid].state=PROC_TERMINATED;return true;
+source/src/t425_occam_runtime.c:11:    r->proc[id]=(t425_occam_proc_t){.proc_id=id,.state=T425_PROC_READY,.pc=0,.priority=priority};
+source/src/t425_occam_runtime.c:29:    r->proc[pid].state=T425_PROC_READY;
+source/src/t425_occam_runtime.c:30:    if(c->waiting_in>=0){r->proc[(uint8_t)c->waiting_in].state=T425_PROC_READY;c->waiting_in=-1;}
+source/src/t425_occam_runtime.c:38:    r->proc[pid].state=T425_PROC_READY;
+source/src/t425_occam_runtime.c:39:    if(c->waiting_out>=0){r->proc[(uint8_t)c->waiting_out].state=T425_PROC_READY;c->waiting_out=-1;}
+source/src/t425_occam_runtime.c:46:        if(r->proc[i].state==T425_PROC_READY&&(best<0||r->proc[i].priority>r->proc[(uint8_t)best].priority))
+source/src/t425_occam_runtime.c:48:    if(best>=0){for(uint8_t i=0;i<r->proc_count;i++)if(r->proc[i].state==T425_PROC_RUNNING)r->proc[i].state=T425_PROC_READY;
+source/src/t425_occam_runtime.c:49:        r->proc[(uint8_t)best].state=T425_PROC_RUNNING;r->current=(uint8_t)best;}
+source/src/t425_vm_scheduler.c:88:    if (vm->proc[pid].state == PROC_READY)
+
+============================================================
+FIM FASE 5
+============================================================

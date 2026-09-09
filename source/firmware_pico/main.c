@@ -1,0 +1,253 @@
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
+#include "pico/stdlib.h"
+#include "pico/time.h"
+#include "t425_supervisor.h"
+#include "t425_pio_hw.h"
+#include "t425_config_store.h"
+#include "t425_link_test.h"
+
+#ifndef T425_LINK_BAUD
+#define T425_LINK_BAUD 115200
+#endif
+
+static t425_supervisor_t supervisor;
+static t425_node_config_t cfg;
+static bool configured=false;
+static uint32_t link_rx_ok=0, link_rx_bad=0, link_tx=0;
+
+static const char *runtime_state_name(t425_runtime_state_t state)
+{
+    switch(state){
+    case T425_RT_BOOT:    return "BOOT";
+    case T425_RT_READY:   return "READY";
+    case T425_RT_RUNNING: return "RUNNING";
+    case T425_RT_ERROR:   return "ERROR";
+    default:              return "UNKNOWN";
+    }
+}
+
+static const char *scheduler_state_name(t425_sched_state_t state)
+{
+    switch(state){
+    case T425_SCHED_INIT:    return "INIT";
+    case T425_SCHED_READY:   return "READY";
+    case T425_SCHED_RUNNING: return "RUNNING";
+    case T425_SCHED_FAULT:   return "FAULT";
+    default:                 return "UNKNOWN";
+    }
+}
+
+static void default_config(t425_node_config_t*c,uint8_t id){
+    t425_node_config_init(c,id);
+    if(id>0)t425_node_config_add_interface(c,(uint8_t)(id-1),0,4,5);
+    if(id<3)t425_node_config_add_interface(c,(uint8_t)(id+1),1,6,7);
+}
+static void send_test_ping(uint8_t link){
+    t425_test_frame_t f={.type=T425_TEST_PING,.seq=(uint8_t)link_tx,.len=4,.payload={'T','4','2','5'}};
+    uint8_t raw[64]; uint16_t n=t425_test_encode(&f,raw,sizeof(raw));
+    if(n && t425_pio_hw_write(link,raw,n)){link_tx++;printf("TX TEST LINK=%u SEQ=%u\\r\\n",link,f.seq);}
+    else printf("ERR TX LINK=%u\\r\\n",link);
+}
+static void show_status(void)
+{
+    char b[192];
+
+    if(t425_supervisor_status(&supervisor,b,sizeof(b)))
+        printf(
+            "%s RT_NAME=%s SCHED_NAME=%s CFG=%s\r\n",
+            b,
+            runtime_state_name(supervisor.runtime.state),
+            scheduler_state_name(supervisor.scheduler.state),
+            configured ? "FLASH" : "DEFAULT"
+        );
+
+    for(uint8_t i=0;i<T425_MAX_LINKS;i++)
+        if(i < cfg.interfaces.count &&
+           cfg.interfaces.items[i].state != T425_IF_DOWN)
+            printf(
+                "LINK%u -> NODE %u TX=%u RX=%u PIO_SM=%u\r\n",
+                i,
+                cfg.interfaces.items[i].peer_id,
+                cfg.interfaces.items[i].tx_gpio,
+                cfg.interfaces.items[i].rx_gpio,
+                cfg.interfaces.items[i].pio_sm
+            );
+}
+
+static void print_help(void){
+    printf("COMMANDS: HELP | STATUS | GETID | SETID n | SAVE | LOAD | DEFAULT n | CLEAR | START | PING n\r\n");
+}
+static void process_cmd(char *s){
+    while(*s==' '||*s=='\t')s++;
+    if(!strcmp(s,"HELP")){print_help();return;}
+    if(!strcmp(s,"STATUS")){show_status();printf("LINK_TX=%lu LINK_RX_OK=%lu LINK_RX_BAD=%lu\\r\\n",(unsigned long)link_tx,(unsigned long)link_rx_ok,(unsigned long)link_rx_bad);return;}
+    if(!strcmp(s,"GETID")){printf("NODE=%u\r\n",cfg.node_id);return;}
+    if(!strncmp(s,"SETID ",6)){
+        int id=atoi(s+6);
+        if(id<0||id>254){printf("ERR ID\r\n");return;}
+        default_config(&cfg,(uint8_t)id); configured=false;
+        printf("OK NODE=%u (use SAVE)\r\n",cfg.node_id); return;
+    }
+    if(!strncmp(s,"DEFAULT ",8)){
+        int id=atoi(s+8);
+        if(id<0||id>254){printf("ERR ID\r\n");return;}
+        default_config(&cfg,(uint8_t)id);configured=false;
+        printf("OK DEFAULT NODE=%u\r\n",cfg.node_id);return;
+    }
+    if(!strcmp(s,"SAVE")){
+        if(t425_config_store_save(&cfg)){configured=true;printf("OK SAVED\r\n");}
+        else printf("ERR SAVE\r\n");
+        return;
+    }
+    if(!strcmp(s,"LOAD")){
+        if(t425_config_store_load(&cfg)){configured=true;printf("OK LOADED NODE=%u\r\n",cfg.node_id);}
+        else printf("ERR NO_VALID_CONFIG\r\n");
+        return;
+    }
+    if(!strcmp(s,"CLEAR")){
+        if(t425_config_store_clear()){configured=false;printf("OK CLEARED\r\n");}
+        else printf("ERR CLEAR\r\n");
+        return;
+    }
+    if(!strncmp(s,"PING ",5)){
+        int link=atoi(s+5);
+        if(link<0||link>=T425_HW_LINKS){printf("ERR LINK\\r\\n");return;}
+        send_test_ping((uint8_t)link); return;
+    }
+    if(!strcmp(s,"START")){
+
+        if(supervisor.scheduler.state == T425_SCHED_RUNNING){
+            printf("OK ALREADY RUNNING\r\n");
+            return;
+        }
+
+        if(t425_supervisor_start(&supervisor))
+            printf("OK RUNNING\r\n");
+        else
+            printf("ERR START STATE=%d\r\n",
+                   (int)supervisor.scheduler.state);
+
+        return;
+    }
+    printf("ERR UNKNOWN; ");print_help();
+}
+int main(void){
+    stdio_init_all();sleep_ms(1200);
+    configured=t425_config_store_load(&cfg);
+    if(!configured)default_config(&cfg,0);
+
+    t425_pio_hw_cfg_t hwcfg[T425_HW_LINKS]={
+        {.tx_pin=4,.rx_pin=5,.pio_index=0,.tx_sm=0,.rx_sm=1,.baud=T425_LINK_BAUD},
+        {.tx_pin=6,.rx_pin=7,.pio_index=1,.tx_sm=0,.rx_sm=1,.baud=T425_LINK_BAUD}
+    };
+    bool hw=t425_pio_hw_init(hwcfg);
+    bool rt=t425_supervisor_init(&supervisor,&cfg);
+    printf("\r\nT425-SIM v2.80\r\nNODE=%u BAUD=%lu HW=%s RUNTIME=%s CFG=%s\r\n",
+           cfg.node_id,(unsigned long)T425_LINK_BAUD,hw?"OK":"FAIL",rt?"OK":"FAIL",
+           configured?"FLASH":"DEFAULT");
+    print_help();show_status();
+    char line[96];size_t pos=0;
+    /*
+     * Runtime logical clock:
+     * exactly one scheduler tick every 1 ms.
+     */
+    absolute_time_t next_runtime_tick =
+        make_timeout_time_us(1000);
+
+    /*
+     * Independent status reporting timer.
+     */
+    absolute_time_t next_status =
+        make_timeout_time_ms(1000);
+
+    while(true){
+
+        /* T425_RUNTIME_TRACE_MAIN */
+        static uint32_t t425_trace_loop = 0;
+
+        t425_trace_loop++;
+
+        if ((t425_trace_loop % 1000u) == 0u) {
+
+            printf(
+                "[TRACE MAIN] "
+                "loop=%lu "
+                "ticks=%lu "
+                "sched_state=%d "
+                "cycles=%lu\n",
+
+                (unsigned long)t425_trace_loop,
+                (unsigned long)supervisor.runtime.ticks,
+                (int)supervisor.scheduler.state,
+                (unsigned long)supervisor.scheduler.cycles
+            );
+        }
+
+
+        /*
+         * Scheduler/runtime clock.
+         *
+         * The main loop may execute much faster than 1 ms.
+         * Therefore supervisor_step() is driven by the RP2040
+         * hardware time base instead of loop speed.
+         */
+        if(absolute_time_diff_us(
+                get_absolute_time(),
+                next_runtime_tick) <= 0){
+
+            (void)t425_supervisor_step(&supervisor);
+
+            next_runtime_tick =
+                delayed_by_us(next_runtime_tick, 1000);
+        }
+
+        /*
+         * Physical PIO RX processing.
+         */
+        {
+            for(uint8_t link=0;link<T425_HW_LINKS;link++){
+                if(!t425_pio_hw_ready(link))continue;
+                uint8_t data[32];uint16_t n=t425_pio_hw_read(link,data,sizeof(data));
+                for(uint16_t i=0;i<n;i++){
+                    t425_frame_t f;
+                    (void)t425_runtime_rx_byte(&supervisor.runtime,link,data[i],&f);
+                    t425_test_frame_t tf;
+                    if(t425_test_decode_byte(data[i],&tf)){
+                        link_rx_ok++;
+                        printf("RX TEST LINK=%u TYPE=%u SEQ=%u LEN=%u\\r\\n",
+                               link,tf.type,tf.seq,tf.len);
+                        if(tf.type==T425_TEST_PING){
+                            tf.type=T425_TEST_ACK;
+                            uint8_t raw[64];uint16_t m=t425_test_encode(&tf,raw,sizeof(raw));
+                            if(m)t425_pio_hw_write(link,raw,m);
+                        }
+                    }
+                }
+            }
+        }
+        int ch=getchar_timeout_us(0);
+        if(ch>=0){
+            if(ch=='\r'||ch=='\n'){
+                line[pos]='\0';if(pos)process_cmd(line);pos=0;
+            } else if(ch==8||ch==127){if(pos)pos--;}
+            else if(pos<sizeof(line)-1)line[pos++]=(char)ch;
+        }
+        if(absolute_time_diff_us(
+                get_absolute_time(),
+                next_status) <= 0){
+
+            printf(
+                "TICK=%lu NODE=%u CYCLES=%lu\r\n",
+                (unsigned long)supervisor.runtime.ticks,
+                cfg.node_id,
+                (unsigned long)supervisor.scheduler.cycles
+            );
+
+            next_status =
+                delayed_by_ms(next_status, 1000);
+        }
+        tight_loop_contents();
+    }
+}

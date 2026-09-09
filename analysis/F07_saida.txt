@@ -1,0 +1,51 @@
+============================================================
+ T425-SIM F07.1 — NOVO CORE / ISA FOUNDATION
+============================================================
+
+Projeto  : /work/t425-canonical
+CORE     : /work/t425-canonical/source/t425_core
+Testes   : /work/t425-canonical/tests/t425_core
+Relatório: /work/t425-canonical/analysis/F07_saida.txt
+
+[1/8] CLOCK ARQUITETURAL
+[2/8] CPU
+[3/8] MEMORY
+[4/8] INSTRUCTION FOUNDATION
+[5/8] CORE
+[6/8] PROCESS / SCHEDULER / TIMER / CHANNEL / FPU
+[7/8] ISA MANIFEST
+[8/8] TESTE DE FUNDAÇÃO
+F07.1 FOUNDATION TEST: PASS
+
+=== ISOLAMENTO DO NOVO CORE ===
+
+=== ARQUIVOS CRIADOS ===
+/work/t425-canonical/source/t425_core/channel/t425_channel.h
+/work/t425-canonical/source/t425_core/cpu/t425_cpu.c
+/work/t425-canonical/source/t425_core/fpu/t425_fpu.c
+/work/t425-canonical/source/t425_core/fpu/t425_fpu.h
+/work/t425-canonical/source/t425_core/include/t425_clock.h
+/work/t425-canonical/source/t425_core/include/t425_core.h
+/work/t425-canonical/source/t425_core/include/t425_cpu.h
+/work/t425-canonical/source/t425_core/include/t425_instruction.h
+/work/t425-canonical/source/t425_core/include/t425_memory.h
+/work/t425-canonical/source/t425_core/instruction/t425_instruction.c
+/work/t425-canonical/source/t425_core/memory/t425_memory.c
+/work/t425-canonical/source/t425_core/process/t425_process.h
+/work/t425-canonical/source/t425_core/scheduler/t425_scheduler.c
+/work/t425-canonical/source/t425_core/scheduler/t425_scheduler.h
+/work/t425-canonical/source/t425_core/src/t425_core.c
+/work/t425-canonical/source/t425_core/t425_isa_manifest.csv
+/work/t425-canonical/source/t425_core/timer/t425_timer.c
+/work/t425-canonical/source/t425_core/timer/t425_timer.h
+
+============================================================
+ F07.1 FOUNDATION TEST: PASS
+============================================================
+
+Novo CORE criado.
+CORE legado não foi modificado.
+PIO não integrado.
+OCCAM não integrado.
+Helios não integrado.
+Nenhum commit executado.

@@ -1,0 +1,5 @@
+CHAN OF INT c0;
+PAR {
+  OUT(c0,10);
+  OUT(c0,20);
+}

@@ -1,0 +1,18 @@
+.program t425_pio_rx
+; T425 PHY RX: canonical 8N1 UART timing based on Raspberry Pi's
+; official PIO UART RX example. One serial bit = 8 PIO cycles.
+.wrap_target
+start:
+    wait 0 pin 0
+    set x, 7 [10]           ; center first data-bit sample
+bitloop:
+    in pins, 1
+    jmp x-- bitloop [6]
+    jmp pin good_stop       ; stop bit must be high
+    irq 4 rel                ; framing error marker
+    wait 1 pin 0
+    jmp start
+good_stop:
+    push block
+    jmp start
+.wrap

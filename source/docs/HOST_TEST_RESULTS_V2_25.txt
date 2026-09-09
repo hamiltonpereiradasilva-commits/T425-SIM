@@ -1,0 +1,2 @@
+t425_onehop_v225: /mnt/data/T425_SIM_Pico_Nodes_v2.25/T425_SIM_Pico_Nodes_v2.23/tests/test_onehop.c:29: main: Assertion `a.rl.state==T425_RL2_WAIT_ACK' failed.
+RP2040 SDK/PIO build requires PICO_SDK_PATH.

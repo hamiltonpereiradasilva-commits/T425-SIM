@@ -1,0 +1,21 @@
+.program t425_uart_tx
+.wrap_target
+    pull block
+    set pins, 0 [7]
+    set x, 7
+bitloop:
+    out pins, 1 [6]
+    jmp x-- bitloop
+    set pins, 1 [7]
+.wrap
+
+.program t425_uart_rx
+.wrap_target
+wait_start:
+    wait 0 pin 0
+    set x, 7 [3]
+rxloop:
+    in pins, 1 [6]
+    jmp x-- rxloop
+    push block
+.wrap

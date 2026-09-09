@@ -1,0 +1,11 @@
+T425-SIM v2.85 — REAL BUILD GATE RESULT
+
+return_code=11
+
+=== T425 v2.84 FIRST BUILD GATE ===
+PWD: /mnt/data/T425_SIM_Pico_Nodes_v2.85/T425_SIM_Pico_Nodes_v2.23/firmware_pico
+cmake: /usr/bin/cmake
+arm-none-eabi-gcc: 
+PICO_SDK_PATH: <unset>
+ERROR: arm-none-eabi-gcc not found; ARM build not attempted
+

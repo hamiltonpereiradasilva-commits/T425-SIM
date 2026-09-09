@@ -1,0 +1,3 @@
+GENERIC NODE CONFIG: PASS
+Host build: -std=c11 -Wall -Wextra -Werror
+Hardware-specific PIO integration remains pending.

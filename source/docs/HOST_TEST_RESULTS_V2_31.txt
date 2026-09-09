@@ -1,0 +1,7 @@
+t425_pio_tx.pio: PASS
+t425_pio_rx.pio: PASS
+t425_pio_phy.c: PASS
+t425_pio.cmake: PASS
+manual TX header removed: PASS
+manual RX header removed: PASS
+PIO hardware validation: NOT PERFORMED.

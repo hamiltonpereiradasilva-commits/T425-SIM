@@ -1,0 +1,3 @@
+REMOTE RDV REQ/ACK: PASS
+Host build: -std=c11 -Wall -Wextra -Werror
+Physical P00↔P01 rendezvous: pending bench validation.

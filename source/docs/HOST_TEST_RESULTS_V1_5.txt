@@ -1,0 +1,3 @@
+ACK/timeout/retry: PASS
+Host build: -std=c11 -Wall -Wextra -Werror
+Physical reliability: pending bench validation.

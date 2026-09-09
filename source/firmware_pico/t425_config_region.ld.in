@@ -1,0 +1,8 @@
+/* Generated linker fragment: reserve the last T425_CONFIG_REGION_SIZE bytes. */
+__t425_config_end__ = ORIGIN(FLASH) + LENGTH(FLASH);
+__t425_config_start__ = __t425_config_end__ - T425_CONFIG_REGION_SIZE;
+
+ASSERT((__t425_config_start__ % 4096) == 0, "T425 config start not sector aligned");
+ASSERT((__t425_config_end__ % 4096) == 0, "T425 config end not sector aligned");
+ASSERT((__t425_config_end__ - __t425_config_start__) == T425_CONFIG_REGION_SIZE,
+       "T425 config region has wrong size");

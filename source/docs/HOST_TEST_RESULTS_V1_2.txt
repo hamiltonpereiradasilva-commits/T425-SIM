@@ -1,0 +1,3 @@
+PIO transport API host test: PASS
+Build: -std=c11 -Wall -Wextra -Werror
+Physical PIO/GPIO: NOT YET VALIDATED on RP2040 hardware.

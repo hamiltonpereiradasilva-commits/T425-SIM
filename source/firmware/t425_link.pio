@@ -1,0 +1,26 @@
+; T425-SIM v2.8 — physical link bring-up
+; 8-bit LSB-first transport skeleton.
+; The exact clock divider must be calibrated on hardware.
+
+.program t425_tx
+.side_set 1 opt
+.wrap_target
+    pull block              side 0
+    set x, 7                side 0
+tx_bit:
+    out pins, 1             side 1
+    jmp x-- tx_bit          side 0
+    irq 0
+.wrap
+
+.program t425_rx
+.side_set 1 opt
+.wrap_target
+    wait 0 pin 0            side 0
+    set x, 7                side 0
+rx_bit:
+    in pins, 1              side 0
+    jmp x-- rx_bit          side 0
+    push block
+    irq 1
+.wrap

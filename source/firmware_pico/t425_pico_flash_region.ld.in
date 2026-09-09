@@ -1,0 +1,13 @@
+/* T425 v2.74: link-time reservation of final persistent Flash region. */
+FLASH(rx) : ORIGIN = 0x10000000,
+            LENGTH = (@T425_PHYSICAL_FLASH_SIZE@ - @T425_CONFIG_REGION_SIZE@)
+
+__t425_config_start__ = ORIGIN(FLASH) + LENGTH(FLASH);
+__t425_config_end__   = __t425_config_start__ + @T425_CONFIG_REGION_SIZE@;
+
+ASSERT((__t425_config_start__ % 4096) == 0,
+       "T425 config start must be 4 KiB aligned");
+ASSERT((__t425_config_end__ % 4096) == 0,
+       "T425 config end must be 4 KiB aligned");
+ASSERT((__t425_config_end__ - __t425_config_start__) == @T425_CONFIG_REGION_SIZE@,
+       "T425 config region size mismatch");

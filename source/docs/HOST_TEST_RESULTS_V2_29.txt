@@ -1,0 +1,5 @@
+PIO source exists: PASS
+PIO API exists: PASS
+PIO implementation exists: PASS
+Documentation exists: PASS
+Hardware PIO validation: NOT PERFORMED (no RP2040 board attached to this runtime).

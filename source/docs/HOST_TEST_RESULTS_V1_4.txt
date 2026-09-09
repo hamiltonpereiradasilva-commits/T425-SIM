@@ -1,0 +1,3 @@
+PING/PONG/DATA control: PASS
+Host build: -std=c11 -Wall -Wextra -Werror
+Physical link: pending bench validation.

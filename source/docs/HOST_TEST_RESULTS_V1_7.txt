@@ -1,0 +1,3 @@
+OCCAM runtime IN/OUT/block/schedule: PASS
+Host build: -std=c11 -Wall -Wextra -Werror
+Strict rendezvous: pending v1.8.

@@ -1,0 +1,4 @@
+V2.8 LINK-STACK BOUNDARY: PASS
+Host build: -std=c11 -Wall -Wextra -Werror
+Physical PIO timing/bit integrity: MUST be measured on bench.
+UF2 generation: requires RP2040 Pico SDK toolchain.

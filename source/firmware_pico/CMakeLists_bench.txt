@@ -1,0 +1,30 @@
+cmake_minimum_required(VERSION 3.13)
+include(pico_sdk_import.cmake)
+project(t425_bench C CXX ASM)
+pico_sdk_init()
+
+add_executable(t425_bench
+    t425_bench_main.c
+    t425_pio_phy.c
+)
+
+pico_generate_pio_header(t425_bench ${CMAKE_CURRENT_LIST_DIR}/t425_pio_tx.pio)
+pico_generate_pio_header(t425_bench ${CMAKE_CURRENT_LIST_DIR}/t425_pio_rx.pio)
+
+target_link_libraries(t425_bench
+    pico_stdlib
+    hardware_pio
+    hardware_clocks
+)
+
+pico_enable_stdio_usb(t425_bench 1)
+pico_enable_stdio_uart(t425_bench 0)
+pico_add_extra_outputs(t425_bench)
+
+target_compile_definitions(t425_bench PRIVATE
+    T425_TX_PIN=2
+    T425_RX_PIN=3
+    T425_BAUD=115200u
+    T425_SM_TX=0
+    T425_SM_RX=1
+)
