@@ -3,7 +3,10 @@
 
 #include <stdint.h>
 
+#define T425_INTERNAL_RAM_BASE 0x80000000u
 #define T425_INTERNAL_RAM_BYTES 4096u
+#define T425_INTERNAL_RAM_END \
+    (T425_INTERNAL_RAM_BASE + T425_INTERNAL_RAM_BYTES)
 
 typedef struct
 {
@@ -11,6 +14,16 @@ typedef struct
 } t425_memory_t;
 
 void t425_memory_reset(t425_memory_t *mem);
+
+int t425_memory_read_byte(
+    const t425_memory_t *mem,
+    uint32_t address,
+    uint8_t *value);
+
+int t425_memory_write_byte(
+    t425_memory_t *mem,
+    uint32_t address,
+    uint8_t value);
 
 int t425_memory_read_word(
     const t425_memory_t *mem,

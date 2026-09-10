@@ -10,11 +10,18 @@ typedef struct
 {
     t425_cpu_state_t cpu;
     t425_memory_t memory;
-
     uint64_t cycles;
     uint64_t instructions;
 } t425_core_t;
 
+#define T425_STEP_OK        0
+#define T425_STEP_HALTED    1
+#define T425_STEP_BADMEM   -1
+#define T425_STEP_UNIMPL   -2
+#define T425_STEP_BADOP    -3
+
 void t425_core_reset(t425_core_t *core);
+
+int t425_core_step(t425_core_t *core);
 
 #endif
