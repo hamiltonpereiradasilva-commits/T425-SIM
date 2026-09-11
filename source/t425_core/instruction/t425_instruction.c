@@ -305,6 +305,39 @@ static int t425_opr_execute(t425_core_t *core)
             return T425_STEP_OK;
         }
 
+        case 0x31u: /* LMUL */
+        {
+            uint64_t product =
+                (uint64_t)cpu->A * (uint64_t)cpu->B;
+
+            product += (uint64_t)cpu->C;
+
+            cpu->A = (uint32_t)product;
+            cpu->B = (uint32_t)(product >> 32);
+
+            finish(core, 33u);
+            return T425_STEP_OK;
+        }
+
+        case 0x1Au: /* LDIV */
+        {
+            uint32_t divisor = cpu->A;
+            uint64_t dividend =
+                ((uint64_t)cpu->C << 32) | (uint64_t)cpu->B;
+
+            if (divisor == 0u || cpu->C >= divisor) {
+                cpu->error = 1u;
+                finish(core, 35u);
+                return T425_STEP_OK;
+            }
+
+            cpu->A = (uint32_t)(dividend / divisor);
+            cpu->B = (uint32_t)(dividend % divisor);
+
+            finish(core, 35u);
+            return T425_STEP_OK;
+        }
+
         default:
             return T425_STEP_UNIMPL;
     }
