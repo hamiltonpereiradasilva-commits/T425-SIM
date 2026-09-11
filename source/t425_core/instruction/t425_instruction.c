@@ -32,6 +32,284 @@ static void finish(t425_core_t *core, uint32_t cycles)
     core->instructions++;
 }
 
+static int t425_opr_execute(t425_core_t *core)
+{
+    t425_cpu_state_t *cpu = &core->cpu;
+    uint32_t value;
+
+    switch (cpu->Oreg)
+    {
+        case 0x20u: /* RET */
+            if (t425_memory_read_word(
+                    &core->memory, cpu->Wptr, &value) != 0)
+                return T425_STEP_BADMEM;
+
+            cpu->Iptr = value;
+            cpu->Wptr += 16u;
+            finish(core, 5u);
+            return T425_STEP_OK;
+
+        case 0x46u: /* AND */
+            cpu->A = cpu->A & cpu->B;
+            cpu->B = cpu->C;
+            finish(core, 1u);
+            return T425_STEP_OK;
+
+        case 0x4Bu: /* OR */
+            cpu->A = cpu->A | cpu->B;
+            cpu->B = cpu->C;
+            finish(core, 1u);
+            return T425_STEP_OK;
+
+        case 0x33u: /* XOR */
+            cpu->A = cpu->A ^ cpu->B;
+            cpu->B = cpu->C;
+            finish(core, 1u);
+            return T425_STEP_OK;
+
+        case 0x32u: /* NOT */
+            cpu->A = ~cpu->A;
+            finish(core, 1u);
+            return T425_STEP_OK;
+
+        case 0x05u: /* ADD */
+        {
+            uint32_t old_a = cpu->A;
+            uint32_t old_b = cpu->B;
+            uint32_t result = old_a + old_b;
+
+            if ((~(old_a ^ old_b) & (old_a ^ result) &
+                 0x80000000u) != 0u)
+                cpu->error = 1u;
+
+            cpu->A = result;
+            cpu->B = cpu->C;
+            finish(core, 1u);
+            return T425_STEP_OK;
+        }
+
+        case 0x0Cu: /* SUB */
+        {
+            uint32_t old_a = cpu->A;
+            uint32_t old_b = cpu->B;
+            uint32_t result = old_b - old_a;
+
+            if (((old_b ^ old_a) & (old_b ^ result) &
+                 0x80000000u) != 0u)
+                cpu->error = 1u;
+
+            cpu->A = result;
+            cpu->B = cpu->C;
+            finish(core, 1u);
+            return T425_STEP_OK;
+        }
+
+        case 0x04u: /* DIFF */
+            cpu->A = cpu->B - cpu->A;
+            cpu->B = cpu->C;
+            finish(core, 1u);
+            return T425_STEP_OK;
+
+        case 0x52u: /* SUM */
+            cpu->A = cpu->B + cpu->A;
+            cpu->B = cpu->C;
+            finish(core, 1u);
+            return T425_STEP_OK;
+
+        case 0x09u: /* GT */
+        {
+            uint32_t old_a = cpu->A;
+            uint32_t old_b = cpu->B;
+
+            cpu->A = (old_b > old_a) ? 1u : 0u;
+            cpu->B = cpu->C;
+            finish(core, 1u);
+            return T425_STEP_OK;
+        }
+
+        case 0x53u: /* MUL */
+            cpu->A = cpu->A * cpu->B;
+            cpu->B = cpu->C;
+            finish(core, 38u);
+            return T425_STEP_OK;
+
+        case 0x08u: /* PROD */
+        {
+            uint32_t original_a = cpu->A;
+            uint32_t magnitude;
+            uint32_t bit = 0u;
+            uint32_t cycles;
+
+            if ((original_a & 0x80000000u) != 0u)
+                magnitude = 0u - original_a;
+            else
+                magnitude = original_a;
+
+            if (magnitude != 0u)
+            {
+                uint32_t value = magnitude;
+                while (value > 1u)
+                {
+                    value >>= 1;
+                    bit++;
+                }
+            }
+
+            cpu->A = original_a * cpu->B;
+            cpu->B = cpu->C;
+
+            if ((original_a & 0x80000000u) != 0u)
+                cycles = bit + 5u;
+            else
+                cycles = bit + 4u;
+
+            finish(core, cycles);
+            return T425_STEP_OK;
+        }
+
+        case 0x16u: /* LADD */
+        {
+            uint64_t result =
+                (uint64_t)cpu->B +
+                (uint64_t)cpu->A +
+                (uint64_t)(cpu->C & 1u);
+
+            if (result > 0xFFFFFFFFu)
+                cpu->error = 1u;
+
+            cpu->A = (uint32_t)result;
+            cpu->B = cpu->C;
+            finish(core, 2u);
+            return T425_STEP_OK;
+        }
+
+        case 0x38u: /* LSUB */
+        {
+            uint64_t subtrahend =
+                (uint64_t)cpu->A +
+                (uint64_t)(cpu->C & 1u);
+
+            uint32_t old_b = cpu->B;
+
+            if ((uint64_t)old_b < subtrahend)
+                cpu->error = 1u;
+
+            cpu->A = (uint32_t)((uint64_t)old_b - subtrahend);
+            cpu->B = cpu->C;
+            finish(core, 2u);
+            return T425_STEP_OK;
+        }
+
+        case 0x37u: /* LSUM */
+        {
+            uint64_t result =
+                (uint64_t)cpu->B +
+                (uint64_t)cpu->A +
+                (uint64_t)(cpu->C & 1u);
+
+            cpu->A = (uint32_t)result;
+            cpu->B = (uint32_t)(result >> 32);
+            finish(core, 3u);
+            return T425_STEP_OK;
+        }
+
+        case 0x4Fu: /* LDIFF */
+        {
+            uint64_t subtrahend =
+                (uint64_t)cpu->A +
+                (uint64_t)(cpu->C & 1u);
+
+            uint32_t old_b = cpu->B;
+            uint32_t borrow =
+                ((uint64_t)old_b < subtrahend) ? 1u : 0u;
+
+            cpu->A = (uint32_t)((uint64_t)old_b - subtrahend);
+            cpu->B = borrow;
+            finish(core, 3u);
+            return T425_STEP_OK;
+        }
+
+        case 0x2Cu: /* DIV */
+        {
+            int32_t divisor = (int32_t)cpu->A;
+            int32_t dividend = (int32_t)cpu->B;
+
+            if (divisor == 0)
+            {
+                cpu->error = 1u;
+                cpu->B = cpu->C;
+                finish(core, 39u);
+                return T425_STEP_OK;
+            }
+
+            if (divisor == -1 && dividend == INT32_MIN)
+            {
+                cpu->error = 1u;
+                cpu->B = cpu->C;
+                finish(core, 39u);
+                return T425_STEP_OK;
+            }
+
+            cpu->A = (uint32_t)(dividend / divisor);
+            cpu->B = cpu->C;
+            finish(core, 39u);
+            return T425_STEP_OK;
+        }
+
+        case 0x1Fu: /* REM */
+        {
+            int32_t divisor = (int32_t)cpu->A;
+            int32_t dividend = (int32_t)cpu->B;
+
+            if (divisor == 0)
+            {
+                cpu->error = 1u;
+                cpu->B = cpu->C;
+                finish(core, 37u);
+                return T425_STEP_OK;
+            }
+
+            if (divisor == -1 && dividend == INT32_MIN)
+            {
+                cpu->error = 1u;
+                cpu->B = cpu->C;
+                finish(core, 37u);
+                return T425_STEP_OK;
+            }
+
+            cpu->A = (uint32_t)(dividend % divisor);
+            cpu->B = cpu->C;
+            finish(core, 37u);
+            return T425_STEP_OK;
+        }
+
+        case 0x41u: /* SHL */
+        {
+            uint32_t n = cpu->A;
+            uint32_t value = cpu->B;
+
+            cpu->A = (n < 32u) ? (value << n) : 0u;
+            cpu->B = cpu->C;
+            finish(core, n + 2u);
+            return T425_STEP_OK;
+        }
+
+        case 0x40u: /* SHR */
+        {
+            uint32_t n = cpu->A;
+            uint32_t value = cpu->B;
+
+            cpu->A = (n < 32u) ? (value >> n) : 0u;
+            cpu->B = cpu->C;
+            finish(core, n + 2u);
+            return T425_STEP_OK;
+        }
+
+        default:
+            return T425_STEP_UNIMPL;
+    }
+}
+
 int t425_core_step(t425_core_t *core)
 {
     t425_cpu_state_t *cpu;
@@ -214,19 +492,7 @@ int t425_core_step(t425_core_t *core)
         }
 
         case T425_OP_OPR:
-            if (cpu->Oreg == 0x20u)
-            {
-                if (t425_memory_read_word(
-                        &core->memory, cpu->Wptr, &value) != 0)
-                    return T425_STEP_BADMEM;
-
-                cpu->Iptr = value;
-                cpu->Wptr += 16u;
-                finish(core, 5u);
-                return T425_STEP_OK;
-            }
-
-            return T425_STEP_UNIMPL;
+            return t425_opr_execute(core);
 
         default:
             return T425_STEP_UNIMPL;
