@@ -338,6 +338,40 @@ static int t425_opr_execute(t425_core_t *core)
             return T425_STEP_OK;
         }
 
+        case 0x36u: /* LSHL */
+        {
+            uint32_t n = cpu->A;
+            uint64_t value =
+                ((uint64_t)cpu->C << 32) | (uint64_t)cpu->B;
+            uint64_t result =
+                (n < 64u) ? (value << n) : 0u;
+            uint32_t cycles =
+                (n < 32u) ? (n + 3u) : (n - 28u);
+
+            cpu->A = (uint32_t)result;
+            cpu->B = (uint32_t)(result >> 32);
+
+            finish(core, cycles);
+            return T425_STEP_OK;
+        }
+
+        case 0x35u: /* LSHR */
+        {
+            uint32_t n = cpu->A;
+            uint64_t value =
+                ((uint64_t)cpu->C << 32) | (uint64_t)cpu->B;
+            uint64_t result =
+                (n < 64u) ? (value >> n) : 0u;
+            uint32_t cycles =
+                (n < 32u) ? (n + 3u) : (n - 28u);
+
+            cpu->A = (uint32_t)result;
+            cpu->B = (uint32_t)(result >> 32);
+
+            finish(core, cycles);
+            return T425_STEP_OK;
+        }
+
         default:
             return T425_STEP_UNIMPL;
     }
