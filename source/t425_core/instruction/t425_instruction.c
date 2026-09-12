@@ -39,7 +39,38 @@ static int t425_opr_execute(t425_core_t *core)
 
     switch (cpu->Oreg)
     {
-        case 0x20u: /* RET */
+        case 0x10u: /* SETERR */
+    cpu->error = 1u;
+    finish(core, 1u);
+    return T425_STEP_OK;
+
+  case 0x29u: /* TESTERR */
+    if (cpu->error) {
+        cpu->error = 0u;
+        push(cpu, 1u);
+        finish(core, 3u);
+    } else {
+        push(cpu, 0u);
+        finish(core, 2u);
+    }
+    return T425_STEP_OK;
+
+  case 0x57u: /* CLRHALTERR */
+            cpu->halt_on_error = 0u;
+            finish(core, 1u);
+            return T425_STEP_OK;
+
+        case 0x58u: /* SETHALTERR */
+            cpu->halt_on_error = 1u;
+            finish(core, 1u);
+            return T425_STEP_OK;
+
+        case 0x59u: /* TESTHALTERR */
+            push(cpu, cpu->halt_on_error ? 1u : 0u);
+            finish(core, 2u);
+            return T425_STEP_OK;
+
+  case 0x20u: /* RET */
             if (t425_memory_read_word(
                     &core->memory, cpu->Wptr, &value) != 0)
                 return T425_STEP_BADMEM;
