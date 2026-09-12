@@ -7,4 +7,11 @@ void t425_scheduler_reset(
         return;
 
     *scheduler = (t425_scheduler_state_t){0};
+
+    scheduler->high_head = T425_NOT_PROCESS;
+    scheduler->high_tail = T425_NOT_PROCESS;
+    scheduler->low_head = T425_NOT_PROCESS;
+    scheduler->low_tail = T425_NOT_PROCESS;
+    scheduler->current_wdesc = T425_NOT_PROCESS;
+
 }

@@ -25,6 +25,9 @@ void t425_memory_reset(t425_memory_t *mem)
 
     for (uint32_t i = 0; i < T425_INTERNAL_RAM_BYTES; ++i)
         mem->data[i] = 0;
+
+    (void)t425_memory_write_word(mem, T425_TPTR_LOC0, 0x80000000u);
+    (void)t425_memory_write_word(mem, T425_TPTR_LOC1, 0x80000000u);
 }
 
 int t425_memory_read_byte(

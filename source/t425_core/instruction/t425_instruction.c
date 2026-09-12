@@ -3,6 +3,7 @@
 #include "t425_core.h"
 #include "t425_process.h"
 #include "t425_instruction.h"
+#include "t425_timer.h"
 
 static void push(t425_cpu_state_t *cpu, uint32_t value)
 {
@@ -26,11 +27,135 @@ static uint32_t word_address(uint32_t base, uint32_t operand)
     return base + (operand << 2);
 }
 
+static int t425_enqueue(t425_core_t *core, uint32_t wdesc);
+
+static unsigned int t425_timer_alt_index(uint32_t wptr)
+{
+    return (unsigned int)((wptr >> 2) & 1023u);
+}
+
+static void t425_timer_alt_mark(t425_timer_state_t *timer, uint32_t wptr)
+{
+    unsigned int index = t425_timer_alt_index(wptr);
+    timer->alt_wait_mask[index >> 5] |= 1u << (index & 31u);
+}
+
+static void t425_timer_alt_clear(t425_timer_state_t *timer, uint32_t wptr)
+{
+    unsigned int index = t425_timer_alt_index(wptr);
+    timer->alt_wait_mask[index >> 5] &= ~(1u << (index & 31u));
+}
+
+static int t425_timer_alt_is_marked(
+    const t425_timer_state_t *timer,
+    uint32_t wptr)
+{
+    unsigned int index = t425_timer_alt_index(wptr);
+    return (timer->alt_wait_mask[index >> 5] &
+            (1u << (index & 31u))) != 0u;
+}
+
+static int t425_timer_service(t425_core_t *core)
+{
+    uint32_t head_addr;
+    uint32_t head;
+    uint32_t now;
+    uint32_t next;
+    uint32_t next_time;
+    uint32_t wptr;
+    int is_alt_wait;
+
+    for (unsigned int pass = 0u; pass < 2u; ++pass)
+    {
+        if (pass == 0u)
+        {
+            head_addr = T425_TPTR_LOC0;
+            now = t425_timer_read_high(&core->timer);
+        }
+        else
+        {
+            head_addr = T425_TPTR_LOC1;
+            now = t425_timer_read_low(&core->timer);
+        }
+
+        for (;;)
+        {
+            if (t425_memory_read_word(&core->memory, head_addr, &head) != 0)
+                return T425_STEP_BADMEM;
+
+            if (head == T425_NOT_PROCESS)
+                break;
+
+            wptr = t425_wdesc_wptr(head);
+
+            if (t425_memory_read_word(&core->memory,
+                                      wptr - 20u,
+                                      &next_time) != 0)
+                return T425_STEP_BADMEM;
+
+            if ((int32_t)(now - next_time) < 0)
+                break;
+
+            if (t425_memory_read_word(&core->memory,
+                                      wptr - 16u,
+                                      &next) != 0)
+                return T425_STEP_BADMEM;
+
+            if (t425_memory_write_word(&core->memory,
+                                       head_addr,
+                                       next) != 0)
+                return T425_STEP_BADMEM;
+
+            if (next == T425_NOT_PROCESS)
+            {
+                if (pass == 0u)
+                    core->timer.next_high = UINT32_MAX;
+                else
+                    core->timer.next_low = UINT32_MAX;
+            }
+            else
+            {
+                if (t425_memory_read_word(&core->memory,
+                                          t425_wdesc_wptr(next) - 20u,
+                                          &next_time) != 0)
+                    return T425_STEP_BADMEM;
+
+                if (pass == 0u)
+                    core->timer.next_high = next_time;
+                else
+                    core->timer.next_low = next_time;
+            }
+
+            is_alt_wait = t425_timer_alt_is_marked(&core->timer, wptr);
+            t425_timer_alt_clear(&core->timer, wptr);
+
+            if (t425_memory_write_word(
+                    &core->memory,
+                    wptr - 16u,
+                    is_alt_wait ? T425_TIMER_TIME_SET
+                                : T425_NOT_PROCESS) != 0)
+                return T425_STEP_BADMEM;
+
+            if (t425_memory_write_word(&core->memory,
+                                       wptr - 12u,
+                                       T425_PROCESS_STATE_READY) != 0)
+                return T425_STEP_BADMEM;
+
+            if (t425_enqueue(core, head) != T425_STEP_OK)
+                return T425_STEP_BADMEM;
+        }
+    }
+
+    return T425_STEP_OK;
+}
+
 static void finish(t425_core_t *core, uint32_t cycles)
 {
     core->cpu.Oreg = 0u;
+    t425_timer_advance(&core->timer, cycles);
     core->cycles += cycles;
     core->instructions++;
+    (void)t425_timer_service(core);
 }
 
 
@@ -123,6 +248,183 @@ static int t425_schedule_next(t425_core_t *core)
     scheduler->current_wdesc = next_wdesc;
     scheduler->running = 1u;
 
+    return T425_STEP_OK;
+}
+
+static int t425_timer_enqueue(
+    t425_core_t *core,
+    uint32_t wdesc,
+    uint32_t time,
+    int alt_wait)
+{
+    uint32_t head_addr;
+    uint32_t head;
+    uint32_t current;
+    uint32_t previous;
+    uint32_t current_time;
+    uint32_t next;
+    uint32_t wptr = t425_wdesc_wptr(wdesc);
+    uint32_t *next_reg;
+
+    if (t425_wdesc_priority(wdesc) == T425_PRIORITY_HIGH)
+    {
+        head_addr = T425_TPTR_LOC0;
+        next_reg = &core->timer.next_high;
+    }
+    else
+    {
+        head_addr = T425_TPTR_LOC1;
+        next_reg = &core->timer.next_low;
+    }
+
+    if (t425_memory_read_word(&core->memory, head_addr, &head) != 0)
+        return T425_STEP_BADMEM;
+
+    if (t425_memory_write_word(&core->memory, wptr - 20u, time) != 0 ||
+        t425_memory_write_word(&core->memory, wptr - 12u,
+                               T425_PROCESS_STATE_WAITING) != 0)
+        return T425_STEP_BADMEM;
+
+    previous = T425_NOT_PROCESS;
+    current = head;
+
+    while (current != T425_NOT_PROCESS)
+    {
+        uint32_t current_wptr = t425_wdesc_wptr(current);
+        if (t425_memory_read_word(&core->memory,
+                                  current_wptr - 20u,
+                                  &current_time) != 0)
+            return T425_STEP_BADMEM;
+
+        if ((int32_t)(time - current_time) < 0)
+            break;
+
+        previous = current;
+        if (t425_memory_read_word(&core->memory,
+                                  current_wptr - 16u,
+                                  &current) != 0)
+            return T425_STEP_BADMEM;
+    }
+
+    next = current;
+
+    if (t425_memory_write_word(&core->memory, wptr - 16u, next) != 0)
+        return T425_STEP_BADMEM;
+
+    if (previous == T425_NOT_PROCESS)
+    {
+        if (t425_memory_write_word(&core->memory, head_addr, wdesc) != 0)
+            return T425_STEP_BADMEM;
+        *next_reg = time;
+    }
+    else
+    {
+        uint32_t previous_wptr = t425_wdesc_wptr(previous);
+        if (t425_memory_write_word(&core->memory,
+                                   previous_wptr - 16u,
+                                   wdesc) != 0)
+            return T425_STEP_BADMEM;
+    }
+
+    if (alt_wait)
+        t425_timer_alt_mark(&core->timer, wptr);
+
+    return T425_STEP_OK;
+}
+
+static int t425_timer_remove(
+    t425_core_t *core,
+    uint32_t wdesc)
+{
+    uint32_t head_addr;
+    uint32_t head;
+    uint32_t current;
+    uint32_t previous;
+    uint32_t next;
+    uint32_t current_wptr;
+    uint32_t previous_wptr;
+
+    if (t425_wdesc_priority(wdesc) == T425_PRIORITY_HIGH)
+        head_addr = T425_TPTR_LOC0;
+    else
+        head_addr = T425_TPTR_LOC1;
+
+    if (t425_memory_read_word(&core->memory, head_addr, &head) != 0)
+        return T425_STEP_BADMEM;
+
+    previous = T425_NOT_PROCESS;
+    current = head;
+
+    while (current != T425_NOT_PROCESS)
+    {
+        if (current == wdesc)
+        {
+            current_wptr = t425_wdesc_wptr(current);
+
+            if (t425_memory_read_word(&core->memory,
+                                      current_wptr - 16u,
+                                      &next) != 0)
+                return T425_STEP_BADMEM;
+
+            if (previous == T425_NOT_PROCESS)
+            {
+                if (t425_memory_write_word(&core->memory,
+                                           head_addr,
+                                           next) != 0)
+                    return T425_STEP_BADMEM;
+            }
+            else
+            {
+                previous_wptr = t425_wdesc_wptr(previous);
+
+                if (t425_memory_write_word(&core->memory,
+                                           previous_wptr - 16u,
+                                           next) != 0)
+                    return T425_STEP_BADMEM;
+            }
+
+            if (next == T425_NOT_PROCESS)
+            {
+                if (t425_wdesc_priority(wdesc) == T425_PRIORITY_HIGH)
+                    core->timer.next_high = UINT32_MAX;
+                else
+                    core->timer.next_low = UINT32_MAX;
+            }
+            else
+            {
+                uint32_t next_time;
+
+                if (t425_memory_read_word(
+                        &core->memory,
+                        t425_wdesc_wptr(next) - 20u,
+                        &next_time) != 0)
+                    return T425_STEP_BADMEM;
+
+                if (t425_wdesc_priority(wdesc) == T425_PRIORITY_HIGH)
+                    core->timer.next_high = next_time;
+                else
+                    core->timer.next_low = next_time;
+            }
+
+            t425_timer_alt_clear(&core->timer, wdesc);
+            return T425_STEP_OK;
+        }
+
+        previous = current;
+
+        current_wptr = t425_wdesc_wptr(current);
+
+        if (t425_memory_read_word(&core->memory,
+                                  current_wptr - 16u,
+                                  &current) != 0)
+            return T425_STEP_BADMEM;
+    }
+
+    /*
+     * The process may already have timed out and been removed.
+     * In that case there is nothing left to unlink.
+     */
+    t425_timer_alt_clear(&core->timer, wdesc);
     return T425_STEP_OK;
 }
 
@@ -653,6 +955,335 @@ case 0x03u: /* ENDP */
             cpu->B = (uint32_t)(result >> 32);
 
             finish(core, cycles);
+            return T425_STEP_OK;
+        }
+
+        case 0x4Eu: /* TALT */
+        {
+            if (t425_memory_write_word(&core->memory,
+                                       cpu->Wptr - 12u,
+                                       T425_PROCESS_STATE_ENABLING) != 0)
+                return T425_STEP_BADMEM;
+
+            if (t425_memory_write_word(&core->memory,
+                                       cpu->Wptr - 16u,
+                                       T425_TIMER_TIME_NO_SET) != 0)
+                return T425_STEP_BADMEM;
+
+            finish(core, 4u);
+            return T425_STEP_OK;
+        }
+
+        case 0x47u: /* ENBT */
+        {
+            uint32_t tlink;
+            uint32_t time;
+
+            if (cpu->A == 0u)
+            {
+                finish(core, 8u);
+                return T425_STEP_OK;
+            }
+
+            if (t425_memory_read_word(&core->memory,
+                                      cpu->Wptr - 16u,
+                                      &tlink) != 0)
+                return T425_STEP_BADMEM;
+
+            if (t425_memory_read_word(&core->memory,
+                                      cpu->Wptr - 20u,
+                                      &time) != 0)
+                return T425_STEP_BADMEM;
+
+            if (tlink == T425_TIMER_TIME_NO_SET)
+            {
+                if (t425_memory_write_word(&core->memory,
+                                           cpu->Wptr - 20u,
+                                           cpu->B) != 0)
+                    return T425_STEP_BADMEM;
+
+                if (t425_memory_write_word(&core->memory,
+                                           cpu->Wptr - 16u,
+                                           T425_TIMER_TIME_SET) != 0)
+                    return T425_STEP_BADMEM;
+            }
+            else if (tlink == T425_TIMER_TIME_SET)
+            {
+                if ((int32_t)(time - cpu->B) > 0)
+                {
+                    if (t425_memory_write_word(&core->memory,
+                                               cpu->Wptr - 20u,
+                                               cpu->B) != 0)
+                        return T425_STEP_BADMEM;
+                }
+            }
+
+            cpu->B = cpu->C;
+            cpu->C = 0u;
+
+            finish(core, 8u);
+            return T425_STEP_OK;
+        }
+
+        case 0x51u: /* TALTWT */
+        {
+            uint32_t state;
+            uint32_t tlink;
+            uint32_t time;
+            uint32_t now;
+
+            if (t425_memory_write_word(&core->memory,
+                                       cpu->Wptr,
+                                       UINT32_MAX) != 0)
+                return T425_STEP_BADMEM;
+
+            if (t425_memory_read_word(&core->memory,
+                                      cpu->Wptr - 12u,
+                                      &state) != 0)
+                return T425_STEP_BADMEM;
+
+            if (t425_memory_read_word(&core->memory,
+                                      cpu->Wptr - 16u,
+                                      &tlink) != 0)
+                return T425_STEP_BADMEM;
+
+            if (t425_memory_read_word(&core->memory,
+                                      cpu->Wptr - 20u,
+                                      &time) != 0)
+                return T425_STEP_BADMEM;
+
+            if (t425_wdesc_priority(core->scheduler.current_wdesc) ==
+                T425_PRIORITY_HIGH)
+                now = t425_timer_read_high(&core->timer);
+            else
+                now = t425_timer_read_low(&core->timer);
+
+            /*
+             * A ready guard has already selected the ALT branch.
+             */
+            if (state == T425_PROCESS_STATE_READY)
+            {
+                /*
+                 * TALTWT: when an ALT guard is already ready,
+                 * record the current priority timer in pw.Time.
+                 */
+                if (t425_memory_write_word(
+                        &core->memory,
+                        cpu->Wptr - 20u,
+                        now) != 0)
+                    return T425_STEP_BADMEM;
+
+                finish(core, 15u);
+                return T425_STEP_OK;
+            }
+
+            /*
+             * A timer guard has selected the branch only when the
+             * timer has expired. Equality is considered reached here.
+             */
+            if (tlink == T425_TIMER_TIME_SET &&
+                (int32_t)(now - time) >= 0)
+            {
+                /*
+                 * TALTWT: an already-expired timer guard selects
+                 * the ALT branch immediately. The process remains
+                 * running, becomes Ready, and pw.Time records the
+                 * current priority timer value.
+                 */
+                if (t425_memory_write_word(
+                        &core->memory,
+                        cpu->Wptr - 12u,
+                        T425_PROCESS_STATE_READY) != 0)
+                    return T425_STEP_BADMEM;
+
+                if (t425_memory_write_word(
+                        &core->memory,
+                        cpu->Wptr - 20u,
+                        now) != 0)
+                    return T425_STEP_BADMEM;
+
+                finish(core, 15u);
+                return T425_STEP_OK;
+            }
+
+            if (core->scheduler.current_wdesc == T425_NOT_PROCESS)
+                return T425_STEP_BADMEM;
+
+            /*
+             * The process is waiting for the timer ALT. Transition
+             * the process to Waiting, save the instruction pointer,
+             * and insert it in the appropriate timer queue.
+             */
+            if (t425_memory_write_word(&core->memory,
+                                       cpu->Wptr - 12u,
+                                       T425_PROCESS_STATE_WAITING) != 0)
+                return T425_STEP_BADMEM;
+            if (t425_memory_write_word(&core->memory,
+                                       cpu->Wptr - 4u,
+                                       cpu->Iptr) != 0)
+                return T425_STEP_BADMEM;
+
+            if (tlink != T425_TIMER_TIME_SET)
+                return T425_STEP_BADMEM;
+
+            if (t425_timer_enqueue(core,
+                                   core->scheduler.current_wdesc,
+                                   time,
+                                   1) != T425_STEP_OK)
+                return T425_STEP_BADMEM;
+
+            if (t425_schedule_next(core) != T425_STEP_OK)
+                return T425_STEP_BADMEM;
+
+            cpu->A = 0u;
+            cpu->B = 0u;
+            cpu->C = 0u;
+
+            finish(core, 48u);
+            return T425_STEP_OK;
+        }
+
+        case 0x2Eu: /* DIST */
+        {
+            uint32_t disable_status;
+            uint32_t now;
+            int guard_fired;
+
+            if (t425_memory_read_word(&core->memory,
+                                      cpu->Wptr,
+                                      &disable_status) != 0)
+                return T425_STEP_BADMEM;
+
+            if (t425_wdesc_priority(core->scheduler.current_wdesc) ==
+                T425_PRIORITY_HIGH)
+                now = t425_timer_read_high(&core->timer);
+            else
+                now = t425_timer_read_low(&core->timer);
+
+            /*
+             * Timer guard fires only if:
+             *   B != 0
+             *   no other ALT guard has been selected
+             *   current time is strictly after C.
+             */
+            guard_fired =
+                (cpu->B != 0u) &&
+                (disable_status == UINT32_MAX) &&
+                ((int32_t)(now - cpu->C) > 0);
+
+            if (guard_fired)
+            {
+                if (t425_memory_write_word(&core->memory,
+                                           cpu->Wptr,
+                                           cpu->A) != 0)
+                    return T425_STEP_BADMEM;
+
+                cpu->A = 1u;
+            }
+            else
+            {
+                /*
+                 * If this timer guard is still in the future, remove
+                 * this ALT process from the timer queue.
+                 */
+                if (cpu->B != 0u &&
+                    disable_status == UINT32_MAX &&
+                    (int32_t)(cpu->C - now) > 0)
+                {
+                    if (core->scheduler.current_wdesc ==
+                        T425_NOT_PROCESS)
+                        return T425_STEP_BADMEM;
+
+                    if (t425_timer_remove(
+                            core,
+                            core->scheduler.current_wdesc) !=
+                        T425_STEP_OK)
+                        return T425_STEP_BADMEM;
+                }
+
+                cpu->A = 0u;
+            }
+
+            /*
+             * B and C are undefined after DIST.
+             * Keep deterministic zero values in the simulator.
+             */
+            cpu->B = 0u;
+            cpu->C = 0u;
+
+            finish(core, 23u);
+            return T425_STEP_OK;
+        }
+
+        case 0x2Bu: /* TIN */
+        {
+            uint32_t now;
+            if (t425_wdesc_priority(core->scheduler.current_wdesc) == T425_PRIORITY_HIGH)
+                now = t425_timer_read_high(&core->timer);
+            else
+                now = t425_timer_read_low(&core->timer);
+            if ((int32_t)(cpu->A - now) < 0)
+            {
+                finish(core, 4u);
+                return T425_STEP_OK;
+            }
+
+            if (core->scheduler.current_wdesc == T425_NOT_PROCESS)
+                return T425_STEP_BADMEM;
+
+            if (t425_memory_write_word(&core->memory,
+                                       cpu->Wptr - 4u,
+                                       cpu->Iptr) != 0)
+                return T425_STEP_BADMEM;
+
+            if (t425_timer_enqueue(core,
+                                   core->scheduler.current_wdesc,
+                                   cpu->A,
+                                   0) != T425_STEP_OK)
+                return T425_STEP_BADMEM;
+
+            if (t425_schedule_next(core) != T425_STEP_OK)
+                return T425_STEP_BADMEM;
+
+            cpu->A = 0u;
+            cpu->B = 0u;
+            cpu->C = 0u;
+            finish(core, 30u);
+            return T425_STEP_OK;
+        }
+        case 0x22u: /* LDTIMER */
+            if (t425_wdesc_priority(core->scheduler.current_wdesc)
+                == T425_PRIORITY_HIGH)
+                push(cpu, t425_timer_read_high(&core->timer));
+            else
+                push(cpu, t425_timer_read_low(&core->timer));
+            finish(core, 2u);
+            return T425_STEP_OK;
+
+        case 0x54u: /* STTIMER */
+        {
+            /*
+             * T425 STTIMER:
+             *
+             *   ClockReg[High] = A
+             *   ClockReg[Low]  = A
+             *   A = B
+             *   B = C
+             *   C = undefined
+             *
+             * The simulator keeps C deterministic as zero.
+             * STTIMER also starts the timer clocks.
+             */
+            core->timer.high = cpu->A;
+            core->timer.low = cpu->A;
+
+            cpu->A = cpu->B;
+            cpu->B = cpu->C;
+            cpu->C = 0u;
+
+            core->timer.running = 1u;
+
+            finish(core, 1u);
             return T425_STEP_OK;
         }
 

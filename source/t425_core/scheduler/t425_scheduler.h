@@ -9,15 +9,12 @@ typedef struct
 {
     uint32_t high_head;
     uint32_t high_tail;
-
     uint32_t low_head;
     uint32_t low_tail;
-
     uint32_t current_wdesc;
     uint8_t running;
 } t425_scheduler_state_t;
 
-void t425_scheduler_reset(
-    t425_scheduler_state_t *scheduler);
+void t425_scheduler_reset(t425_scheduler_state_t *scheduler);
 
 #endif
