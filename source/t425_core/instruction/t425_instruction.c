@@ -1,6 +1,7 @@
 #include <stdint.h>
 
 #include "t425_core.h"
+#include "t425_process.h"
 #include "t425_instruction.h"
 
 static void push(t425_cpu_state_t *cpu, uint32_t value)
@@ -32,6 +33,60 @@ static void finish(t425_core_t *core, uint32_t cycles)
     core->instructions++;
 }
 
+
+static int t425_schedule_next(t425_core_t *core)
+{
+    t425_scheduler_state_t *scheduler = &core->scheduler;
+    uint32_t next_wdesc;
+    uint32_t next_wptr;
+    uint32_t next_iptr;
+    uint32_t next_link;
+
+    if (scheduler->high_head != T425_NOT_PROCESS)
+        next_wdesc = scheduler->high_head;
+    else if (scheduler->low_head != T425_NOT_PROCESS)
+        next_wdesc = scheduler->low_head;
+    else
+    {
+        scheduler->current_wdesc = T425_NOT_PROCESS;
+        scheduler->running = 0u;
+        return T425_STEP_OK;
+    }
+
+    next_wptr = t425_wdesc_wptr(next_wdesc);
+
+    if (t425_memory_read_word(
+            &core->memory, next_wptr - 4u, &next_iptr) != 0)
+        return T425_STEP_BADMEM;
+
+    if (t425_memory_read_word(
+            &core->memory, next_wptr - 8u, &next_link) != 0)
+        return T425_STEP_BADMEM;
+
+    if (t425_wdesc_priority(next_wdesc) == T425_PRIORITY_HIGH)
+    {
+        scheduler->high_head = next_link;
+
+        if (next_link == T425_NOT_PROCESS)
+            scheduler->high_tail = T425_NOT_PROCESS;
+    }
+    else
+    {
+        scheduler->low_head = next_link;
+
+        if (next_link == T425_NOT_PROCESS)
+            scheduler->low_tail = T425_NOT_PROCESS;
+    }
+
+    core->cpu.Wptr = next_wptr;
+    core->cpu.Iptr = next_iptr;
+
+    scheduler->current_wdesc = next_wdesc;
+    scheduler->running = 1u;
+
+    return T425_STEP_OK;
+}
+
 static int t425_opr_execute(t425_core_t *core)
 {
     t425_cpu_state_t *cpu = &core->cpu;
@@ -39,6 +94,19 @@ static int t425_opr_execute(t425_core_t *core)
 
     switch (cpu->Oreg)
     {
+        case 0x55u: /* STOPERR */
+            if (!cpu->error)
+            {
+                finish(core, 2u);
+                return T425_STEP_OK;
+            }
+
+            if (t425_schedule_next(core) != T425_STEP_OK)
+                return T425_STEP_BADMEM;
+
+            finish(core, 2u);
+            return T425_STEP_OK;
+
         case 0x10u: /* SETERR */
     cpu->error = 1u;
     finish(core, 1u);

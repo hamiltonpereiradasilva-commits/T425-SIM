@@ -3,6 +3,8 @@
 
 #include <stdint.h>
 
+#define T425_NOT_PROCESS 0x80000000u
+
 typedef struct
 {
     uint32_t high_head;
@@ -11,6 +13,7 @@ typedef struct
     uint32_t low_head;
     uint32_t low_tail;
 
+    uint32_t current_wdesc;
     uint8_t running;
 } t425_scheduler_state_t;
 
