@@ -23,6 +23,7 @@ static void test_high_timer(void)
     t425_timer_state_t timer = {0};
 
     t425_timer_reset(&timer);
+    timer.running = 1u;
 
     t425_timer_advance(&timer, 19u);
     assert(timer.high == 0u);
@@ -39,6 +40,7 @@ static void test_low_timer(void)
     t425_timer_state_t timer = {0};
 
     t425_timer_reset(&timer);
+    timer.running = 1u;
 
     t425_timer_advance(&timer, 1279u);
     assert(timer.low == 0u);
@@ -55,6 +57,7 @@ static void test_fractional_progress(void)
     t425_timer_state_t timer = {0};
 
     t425_timer_reset(&timer);
+    timer.running = 1u;
 
     t425_timer_advance(&timer, 10u);
     assert(timer.high == 0u);
@@ -73,6 +76,7 @@ static void test_overflow(void)
     t425_timer_state_t timer = {0};
 
     t425_timer_reset(&timer);
+    timer.running = 1u;
 
     timer.high = UINT32_MAX;
     timer.low = UINT32_MAX;

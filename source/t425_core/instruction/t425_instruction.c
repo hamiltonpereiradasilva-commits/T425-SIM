@@ -635,6 +635,144 @@ case 0x03u: /* ENDP */
             finish(core, 5u);
             return T425_STEP_OK;
 
+        case 0x00u: /* REV */
+        {
+            uint32_t value = cpu->A;
+            cpu->A = cpu->B;
+            cpu->B = value;
+            finish(core, 1u);
+            return T425_STEP_OK;
+        }
+
+        case 0x3Au: /* XWORD */
+        {
+            uint32_t sign_bit = cpu->A;
+            uint32_t value = cpu->B;
+            uint32_t mask;
+            uint32_t extended;
+
+            /*
+             * A contains 2^(N-1), identifying the sign bit of
+             * the N-bit signed object.  XWORD sign-extends B.
+             * The result occupies A and the old C is promoted to B.
+             */
+            if (sign_bit == 0u ||
+                (sign_bit & (sign_bit - 1u)) != 0u)
+            {
+                cpu->error = 1u;
+                finish(core, 4u);
+                return T425_STEP_OK;
+            }
+
+            mask = (sign_bit << 1u) - 1u;
+            extended = value & mask;
+
+            if ((value & sign_bit) != 0u)
+                extended |= ~mask;
+
+            cpu->A = extended;
+            cpu->B = cpu->C;
+            finish(core, 4u);
+            return T425_STEP_OK;
+        }
+
+        case 0x56u: /* CWORD */
+        {
+            uint32_t sign_bit = cpu->A;
+
+            /*
+             * A contains 2^(N-1).  A signed N-bit value is in
+             * [-A, A-1].
+             */
+            if (sign_bit == 0u ||
+                (sign_bit & (sign_bit - 1u)) != 0u)
+            {
+                cpu->error = 1u;
+            }
+            else
+            {
+                int64_t value = (int64_t)(int32_t)cpu->B;
+                int64_t minimum = -(int64_t)sign_bit;
+                int64_t maximum = (int64_t)sign_bit - 1;
+
+                if (value < minimum || value > maximum)
+                    cpu->error = 1u;
+            }
+
+            cpu->A = cpu->B;
+            cpu->B = cpu->C;
+            finish(core, 5u);
+            return T425_STEP_OK;
+        }
+
+        case 0x1Du: /* XDBLE */
+        {
+            uint32_t value = cpu->A;
+
+            cpu->C = cpu->B;
+            cpu->B = (value & 0x80000000u) != 0u
+                         ? UINT32_MAX
+                         : 0u;
+
+            finish(core, 2u);
+            return T425_STEP_OK;
+        }
+
+        case 0x4Cu: /* CSNGL */
+        {
+            uint32_t high = cpu->B;
+            uint32_t sign = (cpu->A & 0x80000000u) != 0u;
+
+            /*
+             * A/B is a signed 64-bit integer, with B as MSW.
+             * The value is representable as a signed word iff B
+             * is either all zeroes or all ones matching A's sign.
+             */
+            if ((!sign && high != 0u) ||
+                (sign && high != UINT32_MAX))
+            {
+                cpu->error = 1u;
+            }
+
+            cpu->B = cpu->C;
+            finish(core, 3u);
+            return T425_STEP_OK;
+        }
+
+        case 0x42u: /* MINT */
+        {
+            cpu->A = 0x80000000u;
+            finish(core, 1u);
+            return T425_STEP_OK;
+        }
+
+        case 0x5Au: /* DUP */
+        {
+            uint32_t old_a = cpu->A;
+            uint32_t old_b = cpu->B;
+
+            cpu->C = old_b;
+            cpu->B = old_a;
+            /* A remains unchanged. */
+
+            finish(core, 1u);
+            return T425_STEP_OK;
+        }
+
+        case 0x79u: /* POP */
+        {
+            uint32_t old_a = cpu->A;
+            uint32_t old_b = cpu->B;
+            uint32_t old_c = cpu->C;
+
+            cpu->A = old_b;
+            cpu->B = old_c;
+            cpu->C = old_a;
+
+            finish(core, 1u);
+            return T425_STEP_OK;
+        }
+
         case 0x46u: /* AND */
             cpu->A = cpu->A & cpu->B;
             cpu->B = cpu->C;
