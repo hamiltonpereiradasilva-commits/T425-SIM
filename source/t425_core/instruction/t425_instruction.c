@@ -869,6 +869,142 @@ case 0x03u: /* ENDP */
             return T425_STEP_OK;
         }
 
+        case 0x19u: /* NORM */
+        {
+            uint32_t high = cpu->B;
+            uint32_t low = cpu->A;
+            uint32_t shifts = 0u;
+
+            /*
+             * Normalize the unsigned double-word B:A.
+             * B is the most significant word.
+             *
+             * T425 semantics:
+             *   shift left until B bit 31 is set;
+             *   C receives the number of shifts;
+             *   zero input produces C == 64.
+             */
+            while ((high & 0x80000000u) == 0u && shifts < 64u)
+            {
+                high = (high << 1u) | (low >> 31u);
+                low <<= 1u;
+                ++shifts;
+            }
+
+            cpu->A = low;
+            cpu->B = high;
+            cpu->C = shifts;
+
+            if (shifts == 64u)
+                finish(core, 3u);
+            else if (shifts < 32u)
+                finish(core, shifts + 5u);
+            else
+                finish(core, shifts - 26u);
+
+            return T425_STEP_OK;
+        }
+
+        case 0x21u: /* LEND */
+        {
+            uint32_t index;
+            uint32_t count;
+
+            if (t425_memory_read_word(&core->memory,
+                                      cpu->B,
+                                      &index) != 0)
+                return T425_STEP_BADMEM;
+
+            if (t425_memory_read_word(&core->memory,
+                                      cpu->B + 4u,
+                                      &count) != 0)
+                return T425_STEP_BADMEM;
+
+            count -= 1u;
+
+            if (t425_memory_write_word(&core->memory,
+                                       cpu->B + 4u,
+                                       count) != 0)
+                return T425_STEP_BADMEM;
+
+            if (count != 0u)
+            {
+                index += 1u;
+
+                if (t425_memory_write_word(&core->memory,
+                                           cpu->B,
+                                           index) != 0)
+                    return T425_STEP_BADMEM;
+
+                cpu->Iptr -= cpu->A;
+                finish(core, 10u);
+            }
+            else
+            {
+                finish(core, 5u);
+            }
+
+            return T425_STEP_OK;
+        }
+
+        case 0x3Cu: /* GAJW */
+        {
+            uint32_t old_a = cpu->A;
+            uint32_t old_wptr = cpu->Wptr;
+
+            cpu->A = old_wptr;
+            cpu->Wptr = old_a & ~3u;
+
+            finish(core, 2u);
+            return T425_STEP_OK;
+        }
+
+        case 0x4Au: /* MOVE */
+        {
+            uint32_t count = cpu->A;
+            uint32_t source = cpu->C;
+            uint32_t destination = cpu->B;
+            uint32_t i;
+
+            /*
+             * Architectural MOVE copies A bytes from C to B.
+             * Overlapping source/destination regions have undefined
+             * architectural results; this implementation performs the
+             * natural forward byte copy.
+             */
+            for (i = 0u; i < count; ++i)
+            {
+                uint8_t value;
+
+                if (t425_memory_read_byte(&core->memory,
+                                          source + i,
+                                          &value) != 0)
+                    return T425_STEP_BADMEM;
+
+                if (t425_memory_write_byte(&core->memory,
+                                           destination + i,
+                                           value) != 0)
+                    return T425_STEP_BADMEM;
+            }
+
+            finish(core, 2u * ((count + 3u) / 4u) + 8u);
+            return T425_STEP_OK;
+        }
+
+        case 0x4Du: /* CCNT1 */
+        {
+            uint32_t count = cpu->B;
+
+            if (count == 0u || count > cpu->A)
+                cpu->error = 1u;
+
+            cpu->A = count;
+            cpu->B = cpu->C;
+
+            finish(core, 3u);
+            return T425_STEP_OK;
+        }
+
         case 0x46u: /* AND */
             cpu->A = cpu->A & cpu->B;
             cpu->B = cpu->C;
