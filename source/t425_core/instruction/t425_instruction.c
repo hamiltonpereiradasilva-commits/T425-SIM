@@ -1005,6 +1005,118 @@ case 0x03u: /* ENDP */
             return T425_STEP_OK;
         }
 
+        case 0x74u: /* CRCWORD */
+        {
+            uint32_t data = cpu->A;
+            uint32_t crc = cpu->B;
+            uint32_t generator = cpu->C;
+            uint32_t i;
+
+            for (i = 0u; i < 32u; ++i)
+            {
+                uint32_t carry = (crc >> 31u) & 1u;
+
+                crc = (crc << 1u) | (data >> 31u);
+                data <<= 1u;
+
+                if (carry != 0u)
+                    crc ^= generator;
+            }
+
+            cpu->A = crc;
+            cpu->B = generator;
+
+            finish(core, 35u);
+            return T425_STEP_OK;
+        }
+
+        case 0x75u: /* CRCBYTE */
+        {
+            uint32_t data = cpu->A;
+            uint32_t crc = cpu->B;
+            uint32_t generator = cpu->C;
+            uint32_t i;
+
+            for (i = 0u; i < 8u; ++i)
+            {
+                uint32_t carry = (crc >> 31u) & 1u;
+
+                crc = (crc << 1u) | (data >> 31u);
+                data <<= 1u;
+
+                if (carry != 0u)
+                    crc ^= generator;
+            }
+
+            cpu->A = crc;
+            cpu->B = generator;
+
+            finish(core, 11u);
+            return T425_STEP_OK;
+        }
+
+        case 0x76u: /* BITCNT */
+        {
+            uint32_t value = cpu->A;
+            uint32_t count = cpu->B;
+            uint32_t bits = 0u;
+
+            while (value != 0u)
+            {
+                value &= value - 1u;
+                ++bits;
+            }
+
+            cpu->A = count + bits;
+            cpu->B = cpu->C;
+
+            finish(core, bits + 2u);
+            return T425_STEP_OK;
+        }
+
+        case 0x77u: /* BITREVWORD */
+        {
+            uint32_t value = cpu->A;
+            uint32_t reversed = 0u;
+            uint32_t i;
+
+            for (i = 0u; i < 32u; ++i)
+            {
+                reversed <<= 1u;
+                reversed |= value & 1u;
+                value >>= 1u;
+            }
+
+            cpu->A = reversed;
+
+            finish(core, 36u);
+            return T425_STEP_OK;
+        }
+
+        case 0x78u: /* BITREVNBITS */
+        {
+            uint32_t n = cpu->A;
+            uint32_t value = cpu->B;
+            uint32_t reversed = 0u;
+            uint32_t i;
+
+            if (n > 32u)
+                n = 32u;
+
+            for (i = 0u; i < n; ++i)
+            {
+                reversed <<= 1u;
+                reversed |= value & 1u;
+                value >>= 1u;
+            }
+
+            cpu->A = reversed;
+            cpu->B = cpu->C;
+
+            finish(core, n + 4u);
+            return T425_STEP_OK;
+        }
+
         case 0x46u: /* AND */
             cpu->A = cpu->A & cpu->B;
             cpu->B = cpu->C;
