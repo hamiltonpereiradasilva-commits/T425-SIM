@@ -773,6 +773,102 @@ case 0x03u: /* ENDP */
             return T425_STEP_OK;
         }
 
+        case 0x01u: /* LB */
+        {
+            uint8_t value;
+
+            if (t425_memory_read_byte(&core->memory, cpu->A, &value) != 0)
+                return T425_STEP_BADMEM;
+
+            cpu->A = (uint32_t)value;
+            finish(core, 5u);
+            return T425_STEP_OK;
+        }
+
+        case 0x02u: /* BSUB */
+        {
+            cpu->A += cpu->B;
+            cpu->B = cpu->C;
+            finish(core, 1u);
+            return T425_STEP_OK;
+        }
+
+        case 0x0Au: /* WSUB */
+        {
+            cpu->A += cpu->B * 4u;
+            cpu->B = cpu->C;
+            finish(core, 2u);
+            return T425_STEP_OK;
+        }
+
+        case 0x17u: /* STLB */
+        {
+            core->scheduler.low_tail = cpu->A;
+            finish(core, 1u);
+            return T425_STEP_OK;
+        }
+
+        case 0x18u: /* STHF */
+        {
+            core->scheduler.high_head = cpu->A;
+            finish(core, 1u);
+            return T425_STEP_OK;
+        }
+
+        case 0x1Cu: /* STLF */
+        {
+            core->scheduler.low_head = cpu->A;
+            finish(core, 1u);
+            return T425_STEP_OK;
+        }
+
+        case 0x3Bu: /* SB */
+        {
+            if (t425_memory_write_byte(&core->memory,
+                                       cpu->A,
+                                       (uint8_t)(cpu->B & 0xFFu)) != 0)
+                return T425_STEP_BADMEM;
+
+            cpu->A = cpu->C;
+            finish(core, 4u);
+            return T425_STEP_OK;
+        }
+
+        case 0x34u: /* BCNT */
+        {
+            cpu->A *= 4u;
+            finish(core, 2u);
+            return T425_STEP_OK;
+        }
+
+        case 0x3Fu: /* WCNT */
+        {
+            uint32_t address = cpu->A;
+            uint32_t old_b = cpu->B;
+
+            cpu->A = (address & ~3u) / 4u;
+            cpu->B = address & 3u;
+            cpu->C = old_b;
+
+            finish(core, 5u);
+            return T425_STEP_OK;
+        }
+
+        case 0x50u: /* STHB */
+        {
+            core->scheduler.high_tail = cpu->A;
+            finish(core, 1u);
+            return T425_STEP_OK;
+        }
+
+        case 0x81u: /* WSUBDB */
+        {
+            cpu->A += cpu->B * 8u;
+            cpu->B = cpu->C;
+            finish(core, 3u);
+            return T425_STEP_OK;
+        }
+
         case 0x46u: /* AND */
             cpu->A = cpu->A & cpu->B;
             cpu->B = cpu->C;
