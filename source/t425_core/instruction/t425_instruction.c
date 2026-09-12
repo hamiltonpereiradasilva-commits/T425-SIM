@@ -34,6 +34,45 @@ static void finish(t425_core_t *core, uint32_t cycles)
 }
 
 
+static int t425_enqueue(t425_core_t *core, uint32_t wdesc)
+{
+    t425_scheduler_state_t *scheduler = &core->scheduler;
+    uint32_t wptr = t425_wdesc_wptr(wdesc);
+    uint32_t *head;
+    uint32_t *tail;
+
+    if (t425_wdesc_priority(wdesc) == T425_PRIORITY_HIGH)
+    {
+        head = &scheduler->high_head;
+        tail = &scheduler->high_tail;
+    }
+    else
+    {
+        head = &scheduler->low_head;
+        tail = &scheduler->low_tail;
+    }
+
+    if (t425_memory_write_word(
+            &core->memory, wptr - 8u, T425_NOT_PROCESS) != 0)
+        return T425_STEP_BADMEM;
+
+    if (*head == T425_NOT_PROCESS)
+    {
+        *head = wdesc;
+        *tail = wdesc;
+        return T425_STEP_OK;
+    }
+
+    if (t425_memory_write_word(
+            &core->memory,
+            t425_wdesc_wptr(*tail) - 8u,
+            wdesc) != 0)
+        return T425_STEP_BADMEM;
+
+    *tail = wdesc;
+    return T425_STEP_OK;
+}
+
 static int t425_schedule_next(t425_core_t *core)
 {
     t425_scheduler_state_t *scheduler = &core->scheduler;
@@ -105,6 +144,143 @@ static int t425_opr_execute(t425_core_t *core)
                 return T425_STEP_BADMEM;
 
             finish(core, 2u);
+            return T425_STEP_OK;
+
+        case 0x0Du: /* STARTP */
+        {
+            uint32_t new_wptr = cpu->A;
+            uint32_t new_iptr = cpu->Iptr + cpu->B;
+            uint32_t new_wdesc;
+
+            if ((new_wptr & 3u) != 0u)
+                return T425_STEP_BADMEM;
+
+            if (core->scheduler.current_wdesc == T425_NOT_PROCESS)
+                return T425_STEP_BADMEM;
+
+            new_wdesc =
+                new_wptr |
+                t425_wdesc_priority(core->scheduler.current_wdesc);
+
+            if (t425_memory_write_word(
+                    &core->memory,
+                    new_wptr - 4u,
+                    new_iptr) != 0)
+                return T425_STEP_BADMEM;
+
+            if (t425_enqueue(core, new_wdesc) != T425_STEP_OK)
+                return T425_STEP_BADMEM;
+
+            cpu->A = 0u;
+            cpu->B = 0u;
+            cpu->C = 0u;
+
+            finish(core, 12u);
+            return T425_STEP_OK;
+        }
+
+case 0x03u: /* ENDP */
+        {
+            uint32_t successor_wptr = cpu->A;
+            uint32_t count;
+
+            if (t425_memory_read_word(
+                    &core->memory,
+                    successor_wptr + 4u,
+                    &count) != 0)
+                return T425_STEP_BADMEM;
+
+            if (count == 0u)
+                return T425_STEP_BADMEM;
+
+            if (count == 1u)
+            {
+                uint32_t successor_iptr;
+
+                if (t425_memory_read_word(
+                        &core->memory,
+                        successor_wptr,
+                        &successor_iptr) != 0)
+                    return T425_STEP_BADMEM;
+
+                cpu->Wptr = successor_wptr;
+                cpu->Iptr = successor_iptr;
+                core->scheduler.current_wdesc =
+                    successor_wptr |
+                    t425_wdesc_priority(core->scheduler.current_wdesc);
+                core->scheduler.running = 1u;
+
+                cpu->A = 0u;
+                cpu->B = 0u;
+                cpu->C = 0u;
+
+                finish(core, 13u);
+                return T425_STEP_OK;
+            }
+
+            if (t425_memory_write_word(
+                    &core->memory,
+                    successor_wptr + 4u,
+                    count - 1u) != 0)
+                return T425_STEP_BADMEM;
+
+            if (t425_schedule_next(core) != T425_STEP_OK)
+                return T425_STEP_BADMEM;
+
+            finish(core, 13u);
+            return T425_STEP_OK;
+        }
+
+        case 0x39u: /* RUNP */
+        {
+            uint32_t wdesc = cpu->A;
+            uint32_t wptr = t425_wdesc_wptr(wdesc);
+            uint32_t iptr;
+
+            if ((wptr & 3u) != 0u ||
+                wdesc == T425_NOT_PROCESS)
+                return T425_STEP_BADMEM;
+
+            if (t425_memory_read_word(
+                    &core->memory,
+                    wptr - 4u,
+                    &iptr) != 0)
+                return T425_STEP_BADMEM;
+
+            if (t425_enqueue(core, wdesc) != T425_STEP_OK)
+                return T425_STEP_BADMEM;
+
+            cpu->A = 0u;
+            finish(core, 10u);
+            return T425_STEP_OK;
+        }
+
+        case 0x15u: /* STOPP */
+        {
+            if (core->scheduler.current_wdesc == T425_NOT_PROCESS)
+                return T425_STEP_BADMEM;
+
+            if (t425_memory_write_word(
+                    &core->memory,
+                    cpu->Wptr - 4u,
+                    cpu->Iptr) != 0)
+                return T425_STEP_BADMEM;
+
+            if (t425_schedule_next(core) != T425_STEP_OK)
+                return T425_STEP_BADMEM;
+
+            cpu->A = 0u;
+            cpu->B = 0u;
+            cpu->C = 0u;
+
+            finish(core, 11u);
+            return T425_STEP_OK;
+        }
+
+        case 0x1Eu: /* LDPRI */
+            push(cpu,
+                 t425_wdesc_priority(core->scheduler.current_wdesc));
+            finish(core, 1u);
             return T425_STEP_OK;
 
         case 0x10u: /* SETERR */
