@@ -283,6 +283,15 @@ case 0x03u: /* ENDP */
             finish(core, 1u);
             return T425_STEP_OK;
 
+        case 0x13u: /* CSUB0 */
+            if (cpu->B > cpu->A)
+                cpu->error = 1u;
+
+            cpu->A = cpu->B;
+            cpu->B = cpu->C;
+            finish(core, 2u);
+            return T425_STEP_OK;
+
         case 0x10u: /* SETERR */
     cpu->error = 1u;
     finish(core, 1u);
