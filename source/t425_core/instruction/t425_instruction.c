@@ -625,6 +625,157 @@ case 0x03u: /* ENDP */
             finish(core, 2u);
             return T425_STEP_OK;
 
+
+  case 0x06u: /* GCALL */
+  {
+      uint32_t old_iptr = cpu->Iptr;
+      cpu->Iptr = cpu->A;
+      cpu->A = old_iptr;
+      finish(core, 4u);
+      return T425_STEP_OK;
+  }
+
+  case 0x1Bu: /* LDPI */
+  {
+      cpu->A += cpu->Iptr;
+      finish(core, 2u);
+      return T425_STEP_OK;
+  }
+
+  case 0x2Au: /* TESTPRANAL */
+  {
+      uint32_t old_a = cpu->A;
+      uint32_t old_b = cpu->B;
+
+      cpu->A = cpu->analyse ? 1u : 0u;
+      cpu->B = old_a;
+      cpu->C = old_b;
+
+      finish(core, 2u);
+      return T425_STEP_OK;
+  }
+
+  case 0x3Du: /* SAVEL */
+  {
+      uint32_t address = cpu->A;
+
+      if (t425_memory_write_word(
+              &core->memory, address,
+              core->scheduler.low_head) != 0)
+          return T425_STEP_BADMEM;
+
+      if (t425_memory_write_word(
+              &core->memory, address + 4u,
+              core->scheduler.low_tail) != 0)
+          return T425_STEP_BADMEM;
+
+      cpu->A = cpu->B;
+      cpu->B = cpu->C;
+
+      finish(core, 4u);
+      return T425_STEP_OK;
+  }
+
+  case 0x3Eu: /* SAVEH */
+  {
+      uint32_t address = cpu->A;
+
+      if (t425_memory_write_word(
+              &core->memory, address,
+              core->scheduler.high_head) != 0)
+          return T425_STEP_BADMEM;
+
+      if (t425_memory_write_word(
+              &core->memory, address + 4u,
+              core->scheduler.high_tail) != 0)
+          return T425_STEP_BADMEM;
+
+      cpu->A = cpu->B;
+      cpu->B = cpu->C;
+
+      finish(core, 4u);
+      return T425_STEP_OK;
+  }
+
+  case 0x72u: /* FMUL */
+  {
+      int64_t product =
+          (int64_t)(int32_t)cpu->A *
+          (int64_t)(int32_t)cpu->B;
+
+      /*
+       * T425 fractional multiply, without rounding.
+       *
+       * A and B represent signed fractions scaled by 2^31.
+       * The result is therefore the signed 64-bit product
+       * scaled back by 2^31.
+       *
+       * MinInt * MinInt represents +1, which cannot be
+       * represented in the signed fractional result.
+       */
+      if ((int32_t)cpu->A == INT32_MIN &&
+          (int32_t)cpu->B == INT32_MIN)
+          cpu->error = 1u;
+
+      cpu->A = (uint32_t)(int32_t)(product / 2147483648LL);
+      cpu->B = cpu->C;
+
+      finish(core, 35u);
+      return T425_STEP_OK;
+  }
+
+  case 0x7Au: /* TIMERDISABLEH */
+  {
+      core->timer.interrupt_high_enabled = 0u;
+      cpu->timer_disabled_high = 1u;
+      finish(core, 1u);
+      return T425_STEP_OK;
+  }
+
+  case 0x7Bu: /* TIMERDISABLEL */
+  {
+      core->timer.interrupt_low_enabled = 0u;
+      cpu->timer_disabled_low = 1u;
+      finish(core, 1u);
+      return T425_STEP_OK;
+  }
+
+  case 0x7Cu: /* TIMERENABLEH */
+  {
+      core->timer.interrupt_high_enabled = 1u;
+      cpu->timer_disabled_high = 0u;
+      finish(core, 6u);
+      return T425_STEP_OK;
+  }
+
+  case 0x7Du: /* TIMERENABLEL */
+  {
+      core->timer.interrupt_low_enabled = 1u;
+      cpu->timer_disabled_low = 0u;
+      finish(core, 6u);
+      return T425_STEP_OK;
+  }
+
+  case 0x7Eu: /* LDMEMSTARTVAL */
+  {
+      uint32_t old_a = cpu->A;
+      uint32_t old_b = cpu->B;
+
+      cpu->A = T425_INTERNAL_RAM_BASE + 0x70u;
+      cpu->B = old_a;
+      cpu->C = old_b;
+
+      finish(core, 1u);
+      return T425_STEP_OK;
+  }
+
+  case 0x17Cu: /* LDDEVID */
+  {
+      cpu->A = cpu->devid;
+      finish(core, 1u);
+      return T425_STEP_OK;
+  }
+
   case 0x20u: /* RET */
             if (t425_memory_read_word(
                     &core->memory, cpu->Wptr, &value) != 0)
