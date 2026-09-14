@@ -10,6 +10,12 @@
 
 typedef struct
 {
+    /* T425 VBC internal channel machinery. */
+    uint32_t t425_channel_select;
+    uint32_t t425_channel_stack;
+    uint32_t t425_data_mem_addr;
+    uint32_t t425_data_reg;
+
     t425_cpu_state_t cpu;
     t425_memory_t memory;
     t425_scheduler_state_t scheduler;

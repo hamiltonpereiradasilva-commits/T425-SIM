@@ -16,6 +16,11 @@ void t425_core_reset(t425_core_t *core)
     core->scheduler.current_wdesc = T425_NOT_PROCESS;
     core->scheduler.running = 0u;
 
+    core->t425_channel_select = 0u;
+    core->t425_channel_stack = 0u;
+    core->t425_data_mem_addr = 0u;
+    core->t425_data_reg = 0u;
+
     core->cycles = 0;
     core->instructions = 0;
 }

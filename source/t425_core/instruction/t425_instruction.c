@@ -1,6 +1,7 @@
 #include <stdint.h>
 
 #include "t425_core.h"
+#include "t425_channel.h"
 #include "t425_process.h"
 #include "t425_instruction.h"
 #include "t425_timer.h"
@@ -1773,6 +1774,75 @@ case 0x03u: /* ENDP */
             cpu->C = 0u;
 
             finish(core, 48u);
+            return T425_STEP_OK;
+        }
+
+        case 0x0Eu: /* OUTBYTE */
+        {
+            /*
+             * T425 OUTBYTE.
+             *
+             * VBC:
+             *
+             *     OUTBYTE:
+             *         Areg <- Breg + 1
+             *         DataReg <- Areg (after Breg + 1)
+             *         goto 2D5
+             *
+             *     2D5:
+             *         Creg <- Wptr
+             *         MemWrite(DataMemAddr=Wptr, DataReg)
+             *         goto OUT
+             *
+             *     OUT:
+             *         Areg <- previous Breg
+             *         Breg <- previous Areg
+             */
+
+            uint32_t old_a = cpu->A;
+            uint32_t old_b = cpu->B;
+
+            /* OUTBYTE */
+            cpu->A = old_b + 1u;
+            core->t425_data_reg = cpu->A;
+
+            /* 2D5 */
+            cpu->C = cpu->Wptr;
+
+            if (t425_memory_write_word(
+                    &core->memory,
+                    cpu->Wptr,
+                    core->t425_data_reg) != 0)
+                return T425_STEP_BADMEM;
+
+            /* OUT */
+            cpu->A = old_b;
+            cpu->B = old_a;
+
+            finish(core, 23u);
+            return T425_STEP_OK;
+        }
+
+        case 0x12u: /* RESETCH */
+        {
+            /*
+             * T425 RESETCH:
+             *
+             * A contains the architectural channel address.
+             * Reset the channel control word to MinInt / NotProcess.
+             *
+             * The channel state is architectural T425 memory state;
+             * no private FIFO/rendezvous state is introduced here.
+             */
+
+            {
+                int rc = t425_channel_reset(&core->memory, cpu->A);
+
+                if (rc != 0)
+                    return T425_STEP_BADMEM;
+            }
+
+            finish(core, 3u);
             return T425_STEP_OK;
         }
 
