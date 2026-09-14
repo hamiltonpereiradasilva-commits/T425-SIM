@@ -8,6 +8,17 @@
 #include "t425_scheduler.h"
 #include "t425_timer.h"
 
+#define T425_MAX_PROCESS_CONTEXTS 32u
+
+typedef struct
+{
+    uint8_t valid;
+    uint32_t wptr;
+    uint32_t A;
+    uint32_t B;
+    uint32_t C;
+} t425_process_context_t;
+
 typedef struct
 {
     /* T425 VBC internal channel machinery. */
@@ -15,6 +26,13 @@ typedef struct
     uint32_t t425_channel_stack;
     uint32_t t425_data_mem_addr;
     uint32_t t425_data_reg;
+
+    /*
+     * Simulator-internal register context for processes which are
+     * not currently executing. This is not architectural RAM and
+     * is not channel state.
+     */
+    t425_process_context_t process_contexts[T425_MAX_PROCESS_CONTEXTS];
 
     t425_cpu_state_t cpu;
     t425_memory_t memory;

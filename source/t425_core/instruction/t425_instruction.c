@@ -199,6 +199,106 @@ static int t425_enqueue(t425_core_t *core, uint32_t wdesc)
     return T425_STEP_OK;
 }
 
+
+static t425_process_context_t *
+t425_find_process_context(t425_core_t *core, uint32_t wptr)
+{
+    uint32_t i;
+
+    for (i = 0u; i < T425_MAX_PROCESS_CONTEXTS; ++i) {
+        if (core->process_contexts[i].valid &&
+            core->process_contexts[i].wptr == wptr)
+            return &core->process_contexts[i];
+    }
+
+    return 0;
+}
+
+static t425_process_context_t *
+t425_allocate_process_context(t425_core_t *core, uint32_t wptr)
+{
+    t425_process_context_t *ctx;
+    uint32_t i;
+
+    ctx = t425_find_process_context(core, wptr);
+    if (ctx != 0)
+        return ctx;
+
+    for (i = 0u; i < T425_MAX_PROCESS_CONTEXTS; ++i) {
+        if (!core->process_contexts[i].valid) {
+            ctx = &core->process_contexts[i];
+            ctx->valid = 1u;
+            ctx->wptr = wptr;
+            return ctx;
+        }
+    }
+
+    return 0;
+}
+
+static int t425_process_context_save(t425_core_t *core)
+{
+    t425_process_context_t *ctx;
+
+    if (!core ||
+        !core->scheduler.running ||
+        core->scheduler.current_wdesc == T425_NOT_PROCESS)
+        return T425_STEP_OK;
+
+    ctx = t425_allocate_process_context(core, core->cpu.Wptr);
+    if (ctx == 0)
+        return T425_STEP_BADMEM;
+
+    ctx->A = core->cpu.A;
+    ctx->B = core->cpu.B;
+    ctx->C = core->cpu.C;
+
+    return T425_STEP_OK;
+}
+
+static int t425_process_context_restore(
+    t425_core_t *core,
+    uint32_t wptr)
+{
+    t425_process_context_t *ctx;
+
+    if (!core)
+        return T425_STEP_BADMEM;
+
+    ctx = t425_find_process_context(core, wptr);
+
+    if (ctx == 0) {
+        /*
+         * No saved context means that this is a newly started
+         * process in the current CORE implementation.
+         */
+        core->cpu.A = 0u;
+        core->cpu.B = 0u;
+        core->cpu.C = 0u;
+        return T425_STEP_OK;
+    }
+
+    core->cpu.A = ctx->A;
+    core->cpu.B = ctx->B;
+    core->cpu.C = ctx->C;
+
+    return T425_STEP_OK;
+}
+
+static void t425_process_context_forget(
+    t425_core_t *core,
+    uint32_t wptr)
+{
+    t425_process_context_t *ctx;
+
+    if (!core)
+        return;
+
+    ctx = t425_find_process_context(core, wptr);
+    if (ctx != 0)
+        ctx->valid = 0u;
+}
+
 static int t425_schedule_next(t425_core_t *core)
 {
     t425_scheduler_state_t *scheduler = &core->scheduler;
@@ -248,6 +348,9 @@ static int t425_schedule_next(t425_core_t *core)
 
     scheduler->current_wdesc = next_wdesc;
     scheduler->running = 1u;
+
+    if (t425_process_context_restore(core, next_wptr) != T425_STEP_OK)
+        return T425_STEP_BADMEM;
 
     return T425_STEP_OK;
 }
@@ -485,6 +588,7 @@ static int t425_opr_execute(t425_core_t *core)
 case 0x03u: /* ENDP */
         {
             uint32_t successor_wptr = cpu->A;
+            uint32_t terminated_wptr = cpu->Wptr;
             uint32_t count;
 
             if (t425_memory_read_word(
@@ -513,6 +617,7 @@ case 0x03u: /* ENDP */
                     t425_wdesc_priority(core->scheduler.current_wdesc);
                 core->scheduler.running = 1u;
 
+                t425_process_context_forget(core, terminated_wptr);
                 cpu->A = 0u;
                 cpu->B = 0u;
                 cpu->C = 0u;
@@ -527,6 +632,7 @@ case 0x03u: /* ENDP */
                     count - 1u) != 0)
                 return T425_STEP_BADMEM;
 
+            t425_process_context_forget(core, terminated_wptr);
             if (t425_schedule_next(core) != T425_STEP_OK)
                 return T425_STEP_BADMEM;
 
@@ -569,12 +675,11 @@ case 0x03u: /* ENDP */
                     cpu->Iptr) != 0)
                 return T425_STEP_BADMEM;
 
-            if (t425_schedule_next(core) != T425_STEP_OK)
+            if (t425_process_context_save(core) != T425_STEP_OK)
                 return T425_STEP_BADMEM;
 
-            cpu->A = 0u;
-            cpu->B = 0u;
-            cpu->C = 0u;
+            if (t425_schedule_next(core) != T425_STEP_OK)
+                return T425_STEP_BADMEM;
 
             finish(core, 11u);
             return T425_STEP_OK;
@@ -1766,12 +1871,11 @@ case 0x03u: /* ENDP */
                                    1) != T425_STEP_OK)
                 return T425_STEP_BADMEM;
 
+            if (t425_process_context_save(core) != T425_STEP_OK)
+                return T425_STEP_BADMEM;
             if (t425_schedule_next(core) != T425_STEP_OK)
                 return T425_STEP_BADMEM;
 
-            cpu->A = 0u;
-            cpu->B = 0u;
-            cpu->C = 0u;
 
             finish(core, 48u);
             return T425_STEP_OK;

@@ -21,6 +21,17 @@ void t425_core_reset(t425_core_t *core)
     core->t425_data_mem_addr = 0u;
     core->t425_data_reg = 0u;
 
+    {
+        uint32_t i;
+        for (i = 0u; i < T425_MAX_PROCESS_CONTEXTS; ++i) {
+            core->process_contexts[i].valid = 0u;
+            core->process_contexts[i].wptr = 0u;
+            core->process_contexts[i].A = 0u;
+            core->process_contexts[i].B = 0u;
+            core->process_contexts[i].C = 0u;
+        }
+    }
+
     core->cycles = 0;
     core->instructions = 0;
 }

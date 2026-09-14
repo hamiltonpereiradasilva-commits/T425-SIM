@@ -84,6 +84,72 @@ static void test_stopp(void)
     assert(c.cycles == 12u);
 }
 
+
+static void test_stopp_context_switch(void)
+{
+    t425_core_t c;
+    uint32_t p1 = T425_INTERNAL_RAM_BASE + 0x100u;
+    uint32_t p2 = T425_INTERNAL_RAM_BASE + 0x200u;
+    uint32_t p1_iptr = T425_INTERNAL_RAM_BASE + 0x300u;
+    uint32_t p2_iptr = T425_INTERNAL_RAM_BASE + 0x400u;
+    uint32_t p1_wdesc = p1 | T425_PRIORITY_HIGH;
+    uint32_t p2_wdesc = p2 | T425_PRIORITY_HIGH;
+
+    t425_core_reset(&c);
+
+    c.cpu.Wptr = p1;
+    c.cpu.Iptr = p1_iptr;
+    c.cpu.A = 0xAAAAAAAAu;
+    c.cpu.B = 0xBBBBBBBBu;
+    c.cpu.C = 0xCCCCCCCCu;
+    c.scheduler.current_wdesc = p1_wdesc;
+    c.scheduler.running = 1u;
+
+    assert(t425_memory_write_word(
+        &c.memory, p2 - 4u, p2_iptr) == 0);
+    assert(t425_memory_write_word(
+        &c.memory, p2 - 8u, T425_NOT_PROCESS) == 0);
+
+    c.scheduler.high_head = p2_wdesc;
+    c.scheduler.high_tail = p2_wdesc;
+
+    exec_opr(&c, 0x15u);
+
+    assert(c.cpu.Wptr == p2);
+    assert(c.cpu.Iptr == p2_iptr);
+    assert(c.cpu.A == 0u);
+    assert(c.cpu.B == 0u);
+    assert(c.cpu.C == 0u);
+
+    c.cpu.A = 0x11111111u;
+    c.cpu.B = 0x22222222u;
+    c.cpu.C = 0x33333333u;
+
+    /*
+     * Requeue P1 explicitly. This is a deterministic test of
+     * context save/restore, not a claim that STOPP itself
+     * makes a terminated process runnable again.
+     */
+    assert(t425_memory_write_word(
+        &c.memory, p1 - 4u, p1_iptr) == 0);
+    assert(t425_memory_write_word(
+        &c.memory, p1 - 8u, T425_NOT_PROCESS) == 0);
+
+    c.scheduler.high_head = p1_wdesc;
+    c.scheduler.high_tail = p1_wdesc;
+
+    exec_opr(&c, 0x15u);
+
+    assert(c.cpu.Wptr == p1);
+    assert(c.cpu.Iptr == p1_iptr);
+    assert(c.cpu.A == 0xAAAAAAAAu);
+    assert(c.cpu.B == 0xBBBBBBBBu);
+    assert(c.cpu.C == 0xCCCCCCCCu);
+
+    assert(c.scheduler.current_wdesc == p1_wdesc);
+    assert(c.scheduler.high_head == T425_NOT_PROCESS);
+}
+
 static void test_startp(void)
 {
     t425_core_t c;
@@ -153,6 +219,7 @@ int main(void)
     test_ldpri();
     test_runp();
     test_stopp();
+    test_stopp_context_switch();
     test_startp();
     test_endp();
     puts("F08.1-C.2c scheduling: PASS");
