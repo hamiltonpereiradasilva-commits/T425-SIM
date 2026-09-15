@@ -30,6 +30,16 @@ void t425_core_reset(t425_core_t *core)
             core->process_contexts[i].B = 0u;
             core->process_contexts[i].C = 0u;
         }
+
+        for (i = 0u; i < T425_MAX_CHANNEL_RENDEZVOUS; ++i) {
+            core->channel_rendezvous[i].valid = 0u;
+            core->channel_rendezvous[i].operation = T425_RENDEZVOUS_NONE;
+            core->channel_rendezvous[i].wdesc = 0u;
+            core->channel_rendezvous[i].wptr = 0u;
+            core->channel_rendezvous[i].channel_address = 0u;
+            core->channel_rendezvous[i].data_address = 0u;
+            core->channel_rendezvous[i].data_length = 0u;
+        }
     }
 
     core->cycles = 0;

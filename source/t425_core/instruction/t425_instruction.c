@@ -532,6 +532,211 @@ static int t425_timer_remove(
     return T425_STEP_OK;
 }
 
+static t425_channel_rendezvous_t *
+t425_find_rendezvous(t425_core_t *core, uint32_t channel_address)
+{
+    uint32_t i;
+
+    if (core == 0)
+        return 0;
+
+    for (i = 0u; i < T425_MAX_CHANNEL_RENDEZVOUS; ++i)
+    {
+        t425_channel_rendezvous_t *rv =
+            &core->channel_rendezvous[i];
+
+        if (rv->valid &&
+            rv->channel_address == channel_address)
+            return rv;
+    }
+
+    return 0;
+}
+
+static t425_channel_rendezvous_t *
+t425_allocate_rendezvous(t425_core_t *core, uint32_t channel_address)
+{
+    t425_channel_rendezvous_t *rv;
+    uint32_t i;
+
+    if (core == 0)
+        return 0;
+
+    rv = t425_find_rendezvous(core, channel_address);
+    if (rv != 0)
+        return rv;
+
+    for (i = 0u; i < T425_MAX_CHANNEL_RENDEZVOUS; ++i)
+    {
+        rv = &core->channel_rendezvous[i];
+
+        if (!rv->valid)
+        {
+            rv->valid = 1u;
+            rv->operation = T425_RENDEZVOUS_NONE;
+            rv->wdesc = T425_NOT_PROCESS;
+            rv->wptr = 0u;
+            rv->channel_address = channel_address;
+            rv->data_address = 0u;
+            rv->data_length = 0u;
+            return rv;
+        }
+    }
+
+    return 0;
+}
+
+static void
+t425_clear_rendezvous(t425_channel_rendezvous_t *rv)
+{
+    if (rv == 0)
+        return;
+
+    rv->valid = 0u;
+    rv->operation = T425_RENDEZVOUS_NONE;
+    rv->wdesc = T425_NOT_PROCESS;
+    rv->wptr = 0u;
+    rv->channel_address = 0u;
+    rv->data_address = 0u;
+    rv->data_length = 0u;
+}
+
+static int
+t425_rendezvous_copy(t425_core_t *core,
+                     t425_channel_rendezvous_t *rv,
+                     uint32_t source_address,
+                     uint32_t destination_address,
+                     uint32_t length)
+{
+    uint32_t i;
+
+    if (core == 0 || rv == 0 || !rv->valid)
+        return T425_STEP_BADMEM;
+
+    for (i = 0u; i < length; ++i)
+    {
+        uint8_t value;
+
+        if (t425_memory_read_byte(
+                &core->memory,
+                source_address + i,
+                &value) != 0)
+            return T425_STEP_BADMEM;
+
+        if (t425_memory_write_byte(
+                &core->memory,
+                destination_address + i,
+                value) != 0)
+            return T425_STEP_BADMEM;
+    }
+
+
+    return T425_STEP_OK;
+}
+
+static int
+t425_rendezvous_wait(t425_core_t *core,
+                     uint32_t operation,
+                     uint32_t channel_address,
+                     uint32_t data_address,
+                     uint32_t data_length)
+{
+    t425_cpu_state_t *cpu;
+    t425_channel_rendezvous_t *rv;
+    uint32_t wdesc;
+
+    if (core == 0 ||
+        core->scheduler.current_wdesc == T425_NOT_PROCESS)
+        return T425_STEP_BADMEM;
+
+    cpu = &core->cpu;
+    wdesc = core->scheduler.current_wdesc;
+
+    rv = t425_allocate_rendezvous(core, channel_address);
+    if (rv == 0)
+        return T425_STEP_BADMEM;
+
+    rv->operation = (uint8_t)operation;
+    rv->wdesc = wdesc;
+    rv->wptr = cpu->Wptr;
+    rv->channel_address = channel_address;
+    rv->data_address = data_address;
+    rv->data_length = data_length;
+
+    if (t425_channel_wait(
+            &core->memory,
+            channel_address,
+            wdesc) != 0)
+    {
+        t425_clear_rendezvous(rv);
+        return T425_STEP_BADMEM;
+    }
+
+    if (t425_memory_write_word(
+            &core->memory,
+            cpu->Wptr - 12u,
+            T425_PROCESS_STATE_WAITING) != 0)
+        return T425_STEP_BADMEM;
+
+    if (t425_memory_write_word(
+            &core->memory,
+            cpu->Wptr - 4u,
+            cpu->Iptr) != 0)
+        return T425_STEP_BADMEM;
+
+    if (t425_process_context_save(core) != T425_STEP_OK)
+        return T425_STEP_BADMEM;
+
+    if (t425_schedule_next(core) != T425_STEP_OK)
+        return T425_STEP_BADMEM;
+
+    return T425_STEP_OK;
+}
+
+static int
+
+t425_rendezvous_complete(t425_core_t *core,
+                         t425_channel_rendezvous_t *rv,
+                         uint32_t source_address,
+                         uint32_t destination_address,
+                         uint32_t length)
+{
+    uint32_t blocked_wdesc;
+    uint32_t blocked_wptr;
+
+    if (core == 0 || rv == 0 || !rv->valid)
+        return T425_STEP_BADMEM;
+
+    blocked_wdesc = rv->wdesc;
+    blocked_wptr = rv->wptr;
+
+    if (t425_rendezvous_copy(
+            core,
+            rv,
+            source_address,
+            destination_address,
+            length) != T425_STEP_OK)
+        return T425_STEP_BADMEM;
+
+    if (t425_memory_write_word(
+            &core->memory,
+            rv->channel_address,
+            T425_CHANNEL_EMPTY) != 0)
+        return T425_STEP_BADMEM;
+
+    if (t425_memory_write_word(
+            &core->memory,
+            blocked_wptr - 12u,
+            T425_PROCESS_STATE_READY) != 0)
+        return T425_STEP_BADMEM;
+
+    if (t425_enqueue(core, blocked_wdesc) != T425_STEP_OK)
+        return T425_STEP_BADMEM;
+
+    return T425_STEP_OK;
+}
+
+
 static int t425_opr_execute(t425_core_t *core)
 {
     t425_cpu_state_t *cpu = &core->cpu;
@@ -539,6 +744,42 @@ static int t425_opr_execute(t425_core_t *core)
 
     switch (cpu->Oreg)
     {
+        case 0x07u: /* IN */
+        {
+            uint32_t ch=cpu->B, dst=cpu->C, len=cpu->A;
+            t425_channel_rendezvous_t *rv=t425_find_rendezvous(core,ch);
+            if (rv && rv->operation==T425_RENDEZVOUS_OUT) {
+                if (t425_rendezvous_complete(core,rv,rv->data_address,
+                    dst,rv->data_length)!=T425_STEP_OK) return T425_STEP_BADMEM;
+                t425_clear_rendezvous(rv);
+                cpu->A=cpu->B=cpu->C=0u;
+                finish(core,19u);
+                return T425_STEP_OK;
+            }
+            if (t425_rendezvous_wait(core,T425_RENDEZVOUS_IN,
+                ch,dst,len)!=T425_STEP_OK) return T425_STEP_BADMEM;
+            finish(core,19u);
+            return T425_STEP_OK;
+        }
+
+        case 0x0Bu: /* OUT */
+        {
+            uint32_t ch=cpu->B, src=cpu->C, len=cpu->A;
+            t425_channel_rendezvous_t *rv=t425_find_rendezvous(core,ch);
+            if (rv && rv->operation==T425_RENDEZVOUS_IN) {
+                if (t425_rendezvous_complete(core,rv,src,
+                    rv->data_address,len)!=T425_STEP_OK) return T425_STEP_BADMEM;
+                t425_clear_rendezvous(rv);
+                cpu->A=cpu->B=cpu->C=0u;
+                finish(core,19u);
+                return T425_STEP_OK;
+            }
+            if (t425_rendezvous_wait(core,T425_RENDEZVOUS_OUT,
+                ch,src,len)!=T425_STEP_OK) return T425_STEP_BADMEM;
+            finish(core,19u);
+            return T425_STEP_OK;
+        }
+
         case 0x55u: /* STOPERR */
             if (!cpu->error)
             {
