@@ -10,14 +10,48 @@
 
 #define T425_MAX_PROCESS_CONTEXTS 32u
 
+/*
+ * Normal T425 process context.
+ *
+ * This represents the architectural register state associated with
+ * a suspended process. It is distinct from the interrupt-save context.
+ */
 typedef struct
 {
     uint8_t valid;
+
+    /* Simulator lookup key / workspace association. */
     uint32_t wptr;
+
+    /* Normal T425 process architectural context. */
+    uint32_t Wdesc;
+    uint32_t Iptr;
     uint32_t A;
     uint32_t B;
     uint32_t C;
+    uint32_t Ereg;
+    uint32_t Status;
 } t425_process_context_t;
+
+/*
+ * T425 interrupt-save context.
+ *
+ * This is deliberately separate from the normal process context.
+ */
+typedef struct
+{
+    uint8_t valid;
+
+    uint32_t WdescIntSave;
+    uint32_t IptrIntSave;
+    uint32_t AregSave;
+    uint32_t BregSave;
+    uint32_t CregSave;
+    uint32_t StatusIntSave;
+    uint32_t EregIntSave;
+} t425_interrupt_context_t;
+
+#define T425_MAX_INTERRUPT_CONTEXTS 32u
 
 /*
  * Simulator-internal state for an architectural IN/OUT rendezvous.
@@ -58,6 +92,13 @@ typedef struct
      * is not channel state.
      */
     t425_process_context_t process_contexts[T425_MAX_PROCESS_CONTEXTS];
+
+    /*
+     * Separate simulator representation for T425 interrupt-save state.
+     * It must never be conflated with the normal process context.
+     */
+    t425_interrupt_context_t
+        interrupt_contexts[T425_MAX_INTERRUPT_CONTEXTS];
 
     /*
      * Pending IN/OUT rendezvous descriptors.

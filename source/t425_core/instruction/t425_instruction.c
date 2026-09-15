@@ -162,40 +162,15 @@ static void finish(t425_core_t *core, uint32_t cycles)
 
 static int t425_enqueue(t425_core_t *core, uint32_t wdesc)
 {
-    t425_scheduler_state_t *scheduler = &core->scheduler;
-    uint32_t wptr = t425_wdesc_wptr(wdesc);
-    uint32_t *head;
-    uint32_t *tail;
-
-    if (t425_wdesc_priority(wdesc) == T425_PRIORITY_HIGH)
-    {
-        head = &scheduler->high_head;
-        tail = &scheduler->high_tail;
-    }
-    else
-    {
-        head = &scheduler->low_head;
-        tail = &scheduler->low_tail;
-    }
-
-    if (t425_memory_write_word(
-            &core->memory, wptr - 8u, T425_NOT_PROCESS) != 0)
+    if (!core)
         return T425_STEP_BADMEM;
 
-    if (*head == T425_NOT_PROCESS)
-    {
-        *head = wdesc;
-        *tail = wdesc;
-        return T425_STEP_OK;
-    }
-
-    if (t425_memory_write_word(
+    if (t425_scheduler_enqueue(
+            &core->scheduler,
             &core->memory,
-            t425_wdesc_wptr(*tail) - 8u,
             wdesc) != 0)
         return T425_STEP_BADMEM;
 
-    *tail = wdesc;
     return T425_STEP_OK;
 }
 
@@ -245,13 +220,17 @@ static int t425_process_context_save(t425_core_t *core)
         core->scheduler.current_wdesc == T425_NOT_PROCESS)
         return T425_STEP_OK;
 
-    ctx = t425_allocate_process_context(core, core->cpu.Wptr);
+    ctx = t425_allocate_process_context(core, core->cpu.WptrReg);
     if (ctx == 0)
         return T425_STEP_BADMEM;
 
+    ctx->Wdesc = core->cpu.WdescReg;
+    ctx->Iptr = core->cpu.IptrReg;
     ctx->A = core->cpu.A;
     ctx->B = core->cpu.B;
     ctx->C = core->cpu.C;
+    ctx->Ereg = core->cpu.Ereg;
+    ctx->Status = core->cpu.StatusReg;
 
     return T425_STEP_OK;
 }
@@ -269,18 +248,30 @@ static int t425_process_context_restore(
 
     if (ctx == 0) {
         /*
-         * No saved context means that this is a newly started
-         * process in the current CORE implementation.
+         * Newly dispatched process.
+         *
+         * WdescReg/WptrReg/IptrReg have already been selected by
+         * t425_schedule_next().  They are architectural dispatch
+         * state and must therefore remain intact.
+         *
+         * A/B/C/Ereg/Status are initialized for a process for which
+         * no saved execution context exists yet.
          */
         core->cpu.A = 0u;
         core->cpu.B = 0u;
         core->cpu.C = 0u;
+        core->cpu.Ereg = 0u;
+        core->cpu.StatusReg = 0u;
         return T425_STEP_OK;
     }
 
+    core->cpu.WdescReg = ctx->Wdesc;
+    core->cpu.IptrReg = ctx->Iptr;
     core->cpu.A = ctx->A;
     core->cpu.B = ctx->B;
     core->cpu.C = ctx->C;
+    core->cpu.Ereg = ctx->Ereg;
+    core->cpu.StatusReg = ctx->Status;
 
     return T425_STEP_OK;
 }
@@ -301,55 +292,52 @@ static void t425_process_context_forget(
 
 static int t425_schedule_next(t425_core_t *core)
 {
-    t425_scheduler_state_t *scheduler = &core->scheduler;
+    t425_scheduler_state_t *scheduler;
     uint32_t next_wdesc;
     uint32_t next_wptr;
     uint32_t next_iptr;
-    uint32_t next_link;
+    int result;
 
-    if (scheduler->high_head != T425_NOT_PROCESS)
-        next_wdesc = scheduler->high_head;
-    else if (scheduler->low_head != T425_NOT_PROCESS)
-        next_wdesc = scheduler->low_head;
-    else
-    {
+    if (!core)
+        return T425_STEP_BADMEM;
+
+    scheduler = &core->scheduler;
+
+    result = t425_scheduler_dequeue(
+        scheduler,
+        &core->memory,
+        &next_wdesc,
+        &next_iptr);
+
+    if (result < 0)
+        return T425_STEP_BADMEM;
+
+    if (result > 0) {
         scheduler->current_wdesc = T425_NOT_PROCESS;
         scheduler->running = 0u;
         return T425_STEP_OK;
     }
 
-    next_wptr = t425_wdesc_wptr(next_wdesc);
+    next_wptr = next_wdesc & ~1u;
 
-    if (t425_memory_read_word(
-            &core->memory, next_wptr - 4u, &next_iptr) != 0)
-        return T425_STEP_BADMEM;
+    /*
+     * WdescReg is the architectural process descriptor register.
+     * WptrReg is its workspace address representation.
+     */
+    core->cpu.WdescReg = next_wdesc;
+    core->cpu.WptrReg = next_wptr;
+    core->cpu.IptrReg = next_iptr;
 
-    if (t425_memory_read_word(
-            &core->memory, next_wptr - 8u, &next_link) != 0)
-        return T425_STEP_BADMEM;
-
-    if (t425_wdesc_priority(next_wdesc) == T425_PRIORITY_HIGH)
-    {
-        scheduler->high_head = next_link;
-
-        if (next_link == T425_NOT_PROCESS)
-            scheduler->high_tail = T425_NOT_PROCESS;
-    }
-    else
-    {
-        scheduler->low_head = next_link;
-
-        if (next_link == T425_NOT_PROCESS)
-            scheduler->low_tail = T425_NOT_PROCESS;
-    }
-
-    core->cpu.Wptr = next_wptr;
-    core->cpu.Iptr = next_iptr;
-
+    /*
+     * Retained as simulator metadata until F08.2-D completes dispatch
+     * migration.
+     */
     scheduler->current_wdesc = next_wdesc;
     scheduler->running = 1u;
 
-    if (t425_process_context_restore(core, next_wptr) != T425_STEP_OK)
+    if (t425_process_context_restore(
+            core,
+            next_wptr) != T425_STEP_OK)
         return T425_STEP_BADMEM;
 
     return T425_STEP_OK;
@@ -658,7 +646,7 @@ t425_rendezvous_wait(t425_core_t *core,
 
     rv->operation = (uint8_t)operation;
     rv->wdesc = wdesc;
-    rv->wptr = cpu->Wptr;
+    rv->wptr = cpu->WptrReg;
     rv->channel_address = channel_address;
     rv->data_address = data_address;
     rv->data_length = data_length;
@@ -674,14 +662,14 @@ t425_rendezvous_wait(t425_core_t *core,
 
     if (t425_memory_write_word(
             &core->memory,
-            cpu->Wptr - 12u,
+            cpu->WptrReg - 12u,
             T425_PROCESS_STATE_WAITING) != 0)
         return T425_STEP_BADMEM;
 
     if (t425_memory_write_word(
             &core->memory,
-            cpu->Wptr - 4u,
-            cpu->Iptr) != 0)
+            cpu->WptrReg - 4u,
+            cpu->IptrReg) != 0)
         return T425_STEP_BADMEM;
 
     if (t425_process_context_save(core) != T425_STEP_OK)
@@ -796,7 +784,7 @@ static int t425_opr_execute(t425_core_t *core)
         case 0x0Du: /* STARTP */
         {
             uint32_t new_wptr = cpu->A;
-            uint32_t new_iptr = cpu->Iptr + cpu->B;
+            uint32_t new_iptr = cpu->IptrReg + cpu->B;
             uint32_t new_wdesc;
 
             if ((new_wptr & 3u) != 0u)
@@ -829,7 +817,7 @@ static int t425_opr_execute(t425_core_t *core)
 case 0x03u: /* ENDP */
         {
             uint32_t successor_wptr = cpu->A;
-            uint32_t terminated_wptr = cpu->Wptr;
+            uint32_t terminated_wptr = cpu->WptrReg;
             uint32_t count;
 
             if (t425_memory_read_word(
@@ -842,30 +830,37 @@ case 0x03u: /* ENDP */
                 return T425_STEP_BADMEM;
 
             if (count == 1u)
-            {
-                uint32_t successor_iptr;
+    {
+        uint32_t successor_wdesc;
 
-                if (t425_memory_read_word(
-                        &core->memory,
-                        successor_wptr,
-                        &successor_iptr) != 0)
-                    return T425_STEP_BADMEM;
+        /*
+         * The successor process is returned to the ready
+         * scheduler. Its architectural Iptr is stored at
+         * Wptr - 4 and is therefore consumed by
+         * t425_scheduler_dequeue(), not by ENDP itself.
+         *
+         * Selection and architectural restoration remain
+         * centralized in t425_schedule_next().
+         */
+        successor_wdesc =
+            successor_wptr |
+            t425_wdesc_priority(cpu->WdescReg);
 
-                cpu->Wptr = successor_wptr;
-                cpu->Iptr = successor_iptr;
-                core->scheduler.current_wdesc =
-                    successor_wptr |
-                    t425_wdesc_priority(core->scheduler.current_wdesc);
-                core->scheduler.running = 1u;
+        if (t425_enqueue(core, successor_wdesc) != T425_STEP_OK)
+            return T425_STEP_BADMEM;
 
-                t425_process_context_forget(core, terminated_wptr);
-                cpu->A = 0u;
-                cpu->B = 0u;
-                cpu->C = 0u;
+        t425_process_context_forget(core, terminated_wptr);
 
-                finish(core, 13u);
-                return T425_STEP_OK;
-            }
+        if (t425_schedule_next(core) != T425_STEP_OK)
+            return T425_STEP_BADMEM;
+
+        cpu->A = 0u;
+        cpu->B = 0u;
+        cpu->C = 0u;
+
+        finish(core, 13u);
+        return T425_STEP_OK;
+    }
 
             if (t425_memory_write_word(
                     &core->memory,
@@ -907,13 +902,13 @@ case 0x03u: /* ENDP */
 
         case 0x15u: /* STOPP */
         {
-            if (core->scheduler.current_wdesc == T425_NOT_PROCESS)
+            if (cpu->WdescReg == T425_NOT_PROCESS)
                 return T425_STEP_BADMEM;
 
             if (t425_memory_write_word(
                     &core->memory,
-                    cpu->Wptr - 4u,
-                    cpu->Iptr) != 0)
+                    cpu->WptrReg - 4u,
+                    cpu->IptrReg) != 0)
                 return T425_STEP_BADMEM;
 
             if (t425_process_context_save(core) != T425_STEP_OK)
@@ -928,7 +923,7 @@ case 0x03u: /* ENDP */
 
         case 0x1Eu: /* LDPRI */
             push(cpu,
-                 t425_wdesc_priority(core->scheduler.current_wdesc));
+                 t425_wdesc_priority(cpu->WdescReg));
             finish(core, 1u);
             return T425_STEP_OK;
 
@@ -975,8 +970,8 @@ case 0x03u: /* ENDP */
 
   case 0x06u: /* GCALL */
   {
-      uint32_t old_iptr = cpu->Iptr;
-      cpu->Iptr = cpu->A;
+      uint32_t old_iptr = cpu->IptrReg;
+      cpu->IptrReg = cpu->A;
       cpu->A = old_iptr;
       finish(core, 4u);
       return T425_STEP_OK;
@@ -984,7 +979,7 @@ case 0x03u: /* ENDP */
 
   case 0x1Bu: /* LDPI */
   {
-      cpu->A += cpu->Iptr;
+      cpu->A += cpu->IptrReg;
       finish(core, 2u);
       return T425_STEP_OK;
   }
@@ -1004,45 +999,47 @@ case 0x03u: /* ENDP */
 
   case 0x3Du: /* SAVEL */
   {
-      uint32_t address = cpu->A;
+            uint32_t address = cpu->A;
 
-      if (t425_memory_write_word(
-              &core->memory, address,
-              core->scheduler.low_head) != 0)
-          return T425_STEP_BADMEM;
+            if (t425_memory_write_word(
+                    &core->memory,
+                    address,
+                    core->scheduler.fptr[T425_PRIORITY_LOW]) != 0)
+                return T425_STEP_BADMEM;
 
-      if (t425_memory_write_word(
-              &core->memory, address + 4u,
-              core->scheduler.low_tail) != 0)
-          return T425_STEP_BADMEM;
+            if (t425_memory_write_word(
+                    &core->memory,
+                    address + 4u,
+                    core->scheduler.bptr[T425_PRIORITY_LOW]) != 0)
+                return T425_STEP_BADMEM;
 
-      cpu->A = cpu->B;
-      cpu->B = cpu->C;
-
-      finish(core, 4u);
-      return T425_STEP_OK;
-  }
+            cpu->A = cpu->B;
+            cpu->B = cpu->C;
+            finish(core, 4u);
+            return T425_STEP_OK;
+        }
 
   case 0x3Eu: /* SAVEH */
   {
-      uint32_t address = cpu->A;
+            uint32_t address = cpu->A;
 
-      if (t425_memory_write_word(
-              &core->memory, address,
-              core->scheduler.high_head) != 0)
-          return T425_STEP_BADMEM;
+            if (t425_memory_write_word(
+                    &core->memory,
+                    address,
+                    core->scheduler.fptr[T425_PRIORITY_HIGH]) != 0)
+                return T425_STEP_BADMEM;
 
-      if (t425_memory_write_word(
-              &core->memory, address + 4u,
-              core->scheduler.high_tail) != 0)
-          return T425_STEP_BADMEM;
+            if (t425_memory_write_word(
+                    &core->memory,
+                    address + 4u,
+                    core->scheduler.bptr[T425_PRIORITY_HIGH]) != 0)
+                return T425_STEP_BADMEM;
 
-      cpu->A = cpu->B;
-      cpu->B = cpu->C;
-
-      finish(core, 4u);
-      return T425_STEP_OK;
-  }
+            cpu->A = cpu->B;
+            cpu->B = cpu->C;
+            finish(core, 4u);
+            return T425_STEP_OK;
+        }
 
   case 0x72u: /* FMUL */
   {
@@ -1125,11 +1122,11 @@ case 0x03u: /* ENDP */
 
   case 0x20u: /* RET */
             if (t425_memory_read_word(
-                    &core->memory, cpu->Wptr, &value) != 0)
+                    &core->memory, cpu->WptrReg, &value) != 0)
                 return T425_STEP_BADMEM;
 
-            cpu->Iptr = value;
-            cpu->Wptr += 16u;
+            cpu->IptrReg = value;
+            cpu->WptrReg += 16u;
             finish(core, 5u);
             return T425_STEP_OK;
 
@@ -1301,21 +1298,21 @@ case 0x03u: /* ENDP */
 
         case 0x17u: /* STLB */
         {
-            core->scheduler.low_tail = cpu->A;
+            core->scheduler.bptr[T425_PRIORITY_LOW] = cpu->A;
             finish(core, 1u);
             return T425_STEP_OK;
         }
 
         case 0x18u: /* STHF */
         {
-            core->scheduler.high_head = cpu->A;
+            core->scheduler.fptr[T425_PRIORITY_HIGH] = cpu->A;
             finish(core, 1u);
             return T425_STEP_OK;
         }
 
         case 0x1Cu: /* STLF */
         {
-            core->scheduler.low_head = cpu->A;
+            core->scheduler.fptr[T425_PRIORITY_LOW] = cpu->A;
             finish(core, 1u);
             return T425_STEP_OK;
         }
@@ -1354,7 +1351,7 @@ case 0x03u: /* ENDP */
 
         case 0x50u: /* STHB */
         {
-            core->scheduler.high_tail = cpu->A;
+            core->scheduler.bptr[T425_PRIORITY_HIGH] = cpu->A;
             finish(core, 1u);
             return T425_STEP_OK;
         }
@@ -1434,7 +1431,7 @@ case 0x03u: /* ENDP */
                                            index) != 0)
                     return T425_STEP_BADMEM;
 
-                cpu->Iptr -= cpu->A;
+                cpu->IptrReg -= cpu->A;
                 finish(core, 10u);
             }
             else
@@ -1448,10 +1445,10 @@ case 0x03u: /* ENDP */
         case 0x3Cu: /* GAJW */
         {
             uint32_t old_a = cpu->A;
-            uint32_t old_wptr = cpu->Wptr;
+            uint32_t old_wptr = cpu->WptrReg;
 
             cpu->A = old_wptr;
-            cpu->Wptr = old_a & ~3u;
+            cpu->WptrReg = old_a & ~3u;
 
             finish(core, 2u);
             return T425_STEP_OK;
@@ -1941,12 +1938,12 @@ case 0x03u: /* ENDP */
         case 0x4Eu: /* TALT */
         {
             if (t425_memory_write_word(&core->memory,
-                                       cpu->Wptr - 12u,
+                                       cpu->WptrReg - 12u,
                                        T425_PROCESS_STATE_ENABLING) != 0)
                 return T425_STEP_BADMEM;
 
             if (t425_memory_write_word(&core->memory,
-                                       cpu->Wptr - 16u,
+                                       cpu->WptrReg - 16u,
                                        T425_TIMER_TIME_NO_SET) != 0)
                 return T425_STEP_BADMEM;
 
@@ -1966,24 +1963,24 @@ case 0x03u: /* ENDP */
             }
 
             if (t425_memory_read_word(&core->memory,
-                                      cpu->Wptr - 16u,
+                                      cpu->WptrReg - 16u,
                                       &tlink) != 0)
                 return T425_STEP_BADMEM;
 
             if (t425_memory_read_word(&core->memory,
-                                      cpu->Wptr - 20u,
+                                      cpu->WptrReg - 20u,
                                       &time) != 0)
                 return T425_STEP_BADMEM;
 
             if (tlink == T425_TIMER_TIME_NO_SET)
             {
                 if (t425_memory_write_word(&core->memory,
-                                           cpu->Wptr - 20u,
+                                           cpu->WptrReg - 20u,
                                            cpu->B) != 0)
                     return T425_STEP_BADMEM;
 
                 if (t425_memory_write_word(&core->memory,
-                                           cpu->Wptr - 16u,
+                                           cpu->WptrReg - 16u,
                                            T425_TIMER_TIME_SET) != 0)
                     return T425_STEP_BADMEM;
             }
@@ -1992,7 +1989,7 @@ case 0x03u: /* ENDP */
                 if ((int32_t)(time - cpu->B) > 0)
                 {
                     if (t425_memory_write_word(&core->memory,
-                                               cpu->Wptr - 20u,
+                                               cpu->WptrReg - 20u,
                                                cpu->B) != 0)
                         return T425_STEP_BADMEM;
                 }
@@ -2013,22 +2010,22 @@ case 0x03u: /* ENDP */
             uint32_t now;
 
             if (t425_memory_write_word(&core->memory,
-                                       cpu->Wptr,
+                                       cpu->WptrReg,
                                        UINT32_MAX) != 0)
                 return T425_STEP_BADMEM;
 
             if (t425_memory_read_word(&core->memory,
-                                      cpu->Wptr - 12u,
+                                      cpu->WptrReg - 12u,
                                       &state) != 0)
                 return T425_STEP_BADMEM;
 
             if (t425_memory_read_word(&core->memory,
-                                      cpu->Wptr - 16u,
+                                      cpu->WptrReg - 16u,
                                       &tlink) != 0)
                 return T425_STEP_BADMEM;
 
             if (t425_memory_read_word(&core->memory,
-                                      cpu->Wptr - 20u,
+                                      cpu->WptrReg - 20u,
                                       &time) != 0)
                 return T425_STEP_BADMEM;
 
@@ -2049,7 +2046,7 @@ case 0x03u: /* ENDP */
                  */
                 if (t425_memory_write_word(
                         &core->memory,
-                        cpu->Wptr - 20u,
+                        cpu->WptrReg - 20u,
                         now) != 0)
                     return T425_STEP_BADMEM;
 
@@ -2072,13 +2069,13 @@ case 0x03u: /* ENDP */
                  */
                 if (t425_memory_write_word(
                         &core->memory,
-                        cpu->Wptr - 12u,
+                        cpu->WptrReg - 12u,
                         T425_PROCESS_STATE_READY) != 0)
                     return T425_STEP_BADMEM;
 
                 if (t425_memory_write_word(
                         &core->memory,
-                        cpu->Wptr - 20u,
+                        cpu->WptrReg - 20u,
                         now) != 0)
                     return T425_STEP_BADMEM;
 
@@ -2095,12 +2092,12 @@ case 0x03u: /* ENDP */
              * and insert it in the appropriate timer queue.
              */
             if (t425_memory_write_word(&core->memory,
-                                       cpu->Wptr - 12u,
+                                       cpu->WptrReg - 12u,
                                        T425_PROCESS_STATE_WAITING) != 0)
                 return T425_STEP_BADMEM;
             if (t425_memory_write_word(&core->memory,
-                                       cpu->Wptr - 4u,
-                                       cpu->Iptr) != 0)
+                                       cpu->WptrReg - 4u,
+                                       cpu->IptrReg) != 0)
                 return T425_STEP_BADMEM;
 
             if (tlink != T425_TIMER_TIME_SET)
@@ -2152,11 +2149,11 @@ case 0x03u: /* ENDP */
             core->t425_data_reg = cpu->A;
 
             /* 2D5 */
-            cpu->C = cpu->Wptr;
+            cpu->C = cpu->WptrReg;
 
             if (t425_memory_write_word(
                     &core->memory,
-                    cpu->Wptr,
+                    cpu->WptrReg,
                     core->t425_data_reg) != 0)
                 return T425_STEP_BADMEM;
 
@@ -2198,11 +2195,11 @@ case 0x03u: /* ENDP */
             core->t425_data_reg = cpu->A;
 
             /* 2D5 */
-            cpu->C = cpu->Wptr;
+            cpu->C = cpu->WptrReg;
 
             if (t425_memory_write_word(
                     &core->memory,
-                    cpu->Wptr,
+                    cpu->WptrReg,
                     core->t425_data_reg) != 0)
                 return T425_STEP_BADMEM;
 
@@ -2244,7 +2241,7 @@ case 0x03u: /* ENDP */
             int guard_fired;
 
             if (t425_memory_read_word(&core->memory,
-                                      cpu->Wptr,
+                                      cpu->WptrReg,
                                       &disable_status) != 0)
                 return T425_STEP_BADMEM;
 
@@ -2268,7 +2265,7 @@ case 0x03u: /* ENDP */
             if (guard_fired)
             {
                 if (t425_memory_write_word(&core->memory,
-                                           cpu->Wptr,
+                                           cpu->WptrReg,
                                            cpu->A) != 0)
                     return T425_STEP_BADMEM;
 
@@ -2326,8 +2323,8 @@ case 0x03u: /* ENDP */
                 return T425_STEP_BADMEM;
 
             if (t425_memory_write_word(&core->memory,
-                                       cpu->Wptr - 4u,
-                                       cpu->Iptr) != 0)
+                                       cpu->WptrReg - 4u,
+                                       cpu->IptrReg) != 0)
                 return T425_STEP_BADMEM;
 
             if (t425_timer_enqueue(core,
@@ -2404,10 +2401,10 @@ int t425_core_step(t425_core_t *core)
         return T425_STEP_HALTED;
 
     if (t425_memory_read_byte(
-            &core->memory, cpu->Iptr, &instruction) != 0)
+            &core->memory, cpu->IptrReg, &instruction) != 0)
         return T425_STEP_BADMEM;
 
-    cpu->Iptr += 1u;
+    cpu->IptrReg += 1u;
 
     opcode = (uint8_t)(instruction >> 4);
     nibble = (uint8_t)(instruction & 0x0Fu);
@@ -2429,7 +2426,7 @@ int t425_core_step(t425_core_t *core)
             return T425_STEP_OK;
 
         case T425_OP_LDLP:
-            push(cpu, cpu->Wptr + (cpu->Oreg << 2));
+            push(cpu, cpu->WptrReg + (cpu->Oreg << 2));
             finish(core, 1u);
             return T425_STEP_OK;
 
@@ -2439,7 +2436,7 @@ int t425_core_step(t425_core_t *core)
             return T425_STEP_OK;
 
         case T425_OP_LDL:
-            address = word_address(cpu->Wptr, cpu->Oreg);
+            address = word_address(cpu->WptrReg, cpu->Oreg);
 
             if (t425_memory_read_word(
                     &core->memory, address, &value) != 0)
@@ -2461,7 +2458,7 @@ int t425_core_step(t425_core_t *core)
             return T425_STEP_OK;
 
         case T425_OP_AJW:
-            cpu->Wptr += (uint32_t)((int32_t)cpu->Oreg * 4);
+            cpu->WptrReg += (uint32_t)((int32_t)cpu->Oreg * 4);
             finish(core, 1u);
             return T425_STEP_OK;
 
@@ -2471,7 +2468,7 @@ int t425_core_step(t425_core_t *core)
             return T425_STEP_OK;
 
         case T425_OP_STL:
-            address = cpu->Wptr + (cpu->Oreg << 2);
+            address = cpu->WptrReg + (cpu->Oreg << 2);
 
             if (t425_memory_write_word(
                     &core->memory, address, cpu->A) != 0)
@@ -2513,7 +2510,7 @@ int t425_core_step(t425_core_t *core)
             return T425_STEP_OK;
 
         case T425_OP_J:
-            cpu->Iptr += (uint32_t)(int32_t)cpu->Oreg;
+            cpu->IptrReg += (uint32_t)(int32_t)cpu->Oreg;
             cpu->A = 0u;
             cpu->B = 0u;
             cpu->C = 0u;
@@ -2523,7 +2520,7 @@ int t425_core_step(t425_core_t *core)
         case T425_OP_CJ:
             if (cpu->A == 0u)
             {
-                cpu->Iptr += (uint32_t)(int32_t)cpu->Oreg;
+                cpu->IptrReg += (uint32_t)(int32_t)cpu->Oreg;
                 finish(core, 4u);
             }
             else
@@ -2536,8 +2533,8 @@ int t425_core_step(t425_core_t *core)
 
         case T425_OP_CALL:
         {
-            uint32_t old_wptr = cpu->Wptr;
-            uint32_t old_iptr = cpu->Iptr;
+            uint32_t old_wptr = cpu->WptrReg;
+            uint32_t old_iptr = cpu->IptrReg;
             uint32_t old_a = cpu->A;
             uint32_t old_b = cpu->B;
             uint32_t old_c = cpu->C;
@@ -2559,9 +2556,9 @@ int t425_core_step(t425_core_t *core)
                     &core->memory, new_wptr + 12u, old_c) != 0)
                 return T425_STEP_BADMEM;
 
-            cpu->Wptr = new_wptr;
+            cpu->WptrReg = new_wptr;
             cpu->A = old_iptr;
-            cpu->Iptr = old_iptr + (uint32_t)(int32_t)cpu->Oreg;
+            cpu->IptrReg = old_iptr + (uint32_t)(int32_t)cpu->Oreg;
 
             finish(core, 7u);
             return T425_STEP_OK;

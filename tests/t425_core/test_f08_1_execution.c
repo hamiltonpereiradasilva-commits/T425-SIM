@@ -57,7 +57,7 @@ static void test_positive_prefix(void)
     t425_core_t core;
 
     t425_core_reset(&core);
-    core.cpu.Iptr = CODE;
+    core.cpu.IptrReg = CODE;
 
     put8(&core, CODE + 0, 0x21); /* PFIX 1 */
     put8(&core, CODE + 1, 0x22); /* PFIX 2 */
@@ -76,7 +76,7 @@ static void test_negative_prefix(void)
     t425_core_t core;
 
     t425_core_reset(&core);
-    core.cpu.Iptr = CODE;
+    core.cpu.IptrReg = CODE;
 
     put8(&core, CODE + 0, 0x61); /* NFIX 1 */
     put8(&core, CODE + 1, 0x41); /* LDC 1 */
@@ -94,8 +94,8 @@ static void test_workspace_stack(void)
     uint32_t value;
 
     t425_core_reset(&core);
-    core.cpu.Iptr = CODE;
-    core.cpu.Wptr = WORK;
+    core.cpu.IptrReg = CODE;
+    core.cpu.WptrReg = WORK;
 
     put8(&core, CODE + 0, 0x4a); /* LDC 10 */
     put8(&core, CODE + 1, 0xd0); /* STL 0 */
@@ -121,7 +121,7 @@ static void test_control_flow(void)
     t425_core_t core;
 
     t425_core_reset(&core);
-    core.cpu.Iptr = CODE;
+    core.cpu.IptrReg = CODE;
 
     put8(&core, CODE + 0, 0x02); /* J 2 */
 
@@ -129,7 +129,7 @@ static void test_control_flow(void)
 
     expect_u32(
         "J target",
-        core.cpu.Iptr,
+        core.cpu.IptrReg,
         CODE + 3u);
 }
 
@@ -138,7 +138,7 @@ static void test_conditional_jump(void)
     t425_core_t core;
 
     t425_core_reset(&core);
-    core.cpu.Iptr = CODE;
+    core.cpu.IptrReg = CODE;
     core.cpu.A = 0;
 
     put8(&core, CODE, 0xa2); /* CJ 2 */
@@ -147,11 +147,11 @@ static void test_conditional_jump(void)
 
     expect_u32(
         "CJ taken",
-        core.cpu.Iptr,
+        core.cpu.IptrReg,
         CODE + 3u);
 
     t425_core_reset(&core);
-    core.cpu.Iptr = CODE;
+    core.cpu.IptrReg = CODE;
     core.cpu.A = 1;
     core.cpu.B = 2;
     core.cpu.C = 3;
@@ -174,8 +174,8 @@ static void test_call_ret(void)
 
     t425_core_reset(&core);
 
-    core.cpu.Iptr = CODE;
-    core.cpu.Wptr = WORK;
+    core.cpu.IptrReg = CODE;
+    core.cpu.WptrReg = WORK;
     core.cpu.A = 0x11111111u;
     core.cpu.B = 0x22222222u;
     core.cpu.C = 0x33333333u;
@@ -186,8 +186,8 @@ static void test_call_ret(void)
 
     step(&core);
 
-    expect_u32("CALL Wptr", core.cpu.Wptr, WORK - 16u);
-    expect_u32("CALL target", core.cpu.Iptr, CODE + 5u);
+    expect_u32("CALL Wptr", core.cpu.WptrReg, WORK - 16u);
+    expect_u32("CALL target", core.cpu.IptrReg, CODE + 5u);
     expect_u32("CALL A", core.cpu.A, CODE + 1u);
 
     if (t425_memory_read_word(
@@ -214,8 +214,8 @@ static void test_call_ret(void)
     step(&core); /* PFIX #2 */
     step(&core); /* OPR #0 = RET 0x20 */
 
-    expect_u32("RET Iptr", core.cpu.Iptr, CODE + 1u);
-    expect_u32("RET Wptr", core.cpu.Wptr, WORK);
+    expect_u32("RET Iptr", core.cpu.IptrReg, CODE + 1u);
+    expect_u32("RET Wptr", core.cpu.WptrReg, WORK);
     expect_u32("RET A preserved", core.cpu.A, CODE + 1u);
 }
 

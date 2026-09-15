@@ -9,8 +9,14 @@ typedef struct
     uint32_t B;
     uint32_t C;
 
-    uint32_t Wptr;
-    uint32_t Iptr;
+    /* Architectural T425 process-control registers. */
+    uint32_t WptrReg;
+    uint32_t IptrReg;
+    uint32_t WdescReg;
+
+    /* Architectural T425 context registers. */
+    uint32_t Ereg;
+    uint32_t StatusReg;
 
     uint32_t Oreg;
     uint32_t Breg;
