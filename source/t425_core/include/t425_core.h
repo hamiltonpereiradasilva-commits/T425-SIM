@@ -87,6 +87,20 @@ typedef struct
     uint32_t t425_data_reg;
 
     /*
+     * T425 VBC channel-unit state.
+     *
+     * ChannelDataReg is distinct from the general DataReg.
+     * The following fields represent channel control state exposed
+     * by the VBC channel machinery. Exact physical storage granularity
+     * is intentionally not assumed here.
+     */
+    uint32_t t425_channel_data_reg;
+    uint8_t  t425_channel_ready_not_run;
+    uint8_t  t425_channel_run_req;
+    uint8_t  t425_channel_status;
+    uint8_t  t425_alt_enabled;
+
+    /*
      * Simulator-internal register context for processes which are
      * not currently executing. This is not architectural RAM and
      * is not channel state.

@@ -8,10 +8,16 @@ void t425_core_reset(t425_core_t *core)
     t425_cpu_reset(&core->cpu);
     t425_memory_reset(&core->memory);
     t425_timer_reset(&core->timer);
-    t425_scheduler_reset(&core->scheduler);core->t425_channel_select = 0u;
+    t425_scheduler_reset(&core->scheduler);
+    core->t425_channel_select = 0u;
     core->t425_channel_stack = 0u;
     core->t425_data_mem_addr = 0u;
     core->t425_data_reg = 0u;
+    core->t425_channel_data_reg = 0u;
+    core->t425_channel_ready_not_run = 0u;
+    core->t425_channel_run_req = 0u;
+    core->t425_channel_status = 0u;
+    core->t425_alt_enabled = 0u;
 
     {
         uint32_t i;

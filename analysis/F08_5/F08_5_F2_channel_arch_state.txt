@@ -1,0 +1,28 @@
+F08.5-F.2 PASS
+
+HEAD: d0ce11d
+
+Direct GCC compilation:
+-std=c11
+-Wall
+-Wextra
+-Werror
+
+Architectural channel state established:
+t425_channel_select
+t425_channel_stack
+t425_channel_data_reg
+t425_channel_ready_not_run
+t425_channel_run_req
+t425_channel_status
+t425_alt_enabled
+
+DataReg remains distinct from ChannelDataReg.
+
+channel_rendezvous[] remains transitional and was not removed.
+
+F08.5-F.2 test executable:
+/tmp/t425_f08_5f2
+
+Result:
+F08.5-F.2 PASS
