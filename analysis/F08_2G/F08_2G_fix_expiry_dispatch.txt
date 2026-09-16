@@ -1,0 +1,1 @@
+F08.2-G fixture corrected: timer service by B + dispatch by STOPP
