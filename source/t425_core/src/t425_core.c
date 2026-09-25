@@ -1,4 +1,6 @@
 #include "t425_core.h"
+#include "t425_channel.h"
+#include "t425_mir_fields.h"
 
 void t425_core_reset(t425_core_t *core)
 {
@@ -6,6 +8,17 @@ void t425_core_reset(t425_core_t *core)
         return;
 
     t425_cpu_reset(&core->cpu);
+    t425_microsequencer_reset(&core->microsequencer, 0u);
+    core->microentry_signal = 0u;
+
+    /*
+     * FETCH is the reset state.  The next core step performs
+     * instruction fetch and establishes the microcode entry.
+     */
+    core->step_instruction = 0u;
+    core->next_step_instruction = 0u;
+
+    t425_datapath_reset(&core->datapath);
     t425_memory_reset(&core->memory);
     t425_timer_reset(&core->timer);
     t425_scheduler_reset(&core->scheduler);
@@ -13,7 +26,12 @@ void t425_core_reset(t425_core_t *core)
     core->t425_channel_stack = 0u;
     core->t425_data_mem_addr = 0u;
     core->t425_data_reg = 0u;
+    core->previous_read_data = 0u;
+    core->data_in = 0u;
+    core->byte_write_strobe_latch = 0u;
     core->t425_channel_data_reg = 0u;
+    core->clock_reg0 = 0u;
+    core->clock_reg1 = 0u;
     core->t425_channel_ready_not_run = 0u;
     core->t425_channel_run_req = 0u;
     core->t425_channel_status = 0u;
@@ -44,17 +62,243 @@ void t425_core_reset(t425_core_t *core)
             core->interrupt_contexts[i].EregIntSave = 0u;
         }
 
-        for (i = 0u; i < T425_MAX_CHANNEL_RENDEZVOUS; ++i) {
-            core->channel_rendezvous[i].valid = 0u;
-            core->channel_rendezvous[i].operation = T425_RENDEZVOUS_NONE;
-            core->channel_rendezvous[i].wdesc = 0u;
-            core->channel_rendezvous[i].wptr = 0u;
-            core->channel_rendezvous[i].channel_address = 0u;
-            core->channel_rendezvous[i].data_address = 0u;
-            core->channel_rendezvous[i].data_length = 0u;
-        }
+
     }
 
     core->cycles = 0;
     core->instructions = 0;
+}
+
+void t425_core_microcycle(t425_core_t *core)
+{
+    t425_condition_signals_t signals;
+    uint8_t interface_control;
+    uint32_t data_reg_source;
+
+    if (!core)
+        return;
+
+    /*
+     * Capture the interface request belonging to the MIR that is
+     * about to execute.  The request belongs to this microcycle;
+     * therefore it must be sampled before the microsequencer loads
+     * the next MIR.
+     */
+    interface_control =
+        (uint8_t)(t425_mir_interface(
+            &core->microsequencer.mir) & 0x7Fu);
+
+    /*
+     * DataInfromPrevReadReg exposes the result of the
+     * PREVIOUS memory read. It must be sampled before a
+     * MemRead in this same microword can replace the
+     * previous-read latch.
+     */
+    if ((interface_control & 0x10u) != 0u)
+        core->data_in = core->previous_read_data;
+
+    /*
+     * DataRegfromAreg is sampled from Areg at the beginning of
+     * the microword.  This is essential for microwords such as
+     * STL, where DataRegfromAreg and STACK=14 coexist.
+     *
+     * STACK=14 subsequently performs:
+     *
+     *     A <- old B
+     *     B <- old C
+     *
+     * Therefore DataRegfromAreg must retain old A, not the
+     * post-STACK value.
+     */
+    data_reg_source = core->cpu.A;
+
+    signals = (t425_condition_signals_t){0};
+
+    t425_datapath_execute(
+        &core->datapath,
+        &core->cpu,
+        &core->t425_channel_select,
+        &core->t425_channel_stack,
+        &core->t425_data_mem_addr,
+        core->t425_channel_data_reg,
+        &core->scheduler.fptr[0],
+        &core->scheduler.fptr[1],
+        &core->scheduler.bptr[0],
+        &core->scheduler.bptr[1],
+        &core->clock_reg0,
+        &core->clock_reg1,
+        &core->timer.next_high,
+        &core->timer.next_low,
+        &core->microsequencer.mir,
+        core->data_in,
+        core->previous_read_data,
+        core->byte_write_strobe_latch,
+        &signals);
+
+    /*
+     * F19-02 — physical Channel Control Requests.
+     *
+     * RESETCH microstate 1B3 contains CH=0x0C2:
+     *
+     *   bit 7 : ResetChannel
+     *   bit 6 : ResetChannelReadyNotRunlatch
+     *   bit 1 : ResetChannelRunReqlatch
+     *
+     * These are architectural effects of the current microword.
+     * They must be sampled in the same microcycle as the MIR.
+     *
+     * Do not synthesize rendezvous/FIFO state here.
+     */
+    {
+        uint16_t channel_control =
+            (uint16_t)(t425_mir_channel(
+                &core->microsequencer.mir) & 0x07FFu);
+
+        if ((channel_control & 0x080u) != 0u) {
+            if (t425_channel_reset(
+                    &core->memory,
+                    core->t425_channel_select) != 0)
+                core->cpu.error = 1u;
+        }
+
+        if ((channel_control & 0x040u) != 0u)
+            core->t425_channel_ready_not_run = 0u;
+
+        if ((channel_control & 0x002u) != 0u)
+            core->t425_channel_run_req = 0u;
+    }
+
+    /*
+     * DataRegfromAreg.
+     *
+     * The source is the A value sampled at the beginning of this
+     * microword, before any STACK destination is applied.
+     */
+    if ((interface_control & 0x01u) != 0u)
+        core->t425_data_reg = data_reg_source;
+
+    /*
+     * DataRegfromZbus is an independent VBC interface-control
+     * request.  The datapath has already evaluated the current
+     * microword, so datapath->zbus is the physical Z-bus value
+     * produced by that microword.
+     *
+     * CALL state 269 is the decisive case:
+     *
+     *     X = IPTR
+     *     ALU = X
+     *     Z = IPTR
+     *     INTERFACE = MemWrite | DataRegfromZbus = 0x0A
+     *
+     * Therefore the value written by MemWrite must be the
+     * Z-bus value from this same microcycle.
+     */
+    if ((interface_control & 0x02u) != 0u)
+        core->t425_data_reg = core->datapath.zbus;
+
+    /*
+     * F20-09 — DataRegfromByteShifter.
+     *
+     * MIR[108:107] = 01 selects the physical ByteUpShifter
+     * output as the source of DataReg.
+     *
+     * The ByteUpShifter result was already produced by the
+     * datapath during this same microword.
+     */
+    if ((core->datapath.byte_control & 0x01u) != 0u)
+        core->t425_data_reg = core->datapath.byte_upshifter_output;
+
+    /*
+     * MemRead is sampled after the datapath has produced
+     * DataMemAddrFromZbus for this microword.
+     *
+     * The result becomes previous_read_data and is therefore
+     * available to DataInfromPrevReadReg in a later temporal
+     * point.
+     */
+    if ((interface_control & 0x04u) != 0u) {
+        uint32_t value = 0u;
+
+        if (t425_memory_read_word(
+                &core->memory,
+                core->t425_data_mem_addr,
+                &value) == 0) {
+            core->previous_read_data = value;
+
+            /*
+             * AregfromDataIn is simultaneous with MemRead in
+             * LDNL/LDL: A receives the current read result.
+             */
+            if ((interface_control & 0x20u) != 0u)
+                core->cpu.A = value;
+        } else {
+            core->cpu.error = 1u;
+        }
+    } else if ((interface_control & 0x20u) != 0u) {
+        /*
+         * AregfromDataIn without MemRead consumes the
+         * DataIn value already present in this microcycle.
+         */
+        core->cpu.A = core->data_in;
+    }
+
+    /*
+     * MemWrite consumes the DataReg selected by the current
+     * interface-control request.
+     *
+     * DataMemAddrFromZbus was produced by the datapath during
+     * this same microword.
+     */
+    if ((interface_control & 0x08u) != 0u) {
+        if (t425_memory_write_word(
+                &core->memory,
+                core->t425_data_mem_addr,
+                core->t425_data_reg) != 0)
+            core->cpu.error = 1u;
+    }
+
+    t425_microsequencer_step(
+        &core->microsequencer,
+        &signals);
+
+    /*
+     * Next is the VBC Interface Control Request:
+     *
+     *     Next = #B1000000
+     *
+     * It requests return to the instruction-level FETCH stage.
+     * It is not interpreted here as "MPC + 1"; the microsequencer
+     * retains its already-established physical next-state behavior.
+     */
+    /*
+     * T425 Interface Control: Next is bit 6 (0x40).
+     * Next may coexist with other interface requests.
+     * Therefore test the physical Next bit, not equality
+     * with the isolated value 0x40.
+     *
+     * Physical CROM[1B2] has IF=0x5A:
+     * Next | DataInfromPrevReadReg | MemWrite |
+     * DataRegfromZbus.
+     */
+    core->next_step_instruction =
+        ((interface_control & 0x40u) != 0u) ? 0u : 1u;
+}
+
+void t425_core_microentry(
+    t425_core_t *core,
+    uint8_t opcode)
+{
+    uint16_t mpc;
+
+    if (!core)
+        return;
+
+    mpc = t425_microentry_from_instruction(
+        opcode,
+        core->cpu.Oreg,
+        core->microentry_signal);
+
+    t425_microsequencer_reset(
+        &core->microsequencer,
+        mpc);
 }

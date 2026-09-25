@@ -4,6 +4,9 @@
 #include <stdint.h>
 
 #include "t425_cpu.h"
+#include "t425_datapath.h"
+#include "t425_microsequencer.h"
+#include "t425_microentry.h"
 #include "t425_memory.h"
 #include "t425_scheduler.h"
 #include "t425_timer.h"
@@ -61,23 +64,6 @@ typedef struct
  * process.  This state records only the information required to complete
  * the rendezvous when the complementary IN/OUT operation arrives.
  */
-#define T425_MAX_CHANNEL_RENDEZVOUS 32u
-
-#define T425_RENDEZVOUS_NONE 0u
-#define T425_RENDEZVOUS_IN   1u
-#define T425_RENDEZVOUS_OUT  2u
-
-typedef struct
-{
-    uint8_t valid;
-    uint8_t operation;
-    uint32_t wdesc;
-    uint32_t wptr;
-    uint32_t channel_address;
-    uint32_t data_address;
-    uint32_t data_length;
-} t425_channel_rendezvous_t;
-
 typedef struct
 {
     /* T425 VBC internal channel machinery. */
@@ -95,6 +81,8 @@ typedef struct
      * is intentionally not assumed here.
      */
     uint32_t t425_channel_data_reg;
+    uint32_t clock_reg0;
+    uint32_t clock_reg1;
     uint8_t  t425_channel_ready_not_run;
     uint8_t  t425_channel_run_req;
     uint8_t  t425_channel_status;
@@ -118,10 +106,42 @@ typedef struct
      * Pending IN/OUT rendezvous descriptors.
      * No message FIFO is represented here.
      */
-    t425_channel_rendezvous_t
-        channel_rendezvous[T425_MAX_CHANNEL_RENDEZVOUS];
 
     t425_cpu_state_t cpu;
+    t425_microsequencer_t microsequencer;
+    uint16_t microentry_signal;
+
+    /*
+     * Established T425 instruction/microcode execution state.
+     *
+     * StepInstruction:
+     *     current instruction is executing through microcode.
+     *
+     * nextStepInstruction:
+     *     state requested by the current microinstruction for
+     *     the next core step.
+     */
+    uint8_t step_instruction;
+    uint8_t next_step_instruction;
+
+    /*
+     * T425 memory-interface read pipeline.
+     *
+     * previous_read_data is the result produced by MemRead.
+     * data_in is the DataIn interface value selected by the
+     * following microinstruction through DataInfromPrevReadReg.
+     */
+    uint32_t previous_read_data;
+    uint32_t data_in;
+
+    /*
+     * F20-09 — persistent ByteWriteStrobeEnable latch.
+     *
+     * Its set/reset semantics are handled separately in F20-10.
+     */
+    uint8_t byte_write_strobe_latch;
+
+    t425_datapath_t datapath;
     t425_memory_t memory;
     t425_scheduler_state_t scheduler;
     t425_timer_state_t timer;
@@ -138,5 +158,18 @@ typedef struct
 void t425_core_reset(t425_core_t *core);
 
 int t425_core_step(t425_core_t *core);
+
+/*
+ * Execute one T425 microcycle using the current MPC/MIR,
+ * datapath and generated condition signals.
+ */
+void t425_core_microcycle(t425_core_t *core);
+
+/*
+ * Enter the T425 microcode machine from an instruction opcode.
+ */
+void t425_core_microentry(
+    t425_core_t *core,
+    uint8_t opcode);
 
 #endif
