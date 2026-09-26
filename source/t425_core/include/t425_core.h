@@ -134,6 +134,15 @@ typedef struct
     uint32_t previous_read_data;
     uint32_t data_in;
 
+    /* F20-10-05D — physical DataInReg. */
+    uint32_t data_in_reg;
+
+    /* F20-10-05D — physical TwoReadsLatch. */
+    uint8_t two_reads_latch;
+
+    /* F20-10-05D — ClearBWSELatchAfterWrite event. */
+    uint8_t clear_bwse_latch_after_write;
+
     /*
      * F20-09 — persistent ByteWriteStrobeEnable latch.
      *

@@ -29,6 +29,9 @@ void t425_core_reset(t425_core_t *core)
     core->previous_read_data = 0u;
     core->data_in = 0u;
     core->byte_write_strobe_latch = 0u;
+    core->data_in_reg = 0u;
+    core->two_reads_latch = 0u;
+    core->clear_bwse_latch_after_write = 0u;
     core->t425_channel_data_reg = 0u;
     core->clock_reg0 = 0u;
     core->clock_reg1 = 0u;
@@ -114,6 +117,32 @@ void t425_core_microcycle(t425_core_t *core)
 
     signals = (t425_condition_signals_t){0};
 
+    /*
+     * F20-10 — ByteWriteStrobeEnable.
+     *
+     * VBC:
+     *
+     *     ByteWriteStrobeEnable = #B10
+     *     DataRegfromByteShifter = #B01
+     *
+     * The ByteWriteStrobeEnable request SETs the persistent
+     * ByteWriteStrobeEnableLatch before ByteUpShifter evaluates
+     * its input state.
+     *
+     * MIR[108:107] = 10 -> SET latch.
+     */
+    if ((t425_mir_byte(&core->microsequencer.mir) & 0x02u) != 0u)
+        core->byte_write_strobe_latch = 1u;
+
+    /*
+     * F20-10-05E — ByteUpShifter input is the physical DataInReg.
+     *
+     * DataInReg is the current memory-read result.
+     * PreviousReadReg remains a separate temporal register and is
+     * supplied independently below.
+     *
+     * DataInfromPrevReadReg continues to use core->data_in.
+     */
     t425_datapath_execute(
         &core->datapath,
         &core->cpu,
@@ -130,7 +159,7 @@ void t425_core_microcycle(t425_core_t *core)
         &core->timer.next_high,
         &core->timer.next_low,
         &core->microsequencer.mir,
-        core->data_in,
+        core->data_in_reg,
         core->previous_read_data,
         core->byte_write_strobe_latch,
         &signals);
@@ -223,6 +252,10 @@ void t425_core_microcycle(t425_core_t *core)
                 &core->memory,
                 core->t425_data_mem_addr,
                 &value) == 0) {
+            /* Current DataInReg, physically distinct from
+             * PreviousReadReg/DataInfromPrevReadReg. */
+            core->data_in_reg = value;
+
             core->previous_read_data = value;
 
             /*
@@ -243,6 +276,23 @@ void t425_core_microcycle(t425_core_t *core)
     }
 
     /*
+     * F20-10-05D — physical ClearBWSELatchAfterWrite.
+     *
+     * Emulator condition:
+     *   DataInReg[3] && MPC != 0x283 && TwoReadsLatch
+     *
+     * DataInReg is the current memory-read register.
+     * data_in is deliberately NOT used here because it
+     * represents DataInfromPrevReadReg.
+     */
+    if (((core->data_in_reg & 0x08u) != 0u) &&
+        (core->microsequencer.mpc != 0x283u) &&
+        (core->two_reads_latch != 0u))
+    {
+        core->clear_bwse_latch_after_write = 1u;
+    }
+
+    /*
      * MemWrite consumes the DataReg selected by the current
      * interface-control request.
      *
@@ -253,8 +303,13 @@ void t425_core_microcycle(t425_core_t *core)
         if (t425_memory_write_word(
                 &core->memory,
                 core->t425_data_mem_addr,
-                core->t425_data_reg) != 0)
+                core->t425_data_reg) != 0) {
             core->cpu.error = 1u;
+        } else if (core->clear_bwse_latch_after_write != 0u) {
+            /* MemoryInterface consumes ClearBWSELatchAfterWrite. */
+            core->byte_write_strobe_latch = 0u;
+            core->clear_bwse_latch_after_write = 0u;
+        }
     }
 
     t425_microsequencer_step(

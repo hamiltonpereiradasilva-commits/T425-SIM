@@ -1068,6 +1068,39 @@ void t425_datapath_execute(
     signals->not_carryout =
         datapath->alu_carryout ? 0u : 1u;
 
+    /*
+     * T425 DIVSTEP condition generation.
+     *
+     * Physical source:
+     *
+     *     Cslave[15] = bit 15 of the pre-microcycle C register.
+     *
+     * Documented DIVSTEP equations:
+     *
+     *     DivStep0 = Carryout XOR Cslave[15]
+     *     DivStep1 = NotCarryout XOR Cslave[15]
+     *
+     * The C slave value must come from the register state
+     * captured at the beginning of this microcycle, not from
+     * the possibly modified CPU C register.
+     */
+    {
+        uint8_t c_slave_15 =
+            (uint8_t)((old_c >> 15) & 1u);
+
+        uint8_t carryout =
+            (uint8_t)(datapath->alu_carryout & 1u);
+
+        uint8_t not_carryout =
+            (uint8_t)(signals->not_carryout & 1u);
+
+        signals->div_step0 =
+            (uint8_t)(carryout ^ c_slave_15);
+
+        signals->div_step1 =
+            (uint8_t)(not_carryout ^ c_slave_15);
+    }
+
     signals->not_alu_prop_all1 =
         datapath->alu_prop_all1 ? 0u : 1u;
 

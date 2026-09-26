@@ -19,6 +19,7 @@ typedef struct
     uint32_t StatusReg;
 
     uint32_t Oreg;
+    uint32_t Dreg;
     uint32_t Breg;
     uint32_t Creg;
 
