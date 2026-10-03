@@ -1,0 +1,34 @@
+.program t425_link_tx
+
+; IMS T425 LINK TX
+;
+; A palavra recebida pelo PIO possui:
+;
+; bits 0..4  = N-1
+; bits 5..   = sequência serial
+;
+; DATA:
+;   1 START
+;   1 TYPE=1
+;   8 DATA bits, LSB first
+;   1 STOP=0
+;   total = 11 bits
+;
+; ACK:
+;   1 START
+;   1 TYPE=0
+;   total = 2 bits
+;
+; O PIO somente serializa.
+; A decisão DATA/ACK pertence ao protocol engine.
+
+.wrap_target
+
+    pull block
+    out x, 5
+
+tx_loop:
+    out pins, 1
+    jmp x-- tx_loop
+
+.wrap
