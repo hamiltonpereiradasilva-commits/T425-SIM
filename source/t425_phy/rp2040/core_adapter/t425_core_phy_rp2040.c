@@ -444,6 +444,8 @@ void t425_core_phy_rp2040_stop(t425_core_phy_rp2040_t *adapter)
                 false);
             t425_link_stop(adapter->links[i]);
         }
+        adapter->physical_ack_pending[i] = false;
+        adapter->physical_ack_count[i] = 0u;
     }
     if (adapter->ack_irq_registered) {
         irq_set_enabled(pio_get_irq_num(pio0, 0u), false);
