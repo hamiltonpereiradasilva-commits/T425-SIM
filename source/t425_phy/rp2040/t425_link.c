@@ -207,15 +207,17 @@ void t425_link_stop(t425_link_t *link)
 {
     uint mask = (1u << link->sm_tx) | (1u << link->sm_rx);
     pio_set_sm_mask_enabled(link->pio, mask, false);
+    link->tx_waiting_ack = false;
 }
 
 bool t425_link_send_frame(t425_link_t *link, uint16_t data)
 {
-    if (link == 0 || link->tx_dma < 0)
+    if (link == 0 || link->tx_dma < 0 || link->tx_waiting_ack)
         return false;
 
     link->tx_word = (uint8_t)(data & 0xffu);
     tx_start_word(link, build_data_word(link->tx_word));
+    link->tx_waiting_ack = true;
     return true;
 }
 
