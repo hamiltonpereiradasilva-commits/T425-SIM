@@ -39,6 +39,7 @@ void t425_core_reset(t425_core_t *core)
     core->t425_channel_run_req = 0u;
     core->t425_channel_status = 0u;
     core->t425_alt_enabled = 0u;
+    core->phy = 0;
 
     {
         uint32_t i;
@@ -70,6 +71,68 @@ void t425_core_reset(t425_core_t *core)
 
     core->cycles = 0;
     core->instructions = 0;
+}
+
+bool t425_core_attach_phy(
+    t425_core_t *core,
+    t425_core_phy_t *phy)
+{
+    if (core == 0)
+        return false;
+
+    core->phy = phy;
+    return true;
+}
+
+int t425_core_link_output(
+    t425_core_t *core,
+    uint32_t link_id)
+{
+    uint32_t frame;
+
+    if (core == 0 || link_id >= T425_CORE_PHY_MAX_ENDPOINTS ||
+        core->phy == 0)
+        return -1;
+
+    frame = core->t425_channel_data_reg;
+    if (frame > 0xFFu)
+        return -1;
+
+    return t425_core_phy_tx(core->phy, link_id, (uint16_t)frame);
+}
+
+bool t425_core_link_input_available(
+    t425_core_t *core,
+    uint32_t link_id)
+{
+    if (core == 0 || link_id >= T425_CORE_PHY_MAX_ENDPOINTS ||
+        core->phy == 0)
+        return false;
+
+    return t425_core_phy_rx_available(core->phy, link_id);
+}
+
+int t425_core_link_input_consume(
+    t425_core_t *core,
+    uint32_t link_id,
+    uint8_t *byte)
+{
+    uint32_t frame;
+    int result;
+
+    if (core == 0 || byte == 0 ||
+        link_id >= T425_CORE_PHY_MAX_ENDPOINTS ||
+        core->phy == 0)
+        return -1;
+
+    frame = 0u;
+    result = t425_core_phy_rx(core->phy, link_id, &frame);
+    if (result != 0 || frame > 0xFFu)
+        return (result != 0) ? result : -1;
+
+    core->t425_channel_data_reg = frame;
+    *byte = (uint8_t)frame;
+    return 0;
 }
 
 void t425_core_microcycle(t425_core_t *core)

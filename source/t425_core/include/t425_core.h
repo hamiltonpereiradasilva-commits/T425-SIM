@@ -10,6 +10,7 @@
 #include "t425_memory.h"
 #include "t425_scheduler.h"
 #include "t425_timer.h"
+#include "t425_core_phy.h"
 
 #define T425_MAX_PROCESS_CONTEXTS 32u
 
@@ -88,6 +89,9 @@ typedef struct
     uint8_t  t425_channel_status;
     uint8_t  t425_alt_enabled;
 
+    /* Non-owning optional portable CORE PHY attachment. */
+    t425_core_phy_t *phy;
+
     /*
      * Simulator-internal register context for processes which are
      * not currently executing. This is not architectural RAM and
@@ -165,6 +169,12 @@ typedef struct
 #define T425_STEP_BADOP    -3
 
 void t425_core_reset(t425_core_t *core);
+
+bool t425_core_attach_phy(t425_core_t *core, t425_core_phy_t *phy);
+int t425_core_link_output(t425_core_t *core, uint32_t link_id);
+bool t425_core_link_input_available(t425_core_t *core, uint32_t link_id);
+int t425_core_link_input_consume(
+    t425_core_t *core, uint32_t link_id, uint8_t *byte);
 
 int t425_core_step(t425_core_t *core);
 

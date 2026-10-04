@@ -47,6 +47,7 @@ target_include_directories(t425_core_engine PUBLIC
     ${T425_CORE_ROOT}/process
     ${T425_CORE_ROOT}/scheduler
     ${T425_CORE_ROOT}/timer
+    ${T425_CORE_ROOT}/phy
 )
 
 add_library(t425_core_phy_contract STATIC
