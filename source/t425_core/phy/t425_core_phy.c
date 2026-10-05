@@ -75,3 +75,27 @@ int t425_core_phy_rx(
         endpoint_id,
         frame);
 }
+
+bool t425_core_phy_read_system_inputs(
+    t425_core_phy_t *phy,
+    t425_core_phy_system_inputs_t *inputs)
+{
+    if (!t425_core_phy_endpoint_valid(phy, 0u) ||
+        inputs == 0 ||
+        phy->ops.read_system_inputs == 0)
+        return false;
+
+    return phy->ops.read_system_inputs(phy->ops.context, inputs);
+}
+
+bool t425_core_phy_write_system_outputs(
+    t425_core_phy_t *phy,
+    const t425_core_phy_system_outputs_t *outputs)
+{
+    if (!t425_core_phy_endpoint_valid(phy, 0u) ||
+        outputs == 0 ||
+        phy->ops.write_system_outputs == 0)
+        return false;
+
+    return phy->ops.write_system_outputs(phy->ops.context, outputs);
+}

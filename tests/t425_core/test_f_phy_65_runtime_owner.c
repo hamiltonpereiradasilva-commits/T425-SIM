@@ -48,7 +48,7 @@ static int mock_rx_get(void *context, uint32_t endpoint_id, uint32_t *frame)
 }
 static t425_core_phy_ops_t make_ops(mock_t *mock)
 {
-    t425_core_phy_ops_t ops = {mock_tx, mock_rx_available, mock_rx_get, mock};
+    t425_core_phy_ops_t ops = {mock_tx, mock_rx_available, mock_rx_get, mock, 0, 0};
     return ops;
 }
 static void test_invalid_init(void)

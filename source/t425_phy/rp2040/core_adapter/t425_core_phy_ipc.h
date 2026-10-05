@@ -19,6 +19,8 @@ typedef struct
 {
     queue_t core0_to_core1[T425_CORE_PHY_MAX_ENDPOINTS];
     queue_t core1_to_core0[T425_CORE_PHY_MAX_ENDPOINTS];
+    t425_core_phy_system_inputs_t system_inputs;
+    t425_core_phy_system_outputs_t system_outputs;
     bool initialized;
 } t425_core_phy_ipc_t;
 

@@ -13,6 +13,28 @@ static int core0_tx(void *context, uint32_t endpoint_id, uint16_t frame)
     return queue_try_add(&ipc->core0_to_core1[endpoint_id], &message) ? 0 : -2;
 }
 
+static bool core0_read_system_inputs(
+    void *context,
+    t425_core_phy_system_inputs_t *inputs)
+{
+    t425_core_phy_ipc_t *ipc = context;
+    if (ipc == 0 || !ipc->initialized || inputs == 0)
+        return false;
+    *inputs = ipc->system_inputs;
+    return true;
+}
+
+static bool core0_write_system_outputs(
+    void *context,
+    const t425_core_phy_system_outputs_t *outputs)
+{
+    t425_core_phy_ipc_t *ipc = context;
+    if (ipc == 0 || !ipc->initialized || outputs == 0)
+        return false;
+    ipc->system_outputs = *outputs;
+    return true;
+}
+
 static bool core0_rx_available(void *context, uint32_t endpoint_id)
 {
     t425_core_phy_ipc_t *ipc = context;
@@ -46,6 +68,8 @@ bool t425_core_phy_ipc_init(t425_core_phy_ipc_t *ipc)
         return false;
 
     ipc->initialized = false;
+    ipc->system_inputs = (t425_core_phy_system_inputs_t){0};
+    ipc->system_outputs = (t425_core_phy_system_outputs_t){0};
     for (uint32_t endpoint = 0u;
          endpoint < T425_CORE_PHY_MAX_ENDPOINTS;
          ++endpoint) {
@@ -89,6 +113,8 @@ void t425_core_phy_ipc_make_core0_ops(
     ops->tx_frame = core0_tx;
     ops->rx_available = core0_rx_available;
     ops->rx_get = core0_rx_get;
+    ops->read_system_inputs = core0_read_system_inputs;
+    ops->write_system_outputs = core0_write_system_outputs;
     ops->context = ipc;
 }
 
@@ -144,5 +170,12 @@ uint32_t t425_core_phy_ipc_service_poll(
             }
         }
     }
+
+    if (service->phy.ops.read_system_inputs != 0)
+        (void)service->phy.ops.read_system_inputs(
+            service->phy.ops.context, &service->ipc->system_inputs);
+    if (service->phy.ops.write_system_outputs != 0)
+        (void)service->phy.ops.write_system_outputs(
+            service->phy.ops.context, &service->ipc->system_outputs);
     return work;
 }

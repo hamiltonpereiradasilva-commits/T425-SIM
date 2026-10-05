@@ -1,5 +1,6 @@
 #include "t425_core_phy_rp2040.h"
 
+#include "hardware/gpio.h"
 #include "hardware/irq.h"
 
 static t425_core_phy_rp2040_t *ack_irq_adapter;
@@ -67,6 +68,18 @@ static uint32_t physical_index_for_endpoint(
 #define T425_PHY_LINK_SPECIAL_GPIO       20u
 #define T425_PHY_LINK0_SPECIAL_GPIO      21u
 #define T425_PHY_LINK123_SPECIAL_GPIO    22u
+#define T425_PHY_RESET_GPIO               4u
+#define T425_PHY_ANALYSE_GPIO             5u
+#define T425_PHY_ERROR_IN_GPIO            6u
+#define T425_PHY_BOOT_FROM_ROM_GPIO       7u
+#define T425_PHY_EVENT_REQ_GPIO           8u
+#define T425_PHY_DISABLE_INT_RAM_GPIO     9u
+#define T425_PHY_PROC_SPEED0_GPIO        10u
+#define T425_PHY_PROC_SPEED1_GPIO        11u
+#define T425_PHY_PROC_SPEED2_GPIO        12u
+#define T425_PHY_EVENT_ERROR_GPIO        13u
+#define T425_PHY_EVENT_ACK_GPIO          14u
+#define T425_PHY_EVENT_WAITING_GPIO      15u
 
 #define T425_RX_ACK_WORD    0x80000000u
 
@@ -80,6 +93,74 @@ static void t425_phy_speed_gpio_init(void)
 
     gpio_init(T425_PHY_LINK123_SPECIAL_GPIO);
     gpio_set_dir(T425_PHY_LINK123_SPECIAL_GPIO, GPIO_IN);
+}
+
+static void t425_phy_system_gpio_init(void)
+{
+    const uint inputs[] = {
+        T425_PHY_RESET_GPIO,
+        T425_PHY_ANALYSE_GPIO,
+        T425_PHY_ERROR_IN_GPIO,
+        T425_PHY_BOOT_FROM_ROM_GPIO,
+        T425_PHY_EVENT_REQ_GPIO,
+        T425_PHY_DISABLE_INT_RAM_GPIO,
+        T425_PHY_PROC_SPEED0_GPIO,
+        T425_PHY_PROC_SPEED1_GPIO,
+        T425_PHY_PROC_SPEED2_GPIO
+    };
+    uint i;
+
+    for (i = 0u; i < sizeof(inputs) / sizeof(inputs[0]); ++i) {
+        gpio_init(inputs[i]);
+        gpio_set_dir(inputs[i], GPIO_IN);
+    }
+
+    gpio_init(T425_PHY_EVENT_ERROR_GPIO);
+    gpio_set_dir(T425_PHY_EVENT_ERROR_GPIO, GPIO_OUT);
+    gpio_init(T425_PHY_EVENT_ACK_GPIO);
+    gpio_set_dir(T425_PHY_EVENT_ACK_GPIO, GPIO_OUT);
+    gpio_init(T425_PHY_EVENT_WAITING_GPIO);
+    gpio_set_dir(T425_PHY_EVENT_WAITING_GPIO, GPIO_OUT);
+    gpio_put(T425_PHY_EVENT_ERROR_GPIO, false);
+    gpio_put(T425_PHY_EVENT_ACK_GPIO, false);
+    gpio_put(T425_PHY_EVENT_WAITING_GPIO, false);
+}
+
+static bool rp2040_read_system_inputs(
+    void *context,
+    t425_core_phy_system_inputs_t *inputs)
+{
+    (void)context;
+    if (inputs == 0)
+        return false;
+
+    inputs->reset = gpio_get(T425_PHY_RESET_GPIO);
+    inputs->analyse = gpio_get(T425_PHY_ANALYSE_GPIO);
+    inputs->error_in = gpio_get(T425_PHY_ERROR_IN_GPIO);
+    inputs->boot_from_rom = gpio_get(T425_PHY_BOOT_FROM_ROM_GPIO);
+    inputs->event_req = gpio_get(T425_PHY_EVENT_REQ_GPIO);
+    inputs->disable_int_ram = gpio_get(T425_PHY_DISABLE_INT_RAM_GPIO);
+    inputs->proc_speed_select[0] = gpio_get(T425_PHY_PROC_SPEED0_GPIO);
+    inputs->proc_speed_select[1] = gpio_get(T425_PHY_PROC_SPEED1_GPIO);
+    inputs->proc_speed_select[2] = gpio_get(T425_PHY_PROC_SPEED2_GPIO);
+    inputs->link_special = gpio_get(T425_PHY_LINK_SPECIAL_GPIO);
+    inputs->link0_special = gpio_get(T425_PHY_LINK0_SPECIAL_GPIO);
+    inputs->link123_special = gpio_get(T425_PHY_LINK123_SPECIAL_GPIO);
+    return true;
+}
+
+static bool rp2040_write_system_outputs(
+    void *context,
+    const t425_core_phy_system_outputs_t *outputs)
+{
+    (void)context;
+    if (outputs == 0)
+        return false;
+
+    gpio_put(T425_PHY_EVENT_ERROR_GPIO, outputs->error);
+    gpio_put(T425_PHY_EVENT_ACK_GPIO, outputs->event_ack);
+    gpio_put(T425_PHY_EVENT_WAITING_GPIO, outputs->event_waiting);
+    return true;
 }
 
 static t425_link_speed_t t425_phy_decode_speed(
@@ -324,6 +405,7 @@ bool t425_core_phy_rp2040_init_four_links(
         return false;
 
     t425_phy_speed_gpio_init();
+    t425_phy_system_gpio_init();
 
     speed0 = t425_phy_decode_speed(
         gpio_get(T425_PHY_LINK_SPECIAL_GPIO),
@@ -343,6 +425,10 @@ bool t425_core_phy_rp2040_init_four_links(
         uint tx_pin;
         uint rx_pin;
 
+        /*
+         * Link2/Link3 use the board mirrored connector placement:
+         * numeric GPIO order is RX/TX while semantic roles remain TX/RX.
+         */
         switch (physical) {
         case 0u:
             tx_pin = 0u;
@@ -404,6 +490,8 @@ void t425_core_phy_rp2040_make_ops(
     ops->tx_frame = rp2040_tx;
     ops->rx_available = rp2040_rx_available;
     ops->rx_get = rp2040_rx_get;
+    ops->read_system_inputs = rp2040_read_system_inputs;
+    ops->write_system_outputs = rp2040_write_system_outputs;
     ops->context = adapter;
 }
 

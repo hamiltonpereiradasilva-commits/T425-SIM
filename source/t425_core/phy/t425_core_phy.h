@@ -27,10 +27,41 @@ typedef int (*t425_core_phy_rx_get_fn)(
 
 typedef struct
 {
+    bool reset;
+    bool analyse;
+    bool error_in;
+    bool boot_from_rom;
+    bool event_req;
+    bool disable_int_ram;
+    bool proc_speed_select[3];
+    bool link_special;
+    bool link0_special;
+    bool link123_special;
+} t425_core_phy_system_inputs_t;
+
+typedef struct
+{
+    bool error;
+    bool event_ack;
+    bool event_waiting;
+} t425_core_phy_system_outputs_t;
+
+typedef bool (*t425_core_phy_read_system_inputs_fn)(
+    void *context,
+    t425_core_phy_system_inputs_t *inputs);
+
+typedef bool (*t425_core_phy_write_system_outputs_fn)(
+    void *context,
+    const t425_core_phy_system_outputs_t *outputs);
+
+typedef struct
+{
     t425_core_phy_tx_fn tx_frame;
     t425_core_phy_rx_available_fn rx_available;
     t425_core_phy_rx_get_fn rx_get;
     void *context;
+    t425_core_phy_read_system_inputs_fn read_system_inputs;
+    t425_core_phy_write_system_outputs_fn write_system_outputs;
 } t425_core_phy_ops_t;
 
 typedef struct
@@ -58,6 +89,14 @@ int t425_core_phy_rx(
     t425_core_phy_t *phy,
     uint32_t endpoint_id,
     uint32_t *frame);
+
+bool t425_core_phy_read_system_inputs(
+    t425_core_phy_t *phy,
+    t425_core_phy_system_inputs_t *inputs);
+
+bool t425_core_phy_write_system_outputs(
+    t425_core_phy_t *phy,
+    const t425_core_phy_system_outputs_t *outputs);
 
 #ifdef __cplusplus
 }
