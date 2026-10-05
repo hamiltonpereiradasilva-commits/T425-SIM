@@ -20,6 +20,19 @@
  * This represents the architectural register state associated with
  * a suspended process. It is distinct from the interrupt-save context.
  */
+typedef enum
+{
+    T425_BOOT_RESET = 0,
+    T425_BOOT_DECIDE,
+    T425_BOOT_WAIT_CONTROL,
+    T425_BOOT_POKE_ADDRESS,
+    T425_BOOT_POKE_DATA,
+    T425_BOOT_PEEK_ADDRESS,
+    T425_BOOT_PEEK_OUTPUT,
+    T425_BOOT_LOAD,
+    T425_BOOT_RUNNING
+} t425_boot_state_t;
+
 typedef struct
 {
     uint8_t valid;
@@ -91,6 +104,21 @@ typedef struct
 
     /* Non-owning optional portable CORE PHY attachment. */
     t425_core_phy_t *phy;
+
+    /* F_CORE-SYS-01 reset/bootstrap state. */
+    uint8_t reset_active;
+    uint8_t bootfromrom_sampled;
+    uint8_t bootfromrom_value;
+    t425_boot_state_t boot_state;
+    uint8_t bootstrap_link;
+    uint32_t bootstrap_count;
+    uint32_t bootstrap_index;
+    uint32_t bootstrap_address;
+    uint32_t bootstrap_word;
+    uint8_t bootstrap_byte_index;
+    uint32_t rx_credit_generation[T425_CORE_PHY_MAX_ENDPOINTS];
+    uint8_t rx_credit_enabled[T425_CORE_PHY_MAX_ENDPOINTS];
+    uint8_t rx_credit_rearm[T425_CORE_PHY_MAX_ENDPOINTS];
 
     /*
      * Simulator-internal register context for processes which are
@@ -175,6 +203,8 @@ int t425_core_link_output(t425_core_t *core, uint32_t link_id);
 bool t425_core_link_input_available(t425_core_t *core, uint32_t link_id);
 int t425_core_link_input_consume(
     t425_core_t *core, uint32_t link_id, uint8_t *byte);
+bool t425_core_link_rx_admission(
+    const t425_core_t *core, uint32_t link_id);
 
 int t425_core_step(t425_core_t *core);
 
@@ -190,5 +220,8 @@ void t425_core_microcycle(t425_core_t *core);
 void t425_core_microentry(
     t425_core_t *core,
     uint8_t opcode);
+
+/* Returns true when the system/bootstrap layer consumed this step. */
+bool t425_core_system_step(t425_core_t *core);
 
 #endif

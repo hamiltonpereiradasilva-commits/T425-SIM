@@ -26,6 +26,10 @@ typedef struct
     uint32_t rx_data[T425_CORE_PHY_PHYSICAL_LINK_COUNT];
     uint32_t physical_ack_count[T425_CORE_PHY_PHYSICAL_LINK_COUNT];
     bool rx_data_pending[T425_CORE_PHY_PHYSICAL_LINK_COUNT];
+    bool rx_data_consumed[T425_CORE_PHY_PHYSICAL_LINK_COUNT];
+    bool rx_admission[T425_CORE_PHY_PHYSICAL_LINK_COUNT];
+    uint32_t rx_grant_generation[T425_CORE_PHY_PHYSICAL_LINK_COUNT];
+    uint32_t rx_consumed_generation[T425_CORE_PHY_PHYSICAL_LINK_COUNT];
     bool physical_ack_pending[T425_CORE_PHY_PHYSICAL_LINK_COUNT];
     bool ack_irq_registered;
 } t425_core_phy_rp2040_t;

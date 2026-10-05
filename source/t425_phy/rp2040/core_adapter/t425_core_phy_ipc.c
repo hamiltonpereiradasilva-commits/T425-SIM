@@ -35,6 +35,34 @@ static bool core0_write_system_outputs(
     return true;
 }
 
+static int core0_set_rx_admission(
+    void *context,
+    uint32_t endpoint_id,
+    bool enabled)
+{
+    t425_core_phy_ipc_t *ipc = context;
+    if (ipc == 0 || !ipc->initialized ||
+        endpoint_id >= T425_CORE_PHY_MAX_ENDPOINTS)
+        return -1;
+    ipc->rx_admission[endpoint_id] = enabled;
+    return 0;
+}
+
+static int core0_set_rx_admission_credit(
+    void *context,
+    uint32_t endpoint_id,
+    uint32_t generation,
+    bool enabled)
+{
+    t425_core_phy_ipc_t *ipc = context;
+    if (ipc == 0 || !ipc->initialized ||
+        endpoint_id >= T425_CORE_PHY_MAX_ENDPOINTS)
+        return -1;
+    ipc->rx_admission_generation[endpoint_id] = generation;
+    ipc->rx_admission[endpoint_id] = enabled;
+    return 0;
+}
+
 static bool core0_rx_available(void *context, uint32_t endpoint_id)
 {
     t425_core_phy_ipc_t *ipc = context;
@@ -70,6 +98,10 @@ bool t425_core_phy_ipc_init(t425_core_phy_ipc_t *ipc)
     ipc->initialized = false;
     ipc->system_inputs = (t425_core_phy_system_inputs_t){0};
     ipc->system_outputs = (t425_core_phy_system_outputs_t){0};
+    for (uint32_t endpoint = 0u; endpoint < T425_CORE_PHY_MAX_ENDPOINTS; ++endpoint) {
+        ipc->rx_admission[endpoint] = false;
+        ipc->rx_admission_generation[endpoint] = 0u;
+    }
     for (uint32_t endpoint = 0u;
          endpoint < T425_CORE_PHY_MAX_ENDPOINTS;
          ++endpoint) {
@@ -115,6 +147,8 @@ void t425_core_phy_ipc_make_core0_ops(
     ops->rx_get = core0_rx_get;
     ops->read_system_inputs = core0_read_system_inputs;
     ops->write_system_outputs = core0_write_system_outputs;
+    ops->set_rx_admission = core0_set_rx_admission;
+    ops->set_rx_admission_credit = core0_set_rx_admission_credit;
     ops->context = ipc;
 }
 
@@ -150,6 +184,12 @@ uint32_t t425_core_phy_ipc_service_poll(
          ++endpoint) {
         t425_core_phy_ipc_byte_t message;
 
+        if (service->phy.ops.set_rx_admission_credit != 0)
+            (void)t425_core_phy_set_rx_admission_credit(
+                &service->phy, endpoint,
+                service->ipc->rx_admission_generation[endpoint],
+                service->ipc->rx_admission[endpoint]);
+
         /* Keep the descriptor queued when the PHY reports backpressure. */
         if (queue_try_peek(&service->ipc->core0_to_core1[endpoint], &message) &&
             t425_core_phy_tx(&service->phy, endpoint, message.byte) == 0) {
@@ -158,9 +198,15 @@ uint32_t t425_core_phy_ipc_service_poll(
             ++work;
         }
 
-        /* Do not consume PHY RX data when the Core0 mailbox is full. */
-        if (!queue_is_full(&service->ipc->core1_to_core0[endpoint]) &&
-            t425_core_phy_rx_available(&service->phy, endpoint)) {
+        /*
+         * Poll RX even when the Core0 mailbox is full so the PHY can
+         * capture and retain one physical DATA byte without ACKing it.
+         */
+        {
+            bool available = t425_core_phy_rx_available(
+                &service->phy, endpoint);
+            if (!queue_is_full(&service->ipc->core1_to_core0[endpoint]) &&
+                available) {
             uint32_t received;
             if (t425_core_phy_rx(&service->phy, endpoint, &received) == 0) {
                 message.byte = (uint8_t)(received & 0xFFu);
@@ -168,6 +214,7 @@ uint32_t t425_core_phy_ipc_service_poll(
                         &service->ipc->core1_to_core0[endpoint], &message))
                     ++work;
             }
+        }
         }
     }
 

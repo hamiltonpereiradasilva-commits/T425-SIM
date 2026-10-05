@@ -73,6 +73,10 @@ static t425_core_phy_ops_t make_ops(mock_context_t *mock)
     ops.rx_available = mock_rx_available;
     ops.rx_get = mock_rx_get;
     ops.context = mock;
+    ops.read_system_inputs = 0;
+    ops.write_system_outputs = 0;
+    ops.set_rx_admission = 0;
+    ops.set_rx_admission_credit = 0;
 
     return ops;
 }

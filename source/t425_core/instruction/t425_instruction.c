@@ -16,6 +16,9 @@ int t425_core_step(t425_core_t *core)
     if (!core)
         return T425_STEP_BADMEM;
 
+    if (t425_core_system_step(core))
+        return T425_STEP_OK;
+
     cpu = &core->cpu;
 
     if (cpu->halted)

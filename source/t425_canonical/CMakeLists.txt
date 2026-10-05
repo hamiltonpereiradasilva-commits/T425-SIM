@@ -26,6 +26,7 @@ set(T425_PHY_ROOT ${CMAKE_CURRENT_LIST_DIR}/../t425_phy/rp2040)
 
 add_library(t425_core_engine STATIC
     ${T425_CORE_ROOT}/src/t425_core.c
+    ${T425_CORE_ROOT}/src/t425_core_system.c
     ${T425_CORE_ROOT}/instruction/t425_instruction.c
     ${T425_CORE_ROOT}/channel/t425_channel.c
     ${T425_CORE_ROOT}/cpu/t425_cpu.c

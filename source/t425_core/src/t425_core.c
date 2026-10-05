@@ -40,6 +40,21 @@ void t425_core_reset(t425_core_t *core)
     core->t425_channel_status = 0u;
     core->t425_alt_enabled = 0u;
     core->phy = 0;
+    core->reset_active = 0u;
+    core->bootfromrom_sampled = 0u;
+    core->bootfromrom_value = 0u;
+    core->boot_state = T425_BOOT_RESET;
+    core->bootstrap_link = T425_CORE_PHY_MAX_ENDPOINTS;
+    core->bootstrap_count = 0u;
+    core->bootstrap_index = 0u;
+    core->bootstrap_address = 0u;
+    core->bootstrap_word = 0u;
+    core->bootstrap_byte_index = 0u;
+    for (uint32_t i = 0u; i < T425_CORE_PHY_MAX_ENDPOINTS; ++i) {
+        core->rx_credit_generation[i] = 0u;
+        core->rx_credit_enabled[i] = 0u;
+        core->rx_credit_rearm[i] = 0u;
+    }
 
     {
         uint32_t i;
@@ -112,6 +127,23 @@ bool t425_core_link_input_available(
     return t425_core_phy_rx_available(core->phy, link_id);
 }
 
+bool t425_core_link_rx_admission(
+    const t425_core_t *core,
+    uint32_t link_id)
+{
+    uint32_t address;
+    uint32_t control;
+
+    if (core == 0 || link_id >= T425_CORE_PHY_MAX_ENDPOINTS)
+        return false;
+
+    address = 0x80000010u + (link_id * 4u);
+    if (t425_memory_read_word(&core->memory, address, &control) != 0)
+        return false;
+
+    return control != T425_CHANNEL_EMPTY;
+}
+
 int t425_core_link_input_consume(
     t425_core_t *core,
     uint32_t link_id,
@@ -132,6 +164,8 @@ int t425_core_link_input_consume(
 
     core->t425_channel_data_reg = frame;
     *byte = (uint8_t)frame;
+    if (core->boot_state != T425_BOOT_RUNNING)
+        core->rx_credit_rearm[link_id] = 1u;
     return 0;
 }
 

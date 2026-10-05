@@ -54,6 +54,17 @@ typedef bool (*t425_core_phy_write_system_outputs_fn)(
     void *context,
     const t425_core_phy_system_outputs_t *outputs);
 
+typedef int (*t425_core_phy_set_rx_admission_fn)(
+    void *context,
+    uint32_t endpoint_id,
+    bool enabled);
+
+typedef int (*t425_core_phy_set_rx_admission_credit_fn)(
+    void *context,
+    uint32_t endpoint_id,
+    uint32_t generation,
+    bool enabled);
+
 typedef struct
 {
     t425_core_phy_tx_fn tx_frame;
@@ -62,6 +73,8 @@ typedef struct
     void *context;
     t425_core_phy_read_system_inputs_fn read_system_inputs;
     t425_core_phy_write_system_outputs_fn write_system_outputs;
+    t425_core_phy_set_rx_admission_fn set_rx_admission;
+    t425_core_phy_set_rx_admission_credit_fn set_rx_admission_credit;
 } t425_core_phy_ops_t;
 
 typedef struct
@@ -97,6 +110,17 @@ bool t425_core_phy_read_system_inputs(
 bool t425_core_phy_write_system_outputs(
     t425_core_phy_t *phy,
     const t425_core_phy_system_outputs_t *outputs);
+
+int t425_core_phy_set_rx_admission(
+    t425_core_phy_t *phy,
+    uint32_t endpoint_id,
+    bool enabled);
+
+int t425_core_phy_set_rx_admission_credit(
+    t425_core_phy_t *phy,
+    uint32_t endpoint_id,
+    uint32_t generation,
+    bool enabled);
 
 #ifdef __cplusplus
 }

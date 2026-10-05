@@ -99,3 +99,30 @@ bool t425_core_phy_write_system_outputs(
 
     return phy->ops.write_system_outputs(phy->ops.context, outputs);
 }
+
+int t425_core_phy_set_rx_admission(
+    t425_core_phy_t *phy,
+    uint32_t endpoint_id,
+    bool enabled)
+{
+    if (!t425_core_phy_endpoint_valid(phy, endpoint_id) ||
+        phy->ops.set_rx_admission == 0)
+        return -1;
+
+    return phy->ops.set_rx_admission(
+        phy->ops.context, endpoint_id, enabled);
+}
+
+int t425_core_phy_set_rx_admission_credit(
+    t425_core_phy_t *phy,
+    uint32_t endpoint_id,
+    uint32_t generation,
+    bool enabled)
+{
+    if (!t425_core_phy_endpoint_valid(phy, endpoint_id) ||
+        phy->ops.set_rx_admission_credit == 0)
+        return -1;
+
+    return phy->ops.set_rx_admission_credit(
+        phy->ops.context, endpoint_id, generation, enabled);
+}

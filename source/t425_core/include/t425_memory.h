@@ -10,6 +10,8 @@
 
 #define T425_TPTR_LOC0 0x80000024u
 #define T425_TPTR_LOC1 0x80000028u
+#define T425_MEM_START 0x80000070u
+#define T425_ROM_ENTRY 0x7FFFFFFEu
 
 
 typedef struct

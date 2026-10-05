@@ -227,12 +227,6 @@ static void pump_rx(t425_core_phy_rp2040_t *adapter, uint32_t physical_index)
          * Other words are malformed/control words and remain PHY-local.
          */
 
-        if (adapter->physical_ack_pending[physical_index] &&
-            !pio_sm_is_rx_fifo_full(link->pio, link->sm_rx) &&
-            t425_link_send_ack(link)) {
-
-            adapter->physical_ack_pending[physical_index] = false;
-        }
     }
 }
 
@@ -249,13 +243,7 @@ static void service_ack_flags(PIO pio)
             continue;
         if (pio_interrupt_get(pio, link->sm_rx)) {
             pio_interrupt_clear(pio, link->sm_rx);
-            /*
-             * ACK once the DATA packet is identified if the RX FIFO can
-             * accept it and TX is idle. Otherwise defer in PHY state.
-             */
-            if (pio_sm_is_rx_fifo_full(pio, link->sm_rx) ||
-                !t425_link_send_ack(link))
-                adapter->physical_ack_pending[i] = true;
+            /* DATA is acknowledged only after RX admission/publication. */
         }
     }
 }
@@ -297,6 +285,59 @@ static bool register_ack_irqs(t425_core_phy_rp2040_t *adapter)
     return true;
 }
 
+static int rp2040_set_rx_admission(
+    void *context,
+    uint32_t endpoint_id,
+    bool enabled)
+{
+    t425_core_phy_rp2040_t *adapter = context;
+    uint32_t physical_index;
+
+    if (!valid_adapter(adapter) ||
+        endpoint_id >= T425_CORE_PHY_ENDPOINT_COUNT)
+        return -1;
+
+    physical_index = physical_index_for_endpoint(adapter, endpoint_id);
+    if (physical_index >= T425_CORE_PHY_PHYSICAL_LINK_COUNT)
+        return -1;
+
+    adapter->rx_admission[physical_index] = enabled;
+    return 0;
+}
+
+static bool generation_newer(uint32_t candidate, uint32_t current)
+{
+    return candidate != current &&
+           (int32_t)(candidate - current) > 0;
+}
+
+static int rp2040_set_rx_admission_credit(
+    void *context,
+    uint32_t endpoint_id,
+    uint32_t generation,
+    bool enabled)
+{
+    t425_core_phy_rp2040_t *adapter = context;
+    uint32_t physical_index;
+
+    if (!valid_adapter(adapter) ||
+        endpoint_id >= T425_CORE_PHY_ENDPOINT_COUNT)
+        return -1;
+
+    physical_index = physical_index_for_endpoint(adapter, endpoint_id);
+    if (physical_index >= T425_CORE_PHY_PHYSICAL_LINK_COUNT)
+        return -1;
+
+    if (generation_newer(
+            generation, adapter->rx_grant_generation[physical_index])) {
+        adapter->rx_grant_generation[physical_index] = generation;
+        adapter->rx_admission[physical_index] = enabled;
+        adapter->rx_consumed_generation[physical_index] =
+            enabled ? generation - 1u : generation;
+    }
+    return 0;
+}
+
 static int rp2040_tx(void *context, uint32_t endpoint_id, uint16_t frame)
 {
     t425_link_t *link = resolve_endpoint(context, endpoint_id);
@@ -317,7 +358,11 @@ static bool rp2040_rx_available(void *context, uint32_t endpoint_id)
     if (physical_index >= T425_CORE_PHY_PHYSICAL_LINK_COUNT)
         return false;
     pump_rx(adapter, physical_index);
-    return adapter->rx_data_pending[physical_index];
+    return adapter->rx_data_pending[physical_index] &&
+           !adapter->rx_data_consumed[physical_index] &&
+           adapter->rx_admission[physical_index] &&
+           adapter->rx_consumed_generation[physical_index] !=
+               adapter->rx_grant_generation[physical_index];
 }
 
 static int rp2040_rx_get(
@@ -338,7 +383,17 @@ static int rp2040_rx_get(
         return -2;
 
     *frame = adapter->rx_data[physical_index];
-    adapter->rx_data_pending[physical_index] = false;
+    adapter->rx_data_consumed[physical_index] = true;
+    adapter->rx_consumed_generation[physical_index] =
+        adapter->rx_grant_generation[physical_index];
+
+    if (t425_link_send_ack(adapter->links[physical_index])) {
+        adapter->rx_data_pending[physical_index] = false;
+        adapter->rx_data_consumed[physical_index] = false;
+        adapter->physical_ack_pending[physical_index] = false;
+    } else {
+        adapter->physical_ack_pending[physical_index] = true;
+    }
     return 0;
 }
 
@@ -382,6 +437,10 @@ bool t425_core_phy_rp2040_init(
         adapter->rx_data[i] = 0u;
         adapter->physical_ack_count[i] = 0u;
         adapter->rx_data_pending[i] = false;
+        adapter->rx_data_consumed[i] = false;
+        adapter->rx_admission[i] = false;
+        adapter->rx_grant_generation[i] = 0u;
+        adapter->rx_consumed_generation[i] = 0u;
         adapter->physical_ack_pending[i] = false;
     }
     adapter->route_count = T425_CORE_PHY_ENDPOINT_COUNT;
@@ -492,6 +551,8 @@ void t425_core_phy_rp2040_make_ops(
     ops->rx_get = rp2040_rx_get;
     ops->read_system_inputs = rp2040_read_system_inputs;
     ops->write_system_outputs = rp2040_write_system_outputs;
+    ops->set_rx_admission = rp2040_set_rx_admission;
+    ops->set_rx_admission_credit = rp2040_set_rx_admission_credit;
     ops->context = adapter;
 }
 
@@ -505,8 +566,11 @@ void t425_core_phy_rp2040_service(t425_core_phy_rp2040_t *adapter)
         if (!adapter->physical_ack_pending[i] ||
             pio_sm_is_rx_fifo_full(link->pio, link->sm_rx))
             continue;
-        if (t425_link_send_ack(link))
+        if (t425_link_send_ack(link)) {
             adapter->physical_ack_pending[i] = false;
+            adapter->rx_data_pending[i] = false;
+            adapter->rx_data_consumed[i] = false;
+        }
     }
 }
 
@@ -533,6 +597,11 @@ void t425_core_phy_rp2040_stop(t425_core_phy_rp2040_t *adapter)
             t425_link_stop(adapter->links[i]);
         }
         adapter->physical_ack_pending[i] = false;
+        adapter->rx_data_pending[i] = false;
+        adapter->rx_data_consumed[i] = false;
+        adapter->rx_admission[i] = false;
+        adapter->rx_grant_generation[i] = 0u;
+        adapter->rx_consumed_generation[i] = 0u;
         adapter->physical_ack_count[i] = 0u;
     }
     if (adapter->ack_irq_registered) {
