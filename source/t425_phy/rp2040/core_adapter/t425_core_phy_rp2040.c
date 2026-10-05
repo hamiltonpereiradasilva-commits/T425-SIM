@@ -307,8 +307,8 @@ static int rp2040_set_rx_admission(
 
 static bool generation_newer(uint32_t candidate, uint32_t current)
 {
-    return candidate != current &&
-           (int32_t)(candidate - current) > 0;
+    uint32_t delta = (candidate - current) & 0x7FFFFFFFu;
+    return delta != 0u && delta < 0x40000000u;
 }
 
 static int rp2040_set_rx_admission_credit(
@@ -328,12 +328,15 @@ static int rp2040_set_rx_admission_credit(
     if (physical_index >= T425_CORE_PHY_PHYSICAL_LINK_COUNT)
         return -1;
 
+    generation &= 0x7FFFFFFFu;
+    if (generation == 0u)
+        return 0;
     if (generation_newer(
             generation, adapter->rx_grant_generation[physical_index])) {
         adapter->rx_grant_generation[physical_index] = generation;
         adapter->rx_admission[physical_index] = enabled;
         adapter->rx_consumed_generation[physical_index] =
-            enabled ? generation - 1u : generation;
+            enabled ? ((generation - 1u) & 0x7FFFFFFFu) : generation;
     }
     return 0;
 }

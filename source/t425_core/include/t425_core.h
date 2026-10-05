@@ -121,6 +121,15 @@ typedef struct
     uint8_t rx_credit_rearm[T425_CORE_PHY_MAX_ENDPOINTS];
 
     /*
+     * Explicit lifetime for an architectural external IN transfer.
+     * The channel control word remains authoritative for rendezvous;
+     * these fields only retain the byte-transfer lifetime after TAKE.
+     */
+    uint8_t external_in_active[T425_CORE_PHY_MAX_ENDPOINTS];
+    uint8_t external_in_seen[T425_CORE_PHY_MAX_ENDPOINTS];
+    uint32_t external_in_remaining[T425_CORE_PHY_MAX_ENDPOINTS];
+
+    /*
      * Simulator-internal register context for processes which are
      * not currently executing. This is not architectural RAM and
      * is not channel state.
@@ -204,6 +213,12 @@ bool t425_core_link_input_available(t425_core_t *core, uint32_t link_id);
 int t425_core_link_input_consume(
     t425_core_t *core, uint32_t link_id, uint8_t *byte);
 bool t425_core_link_rx_admission(
+    const t425_core_t *core, uint32_t link_id);
+
+int t425_core_external_in_begin(
+    t425_core_t *core, uint32_t link_id, uint32_t byte_count);
+
+uint32_t t425_core_external_in_remaining(
     const t425_core_t *core, uint32_t link_id);
 
 int t425_core_step(t425_core_t *core);

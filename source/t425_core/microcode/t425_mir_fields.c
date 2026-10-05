@@ -114,12 +114,12 @@ uint8_t t425_mir_error(const t425_mir_t *mir)
     return (uint8_t)bit(mir, 40u);
 }
 
-uint8_t t425_mir_channel(const t425_mir_t *mir)
+uint16_t t425_mir_channel(const t425_mir_t *mir)
 {
     static const unsigned p[] =
         {74,11,10,9,7,6,5,4,3,2,1};
 
-    return (uint8_t)field(mir, p, 11u);
+    return (uint16_t)field(mir, p, 11u);
 }
 
 uint16_t t425_mir_next_field(const t425_mir_t *mir)

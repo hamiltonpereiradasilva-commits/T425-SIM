@@ -5,6 +5,10 @@ static void publish_rx_admission(t425_core_t *core)
     if (core == 0 || core->phy == 0)
         return;
 
+    if (core->phy->ops.set_rx_arbitration != 0)
+        (void)t425_core_phy_set_rx_arbitration(
+            core->phy, core->boot_state == T425_BOOT_WAIT_CONTROL);
+
     for (uint32_t endpoint = 0u;
          endpoint < T425_CORE_PHY_MAX_ENDPOINTS;
          ++endpoint) {
@@ -28,9 +32,10 @@ static void publish_rx_admission(t425_core_t *core)
             issue = true;
 
         if (issue) {
-            ++core->rx_credit_generation[endpoint];
+            core->rx_credit_generation[endpoint] =
+                (core->rx_credit_generation[endpoint] + 1u) & 0x7FFFFFFFu;
             if (core->rx_credit_generation[endpoint] == 0u)
-                ++core->rx_credit_generation[endpoint];
+                core->rx_credit_generation[endpoint] = 1u;
             core->rx_credit_enabled[endpoint] = enabled ? 1u : 0u;
             core->rx_credit_rearm[endpoint] = 0u;
             (void)t425_core_phy_set_rx_admission_credit(

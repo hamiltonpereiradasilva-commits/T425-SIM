@@ -35,6 +35,14 @@ static bool core0_write_system_outputs(
     return true;
 }
 
+static uint32_t admission_pack(uint32_t generation, bool enabled)
+{
+    generation &= 0x7FFFFFFFu;
+    if (generation == 0u)
+        generation = 1u;
+    return (generation << 1u) | (enabled ? 1u : 0u);
+}
+
 static int core0_set_rx_admission(
     void *context,
     uint32_t endpoint_id,
@@ -44,7 +52,8 @@ static int core0_set_rx_admission(
     if (ipc == 0 || !ipc->initialized ||
         endpoint_id >= T425_CORE_PHY_MAX_ENDPOINTS)
         return -1;
-    ipc->rx_admission[endpoint_id] = enabled;
+    __atomic_store_n(&ipc->rx_admission_word[endpoint_id],
+                     admission_pack(1u, enabled), __ATOMIC_RELEASE);
     return 0;
 }
 
@@ -58,8 +67,18 @@ static int core0_set_rx_admission_credit(
     if (ipc == 0 || !ipc->initialized ||
         endpoint_id >= T425_CORE_PHY_MAX_ENDPOINTS)
         return -1;
-    ipc->rx_admission_generation[endpoint_id] = generation;
-    ipc->rx_admission[endpoint_id] = enabled;
+    __atomic_store_n(&ipc->rx_admission_word[endpoint_id],
+                     admission_pack(generation, enabled), __ATOMIC_RELEASE);
+    return 0;
+}
+
+static int core0_set_rx_arbitration(void *context, bool wait_control)
+{
+    t425_core_phy_ipc_t *ipc = context;
+    if (ipc == 0 || !ipc->initialized)
+        return -1;
+    __atomic_store_n(&ipc->rx_wait_control_arbitration,
+                     wait_control ? 1u : 0u, __ATOMIC_RELEASE);
     return 0;
 }
 
@@ -96,11 +115,11 @@ bool t425_core_phy_ipc_init(t425_core_phy_ipc_t *ipc)
         return false;
 
     ipc->initialized = false;
+    __atomic_store_n(&ipc->rx_wait_control_arbitration, 0u, __ATOMIC_RELAXED);
     ipc->system_inputs = (t425_core_phy_system_inputs_t){0};
     ipc->system_outputs = (t425_core_phy_system_outputs_t){0};
     for (uint32_t endpoint = 0u; endpoint < T425_CORE_PHY_MAX_ENDPOINTS; ++endpoint) {
-        ipc->rx_admission[endpoint] = false;
-        ipc->rx_admission_generation[endpoint] = 0u;
+        __atomic_store_n(&ipc->rx_admission_word[endpoint], 0u, __ATOMIC_RELAXED);
     }
     for (uint32_t endpoint = 0u;
          endpoint < T425_CORE_PHY_MAX_ENDPOINTS;
@@ -149,6 +168,7 @@ void t425_core_phy_ipc_make_core0_ops(
     ops->write_system_outputs = core0_write_system_outputs;
     ops->set_rx_admission = core0_set_rx_admission;
     ops->set_rx_admission_credit = core0_set_rx_admission_credit;
+    ops->set_rx_arbitration = core0_set_rx_arbitration;
     ops->context = ipc;
 }
 
@@ -168,6 +188,8 @@ bool t425_core_phy_ipc_service_init(
         return false;
 
     service->ipc = ipc;
+    service->rx_wait_control_claimed = false;
+    service->rx_wait_control_mode = false;
     return true;
 }
 
@@ -179,16 +201,40 @@ uint32_t t425_core_phy_ipc_service_poll(
         !service->ipc->initialized || !service->phy.attached)
         return 0u;
 
+    bool wait_control = __atomic_load_n(
+        &service->ipc->rx_wait_control_arbitration, __ATOMIC_ACQUIRE) != 0u;
+    if (!wait_control || !service->rx_wait_control_mode)
+        service->rx_wait_control_claimed = false;
+    service->rx_wait_control_mode = wait_control;
+
+    uint32_t wait_control_winner = T425_CORE_PHY_MAX_ENDPOINTS;
+    if (wait_control && !service->rx_wait_control_claimed) {
+        for (uint32_t endpoint = 0u;
+             endpoint < T425_CORE_PHY_MAX_ENDPOINTS;
+             ++endpoint) {
+            uint32_t word = __atomic_load_n(
+                &service->ipc->rx_admission_word[endpoint],
+                __ATOMIC_ACQUIRE);
+            bool enabled = (word & 1u) != 0u;
+            if (enabled && t425_core_phy_rx_available(&service->phy, endpoint)) {
+                wait_control_winner = endpoint;
+                break;
+            }
+        }
+    }
+
     for (uint32_t endpoint = 0u;
          endpoint < T425_CORE_PHY_MAX_ENDPOINTS;
          ++endpoint) {
         t425_core_phy_ipc_byte_t message;
+        uint32_t word = __atomic_load_n(
+            &service->ipc->rx_admission_word[endpoint], __ATOMIC_ACQUIRE);
+        uint32_t generation = (word >> 1u) & 0x7FFFFFFFu;
+        bool enabled = (word & 1u) != 0u;
 
         if (service->phy.ops.set_rx_admission_credit != 0)
             (void)t425_core_phy_set_rx_admission_credit(
-                &service->phy, endpoint,
-                service->ipc->rx_admission_generation[endpoint],
-                service->ipc->rx_admission[endpoint]);
+                &service->phy, endpoint, generation, enabled);
 
         /* Keep the descriptor queued when the PHY reports backpressure. */
         if (queue_try_peek(&service->ipc->core0_to_core1[endpoint], &message) &&
@@ -205,14 +251,22 @@ uint32_t t425_core_phy_ipc_service_poll(
         {
             bool available = t425_core_phy_rx_available(
                 &service->phy, endpoint);
+            if (wait_control &&
+                (service->rx_wait_control_claimed ||
+                 (wait_control_winner != T425_CORE_PHY_MAX_ENDPOINTS &&
+                  wait_control_winner != endpoint)))
+                available = false;
             if (!queue_is_full(&service->ipc->core1_to_core0[endpoint]) &&
                 available) {
             uint32_t received;
             if (t425_core_phy_rx(&service->phy, endpoint, &received) == 0) {
                 message.byte = (uint8_t)(received & 0xFFu);
                 if (queue_try_add(
-                        &service->ipc->core1_to_core0[endpoint], &message))
+                        &service->ipc->core1_to_core0[endpoint], &message)) {
                     ++work;
+                    if (wait_control)
+                        service->rx_wait_control_claimed = true;
+                }
             }
         }
         }

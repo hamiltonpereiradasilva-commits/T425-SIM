@@ -21,8 +21,9 @@ typedef struct
     queue_t core1_to_core0[T425_CORE_PHY_MAX_ENDPOINTS];
     t425_core_phy_system_inputs_t system_inputs;
     t425_core_phy_system_outputs_t system_outputs;
-    bool rx_admission[T425_CORE_PHY_MAX_ENDPOINTS];
-    uint32_t rx_admission_generation[T425_CORE_PHY_MAX_ENDPOINTS];
+    /* One atomic publication contains enabled + 31-bit generation. */
+    volatile uint32_t rx_admission_word[T425_CORE_PHY_MAX_ENDPOINTS];
+    volatile uint32_t rx_wait_control_arbitration;
     bool initialized;
 } t425_core_phy_ipc_t;
 
@@ -30,6 +31,8 @@ typedef struct
 {
     t425_core_phy_ipc_t *ipc;
     t425_core_phy_t phy;
+    bool rx_wait_control_claimed;
+    bool rx_wait_control_mode;
 } t425_core_phy_ipc_service_t;
 
 /* Called once by Core0 before launching Core1. */

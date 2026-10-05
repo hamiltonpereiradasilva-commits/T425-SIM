@@ -55,6 +55,11 @@ void t425_core_reset(t425_core_t *core)
         core->rx_credit_enabled[i] = 0u;
         core->rx_credit_rearm[i] = 0u;
     }
+    for (uint32_t i = 0u; i < T425_CORE_PHY_MAX_ENDPOINTS; ++i) {
+        core->external_in_active[i] = 0u;
+        core->external_in_seen[i] = 0u;
+        core->external_in_remaining[i] = 0u;
+    }
 
     {
         uint32_t i;
@@ -141,7 +146,31 @@ bool t425_core_link_rx_admission(
     if (t425_memory_read_word(&core->memory, address, &control) != 0)
         return false;
 
+    if (core->external_in_seen[link_id] != 0u)
+        return core->external_in_active[link_id] != 0u &&
+               core->external_in_remaining[link_id] != 0u;
+
     return control != T425_CHANNEL_EMPTY;
+}
+
+int t425_core_external_in_begin(
+    t425_core_t *core, uint32_t link_id, uint32_t byte_count)
+{
+    if (core == 0 || link_id >= T425_CORE_PHY_MAX_ENDPOINTS ||
+        byte_count == 0u)
+        return -1;
+    core->external_in_active[link_id] = 1u;
+    core->external_in_seen[link_id] = 1u;
+    core->external_in_remaining[link_id] = byte_count;
+    return 0;
+}
+
+uint32_t t425_core_external_in_remaining(
+    const t425_core_t *core, uint32_t link_id)
+{
+    if (core == 0 || link_id >= T425_CORE_PHY_MAX_ENDPOINTS)
+        return 0u;
+    return core->external_in_remaining[link_id];
 }
 
 int t425_core_link_input_consume(
@@ -164,8 +193,16 @@ int t425_core_link_input_consume(
 
     core->t425_channel_data_reg = frame;
     *byte = (uint8_t)frame;
-    if (core->boot_state != T425_BOOT_RUNNING)
+    if (core->boot_state != T425_BOOT_RUNNING) {
         core->rx_credit_rearm[link_id] = 1u;
+    } else if (core->external_in_active[link_id] != 0u) {
+        if (core->external_in_remaining[link_id] > 0u)
+            --core->external_in_remaining[link_id];
+        if (core->external_in_remaining[link_id] == 0u)
+            core->external_in_active[link_id] = 0u;
+        else
+            core->rx_credit_rearm[link_id] = 1u;
+    }
     return 0;
 }
 
@@ -213,6 +250,12 @@ void t425_core_microcycle(t425_core_t *core)
     data_reg_source = core->cpu.A;
 
     signals = (t425_condition_signals_t){0};
+    signals.ch_or_timer_req =
+        (uint8_t)(core->t425_channel_run_req & 1u);
+    signals.ch_not_timer_req =
+        (uint8_t)(core->t425_channel_run_req & 1u);
+    signals.channel_ready_not_run =
+        (uint8_t)(core->t425_channel_ready_not_run & 1u);
 
     /*
      * F20-10 — ByteWriteStrobeEnable.
@@ -280,6 +323,9 @@ void t425_core_microcycle(t425_core_t *core)
             (uint16_t)(t425_mir_channel(
                 &core->microsequencer.mir) & 0x07FFu);
 
+        if ((channel_control & 0x001u) != 0u)
+            core->t425_data_mem_addr = core->t425_channel_select;
+
         if ((channel_control & 0x080u) != 0u) {
             if (t425_channel_reset(
                     &core->memory,
@@ -289,6 +335,36 @@ void t425_core_microcycle(t425_core_t *core)
 
         if ((channel_control & 0x040u) != 0u)
             core->t425_channel_ready_not_run = 0u;
+
+        if ((channel_control & 0x020u) != 0u)
+            core->t425_alt_enabled = 1u;
+
+        if ((channel_control & 0x010u) != 0u)
+            core->t425_alt_enabled = 0u;
+
+        if ((channel_control & 0x008u) != 0u)
+            core->t425_channel_status = 0u;
+
+        if ((channel_control & 0x004u) != 0u) {
+            uint32_t endpoint = T425_CORE_PHY_MAX_ENDPOINTS;
+            uint32_t selected = core->t425_channel_select;
+            uint32_t byte_count = core->cpu.B;
+
+            core->t425_channel_ready_not_run = 1u;
+            core->t425_channel_status = 1u;
+
+            if (selected == 0x80000010u) endpoint = 0u;
+            else if (selected == 0x80000014u) endpoint = 1u;
+            else if (selected == 0x80000018u) endpoint = 2u;
+            else if (selected == 0x8000001Cu) endpoint = 3u;
+
+            if (endpoint < T425_CORE_PHY_MAX_ENDPOINTS &&
+                byte_count != 0u &&
+                core->external_in_active[endpoint] == 0u &&
+                core->external_in_remaining[endpoint] == 0u)
+                (void)t425_core_external_in_begin(
+                    core, endpoint, byte_count);
+        }
 
         if ((channel_control & 0x002u) != 0u)
             core->t425_channel_run_req = 0u;

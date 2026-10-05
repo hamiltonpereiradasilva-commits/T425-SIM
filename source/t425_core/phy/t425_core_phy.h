@@ -65,6 +65,10 @@ typedef int (*t425_core_phy_set_rx_admission_credit_fn)(
     uint32_t generation,
     bool enabled);
 
+typedef int (*t425_core_phy_set_rx_arbitration_fn)(
+    void *context,
+    bool wait_control);
+
 typedef struct
 {
     t425_core_phy_tx_fn tx_frame;
@@ -75,6 +79,7 @@ typedef struct
     t425_core_phy_write_system_outputs_fn write_system_outputs;
     t425_core_phy_set_rx_admission_fn set_rx_admission;
     t425_core_phy_set_rx_admission_credit_fn set_rx_admission_credit;
+    t425_core_phy_set_rx_arbitration_fn set_rx_arbitration;
 } t425_core_phy_ops_t;
 
 typedef struct
@@ -121,6 +126,10 @@ int t425_core_phy_set_rx_admission_credit(
     uint32_t endpoint_id,
     uint32_t generation,
     bool enabled);
+
+int t425_core_phy_set_rx_arbitration(
+    t425_core_phy_t *phy,
+    bool wait_control);
 
 #ifdef __cplusplus
 }

@@ -126,3 +126,14 @@ int t425_core_phy_set_rx_admission_credit(
     return phy->ops.set_rx_admission_credit(
         phy->ops.context, endpoint_id, generation, enabled);
 }
+
+int t425_core_phy_set_rx_arbitration(
+    t425_core_phy_t *phy,
+    bool wait_control)
+{
+    if (!t425_core_phy_endpoint_valid(phy, 0u) ||
+        phy->ops.set_rx_arbitration == 0)
+        return -1;
+    return phy->ops.set_rx_arbitration(
+        phy->ops.context, wait_control);
+}
