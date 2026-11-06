@@ -101,7 +101,9 @@ static void architectural_reset(t425_core_t *core)
 
     core->t425_channel_select = 0u;
     core->t425_channel_stack = 0u;
+    t425_channel_dma_bank_init(&core->t425_channel_dma);
     core->t425_data_mem_addr = 0u;
+    core->experimental_data_mem_addr_from_wdesc = 0u;
     core->t425_data_reg = 0u;
     core->previous_read_data = 0u;
     core->data_in = 0u;
@@ -109,6 +111,13 @@ static void architectural_reset(t425_core_t *core)
     core->two_reads_latch = 0u;
     core->clear_bwse_latch_after_write = 0u;
     core->byte_write_strobe_latch = 0u;
+    core->byte_write_pending = 0u;
+    core->byte_write_pending_mask = 0u;
+    core->byte_write_pending_clear_latch = 0u;
+    core->byte_write_pending_address = 0u;
+    core->byte_write_pending_data = 0u;
+    core->byte_write_pending_iptr = 0u;
+    core->byte_write_pending_mpc = 0u;
     core->t425_channel_data_reg = 0u;
     core->clock_reg0 = 0u;
     core->clock_reg1 = 0u;
@@ -161,7 +170,7 @@ static void enter_low_priority_process(
     uint32_t wptr)
 {
     core->cpu.IptrReg = iptr;
-    core->cpu.WptrReg = wptr;
+    /* Wdesc is the authoritative descriptor, including priority bits. */
     core->cpu.WdescReg = wptr | T425_PRIORITY_LOW;
     enter_running(core);
 }
@@ -281,6 +290,8 @@ static bool bootstrap_step(t425_core_t *core)
             uint32_t wptr =
                 (T425_MEM_START + core->bootstrap_count + 3u) & ~3u;
             enter_low_priority_process(core, T425_MEM_START, wptr);
+            core->cpu.C = 0x80000010u +
+                          ((uint32_t)core->bootstrap_link * 4u);
         }
         return true;
 

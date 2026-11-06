@@ -17,6 +17,8 @@ void t425_timer_reset(t425_timer_state_t *timer)
     *timer = (t425_timer_state_t){0};
     timer->next_high = UINT32_MAX;
     timer->next_low = UINT32_MAX;
+    /* T425 hardware clocks tick periodically from reset. */
+    timer->running = 1u;
 }
 
 void t425_timer_advance(

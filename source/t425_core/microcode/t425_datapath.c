@@ -2,6 +2,8 @@
 #include "t425_datapath.h"
 
 #include <stddef.h>
+#include <stdio.h>
+#include <stdlib.h>
 
 /*
  * XBUS:
@@ -119,79 +121,26 @@ static uint32_t decode_shift_control(const t425_mir_t *mir)
 
 static uint32_t decode_constbox(const t425_mir_t *mir)
 {
-    uint32_t selector;
-
-    selector = decode_field(
-        mir,
-        constbox_bits,
+    uint32_t selector = decode_field(
+        mir, constbox_bits,
         sizeof(constbox_bits) / sizeof(constbox_bits[0]));
+    uint32_t value = 0u;
 
-    switch (selector) {
-        case 0x000u: return 0xFFFFFFFFu; /* Minus1 */
-        case 0x800u: return 0xFFFFFFFEu; /* Minus2 */
-        case 0x400u: return 0xFFFFFFFDu; /* Minus3 */
-        case 0xC00u: return 0xFFFFFFFCu; /* Minus4 */
-        case 0x200u: return 0xFFFFFFFBu; /* Minus5 */
-
-        case 0xFFEu: return 0x80000000u; /* MinInt */
-        case 0x7FEu: return 0x80000001u;
-        case 0xBFEu: return 0x80000002u;
-        case 0x3FEu: return 0x80000003u;
-
-        case 0xFFFu: return 0x00000000u; /* Zero */
-        case 0x7FFu: return 0x00000001u; /* One */
-        case 0xBFFu: return 0x00000002u; /* Two */
-        case 0x3FFu: return 0x00000003u; /* Three */
-        case 0xDFFu: return 0x00000004u; /* Four */
-        case 0x5FFu: return 0x00000005u; /* Five */
-        case 0xEFFu: return 0x00000008u; /* Eight */
-        case 0xCFFu: return 0x0000000Cu; /* Twelve */
-        case 0xD7Fu: return 0x00000014u; /* Twenty */
-        case 0xF7Fu: return 0x00000010u; /* Sixteen */
-        case 0xFDFu: return 0x00000020u; /* ThirtyTwo */
-        case 0xDBFu: return 0x00000024u; /* ThirtySix */
-        case 0xE3Fu: return 0x00000038u; /* FiftySix */
-        case 0xF5Fu: return 0x00000040u; /* SixtyFour */
-        case 0xDDFu: return 0x00000084u; /* HundredThirtyTwo */
-        case 0xC1Fu: return 0x0000007Cu; /* HundredTwentyFour */
-        case 0x01Fu: return 0x0000007Fu; /* HundredTwentySeven */
-
-        case 0xFBEu: return 0x80000020u; /* Event */
-        case 0xEDEu: return 0x80000048u; /* ExtendFunctions */
-        case 0xC7Eu: return 0x8000001Cu; /* Link3Input */
-        case 0x00Fu: return 0x000000FFu; /* ByteMask */
-
-        case 0xF1Eu: return 0x80000070u; /* MemStart */
-        case 0x71Eu: return 0x80000071u; /* MemStart+1 */
-        case 0xE1Eu: return 0x80000078u; /* MemStart+8 */
-
-        case 0xEBEu: return 0x80000028u; /* TptrLoc1 */
-        case 0xDBEu: return 0x80000024u; /* TptrLoc0 */
-        case 0xDDEu: return 0x80000044u; /* EregIntSaveLoc */
-        case 0xCFEu: return 0x8000000Cu; /* Link3Output */
-        case 0xF7Eu: return 0x80000040u; /* StatusIntSaveLoc */
-        case 0xF3Eu: return 0x80000030u; /* IptrIntSaveLoc */
-        case 0xD3Eu: return 0x80000034u; /* AregSaveLoc */
-        case 0xE3Eu: return 0x80000038u; /* BregSaveLoc */
-        case 0xC3Eu: return 0x8000003Cu; /* CregSaveLoc */
-        case 0xC5Eu: return 0x8000005Cu; /* CRCFunctionLoc */
-        case 0xCBEu: return 0x8000002Cu; /* WdescIntSaveLoc */
-
-        case 0xFFD:
-            return 0x7F800000u; /* PositiveInfinity */
-
-        case 0x001u: return 0x7FFFFFFFu; /* MostPos */
-        case 0x801u: return 0x7FFFFFFEu; /* MostPosMinus1 */
-
-        case 0xE00u: return 0xFFFFFFF8u; /* Minus8 */
-        case 0xD00u: return 0xFFFFFFF4u; /* Minus12 */
-        case 0xF00u: return 0xFFFFFFF0u; /* Minus16 */
-        case 0xC80u: return 0xFFFFFFECu; /* Minus20 */
-        case 0x680u: return 0xFFFFFFE9u; /* Minus23 */
-
-        default:
-            return 0u;
+    /* VBC Microword[95:84]: active-low bit and group controls. */
+    for (unsigned bit = 0u; bit < 8u; ++bit) {
+        if ((selector & (UINT32_C(1) << (11u - bit))) == 0u)
+            value |= UINT32_C(1) << bit;
     }
+    if ((selector & 0x008u) == 0u)
+        value |= UINT32_C(0x0000FF00);
+    if ((selector & 0x004u) == 0u)
+        value |= UINT32_C(0x007F0000);
+    if ((selector & 0x002u) == 0u)
+        value |= UINT32_C(0x7F800000);
+    if ((selector & 0x001u) == 0u)
+        value |= UINT32_C(0x80000000);
+
+    return value;
 }
 
 
@@ -232,10 +181,10 @@ static uint32_t t425_byte_upshifter(
             return data_in >> 8;
 
         case 2u:
-            return data_in & 0x0000FFFFu;
+            return data_in >> 16;
 
         default:
-            return data_in & 0x000000FFu;
+            return data_in >> 24;
         }
     }
 
@@ -253,108 +202,36 @@ static uint32_t t425_byte_upshifter(
         d += 4;
 
     /*
-     * Special path corresponding to 0x407bf3 .. 0x407c07:
-     *
-     * C == 1
-     * B == 0
-     * AReg-1 <= 2
-     *
-     * i.e. AReg in [1,3].
+     * F212 experimental reconstruction of the functional EMUL64 helper
+     * branch tree, based on the functional binary disassembly (F209/F210).
+     * This predicate is intentionally expressed as the observed cases;
+     * do not broaden it to Boff==0 && A<=3.
      */
-    if (c == 1u && b == 0u &&
-        areg >= 1u && areg <= 3u) {
+    int short_path =
+        (c == 1u && b == 0u && areg >= 1u && areg <= 3u) ||
+        (c == 2u && (b == 0u || b == 1u) && areg >= 1u && areg <= 2u) ||
+        (c == 3u && (b == 0u || b == 1u || b == 2u) && areg == 1u);
 
-        if (d == 0)
-            return data_in;
-
-        if (d == 3)
-            return data_in >> 8;
-
-        if (d == 2)
-            return data_in & 0x0000FFFFu;
-
-        return data_in & 0x000000FFu;
+    if (short_path) {
+        switch ((uint32_t)d) {
+        case 0u: return data_in;
+        case 1u: return data_in >> 24;
+        case 2u: return data_in >> 16;
+        default: return data_in >> 8;
+        }
     }
 
-    /*
-     * 0x407c40 .. 0x407c5f
-     *
-     * C == 2
-     * B != 0
-     * AReg-1 <= 1
-     *
-     * The actual branch enters the common special selector.
-     */
-    if (c == 2u && b != 0u &&
-        areg >= 1u && areg <= 2u) {
-
-        if (d == 0)
-            return data_in;
-
-        if (d == 3)
-            return data_in >> 8;
-
-        if (d == 2)
-            return data_in & 0x0000FFFFu;
-
-        return data_in & 0x000000FFu;
-    }
-
-    /*
-     * C == 3
-     * B != 0
-     * AReg == 1
-     *
-     * 0x407c61 .. 0x407c74
-     */
-    if (c == 3u && b != 0u && areg == 1u) {
-
-        if (d == 0)
-            return data_in;
-
-        if (d == 3)
-            return data_in >> 8;
-
-        if (d == 2)
-            return data_in & 0x0000FFFFu;
-
-        return data_in & 0x000000FFu;
-    }
-
-    /*
-     * Common reconstruction path.
-     *
-     * 0x407c7c .. 0x407ca9
-     */
+    /* Functional-binary common reconstruction path. */
     switch ((uint32_t)d) {
-
     case 0u:
         return data_in;
-
     case 1u:
-        /*
-         * 0x407d40:
-         *   DataInReg << 8
-         *   | PreviousReadReg byte at +3
-         */
         return (data_in << 8) |
                ((previous_read >> 24) & 0x000000FFu);
-
     case 2u:
-        /*
-         * 0x407d60:
-         *   DataInReg << 16
-         *   | PreviousReadReg low 16 bits
-         */
         return (data_in << 16) |
-               (previous_read & 0x0000FFFFu);
-
+               (previous_read >> 16);
     default:
-        /*
-         * 0x407c9b:
-         *   DataInReg << 24
-         *   | PreviousReadReg >> 8
-         */
         return (data_in << 24) |
                (previous_read >> 8);
     }
@@ -376,7 +253,7 @@ static uint32_t select_xbus(
         case 0x040u: return channel_data; /* ChannelData */
         case 0x020u: return data_in; /* DataIn */
         case 0x010u: return cpu->A;
-        case 0x008u: return cpu->WptrReg;
+        case 0x008u: return cpu->WdescReg & ~3u; /* shared Wdesc storage, Wptr view */
         case 0x004u: return cpu->WdescReg;
         case 0x002u: return (fptr0 != NULL) ? *fptr0 : 0u; /* FPtrReg0 */
         case 0x001u: return (fptr1 != NULL) ? *fptr1 : 0u; /* FPtrReg1 */
@@ -393,24 +270,31 @@ static uint32_t select_ybus(
     uint32_t *clock_reg0,
     uint32_t *clock_reg1)
 {
-    switch (selector) {
-        case 0x1000u: return cpu->Oreg << 2;
-        case 0x0800u: return cpu->Oreg;
-        case 0x0400u: return constbox;
-        case 0x0200u: return cpu->Ereg;
-        case 0x0100u: return cpu->B;
-        case 0x0080u: return cpu->C << 1;
-        case 0x0040u: return cpu->C;
-        case 0x0020u: return (bptr0 != NULL) ? *bptr0 : 0u; /* BPtrReg0 */
-        case 0x0010u: return (bptr1 != NULL) ? *bptr1 : 0u; /* BPtrReg1 */
-        case 0x0008u: return cpu->StatusReg;
-        case 0x0004u:
-            return (clock_reg1 != NULL) ? *clock_reg1 : 0u; /* ClockReg1 */
-        case 0x0002u:
-            return (clock_reg0 != NULL) ? *clock_reg0 : 0u; /* ClockReg0 */
-        case 0x0001u: return 0u; /* Byte select */
-        default: return 0u;
+    uint32_t source_selector = selector & ~0x0001u;
+    uint32_t ybus;
+
+    /* ByteSelMask qualifies the normal Y source; it is not a source itself. */
+    switch (source_selector) {
+        case 0x1000u: ybus = cpu->Oreg << 2; break;
+        case 0x0800u: ybus = cpu->Oreg; break;
+        case 0x0400u: ybus = constbox; break;
+        case 0x0200u: ybus = cpu->Ereg; break;
+        case 0x0100u: ybus = cpu->B; break;
+        case 0x0080u:
+            ybus = (uint32_t)(((uint32_t)cpu->C << 1) |
+                              (((uint32_t)cpu->BSlave >> 31) & 1u));
+            break;
+        case 0x0040u: ybus = cpu->C; break;
+        case 0x0020u: ybus = (bptr0 != NULL) ? *bptr0 : 0u; break;
+        case 0x0010u: ybus = (bptr1 != NULL) ? *bptr1 : 0u; break;
+        case 0x0008u: ybus = cpu->StatusReg; break;
+        case 0x0004u: ybus = (clock_reg1 != NULL) ? *clock_reg1 : 0u; break;
+        case 0x0002u: ybus = (clock_reg0 != NULL) ? *clock_reg0 : 0u; break;
+        case 0x0000u: ybus = 0u; break; /* qualifier without a source */
+        default: return 0u; /* preserve the existing invalid-source fallback */
     }
+
+    return (selector & 0x0001u) ? (ybus & 0x00000003u) : ybus;
 }
 
 static uint32_t execute_alu(
@@ -461,6 +345,7 @@ static uint32_t execute_alu(
 
         case 0x58u: /* Y - (X + 1) */
             z = y - (x + 1u);
+            datapath->alu_carryout = (uint8_t)(y > x);
             break;
 
         case 0x30u: /* X */
@@ -473,10 +358,12 @@ static uint32_t execute_alu(
 
         case 0x72u: /* -X */
             z = 0u - x;
+            datapath->alu_carryout = (uint8_t)(x == 0u);
             break;
 
         case 0x5Au: /* Y - X */
             z = y - x;
+            datapath->alu_carryout = (uint8_t)(y >= x);
             break;
 
         case 0x1Au: /* Y + X + 1 */
@@ -500,10 +387,12 @@ static uint32_t execute_alu(
 
         case 0x26u: /* X - Y */
             z = x - y;
+            datapath->alu_carryout = (uint8_t)(x >= y);
             break;
 
         case 0x66u: /* -Y */
             z = 0u - y;
+            datapath->alu_carryout = (uint8_t)(y == 0u);
             break;
 
         case 0x01u: /* 0 */
@@ -674,7 +563,9 @@ static void write_zbus_destination(
     t425_cpu_state_t *cpu,
     uint32_t *channel_select,
     uint32_t *channel_stack,
+    t425_channel_dma_bank_t *channel_stack_bank,
     uint32_t *data_mem_addr,
+    uint8_t *data_mem_addr_from_wdesc,
     uint32_t *fptr0,
     uint32_t *fptr1,
     uint32_t *bptr0,
@@ -724,6 +615,7 @@ static void write_zbus_destination(
     }
 
     if ((selector & 0x00800u) != 0u) {
+        /* Wdesc is the single stored descriptor; Wptr is its aligned read view. */
         cpu->WdescReg = z;
     }
 
@@ -739,12 +631,22 @@ static void write_zbus_destination(
         *channel_select = z;
     }
 
-    if ((selector & 0x00002u) != 0u && channel_stack != NULL) {
-        *channel_stack = z;
+    if ((selector & 0x00002u) != 0u &&
+        channel_stack_bank != NULL &&
+        channel_select != NULL &&
+        t425_channel_dma_push_zbus(
+            channel_stack_bank, *channel_select, z)) {
+        /* Retain the legacy scalar only as a diagnostic mirror. */
+        if (channel_stack != NULL) {
+            *channel_stack = z;
+        }
     }
 
     if ((selector & 0x00001u) != 0u && data_mem_addr != NULL) {
         *data_mem_addr = z;
+        if (data_mem_addr_from_wdesc != NULL)
+            *data_mem_addr_from_wdesc =
+                (uint8_t)((selector & 0x00800u) != 0u);
     }
 
     /*
@@ -817,6 +719,7 @@ void t425_datapath_reset(t425_datapath_t *datapath)
     datapath->ybus_byte_select = 0u;
 
     t425_incrementor_reset(&datapath->incrementor);
+    datapath->channel_stack_bank = NULL;
 }
 
 void t425_datapath_execute(
@@ -825,6 +728,7 @@ void t425_datapath_execute(
     uint32_t *channel_select,
     uint32_t *channel_stack,
     uint32_t *data_mem_addr,
+    uint8_t *data_mem_addr_from_wdesc,
     uint32_t channel_data,
     uint32_t *fptr0,
     uint32_t *fptr1,
@@ -836,8 +740,10 @@ void t425_datapath_execute(
     uint32_t *tnext_reg1,
     const t425_mir_t *mir,
     uint32_t data_in,
+    uint32_t data_in_reg,
     uint32_t previous_read_data,
     uint8_t byte_write_strobe_latch,
+    uint16_t current_mpc,
     t425_condition_signals_t *signals)
 {
     uint32_t xsel;
@@ -859,25 +765,19 @@ void t425_datapath_execute(
     }
 
     /*
-     * T425 stack condition taps.
-     *
-     * These are combinational slave taps sampled from the register
-     * state entering the microcycle. They must be captured before
-     * any stack/shift destination is applied by this microword.
+     * Experimental F1 condition taps read persistent Slave state.
+     * The preceding datapath call captured it after its destinations.
      */
-    signals->a_slave0 = (uint8_t)(cpu->A & 1u);
-    signals->b_slave0 = (uint8_t)(cpu->B & 1u);
-    signals->b_slave1 = (uint8_t)((cpu->B >> 1) & 1u);
-    signals->b_slave_msb = (uint8_t)((cpu->B >> 31) & 1u);
-    signals->c_slave_msb = (uint8_t)((cpu->C >> 31) & 1u);
+    signals->a_slave0 = (uint8_t)(cpu->ASlave & 1u);
+    signals->b_slave0 = (uint8_t)(cpu->BSlave & 1u);
+    signals->b_slave1 = (uint8_t)((cpu->BSlave >> 1) & 1u);
+    signals->b_slave_msb = (uint8_t)((cpu->BSlave >> 31) & 1u);
+    signals->c_slave_msb = (uint8_t)(cpu->CSlave >> 31);
 
-    /*
-     * Stack transfers are parallel operations. Preserve the complete
-     * pre-microcycle A/B/C state before applying any stack destination.
-     */
-    old_a = cpu->A;
-    old_b = cpu->B;
-    old_c = cpu->C;
+    /* Stack transfers are parallel and consume persistent Slave values. */
+    old_a = cpu->ASlave;
+    old_b = cpu->BSlave;
+    old_c = cpu->CSlave;
 
     stacksel = decode_stack_control(mir);
     shiftsel = decode_shift_control(mir);
@@ -920,9 +820,11 @@ void t425_datapath_execute(
             cpu->A,
             cpu->B,
             cpu->C,
-            data_in,
+            data_in_reg,
             previous_read_data,
             byte_write_strobe_latch);
+    
+    
 
     datapath->xbus =
         select_xbus(xsel, cpu, datapath->constbox, data_in,
@@ -944,6 +846,7 @@ void t425_datapath_execute(
             datapath->ybus,
             datapath);
 
+
     execute_shift_control(
         cpu,
         shiftsel,
@@ -956,7 +859,9 @@ void t425_datapath_execute(
         cpu,
         channel_select,
         channel_stack,
+        datapath->channel_stack_bank,
         data_mem_addr,
+        data_mem_addr_from_wdesc,
         fptr0,
         fptr1,
         bptr0,
@@ -988,13 +893,13 @@ void t425_datapath_execute(
     /*
      * T425 A/B/C stack control.
      *
-     * The Slave sources are the register values captured at the
-     * beginning of this microcycle, not values modified above.
+     * Slave sources are persistent state captured after the prior
+     * datapath operation and before its memory/DataIn commit.
      */
     /*
      * T425 A/B/C stack control is a parallel control field.
      * Multiple controls may be asserted in the same microword.
-     * All Slave sources use the pre-microcycle snapshot.
+     * Multiple controls remain parallel and use the same Slave state.
      */
     if ((stacksel & 0x10u) != 0u) {       /* AregfromBregSlave */
         cpu->A = old_b;
@@ -1068,37 +973,15 @@ void t425_datapath_execute(
     signals->not_carryout =
         datapath->alu_carryout ? 0u : 1u;
 
-    /*
-     * T425 DIVSTEP condition generation.
-     *
-     * Physical source:
-     *
-     *     Cslave[15] = bit 15 of the pre-microcycle C register.
-     *
-     * Documented DIVSTEP equations:
-     *
-     *     DivStep0 = Carryout XOR Cslave[15]
-     *     DivStep1 = NotCarryout XOR Cslave[15]
-     *
-     * The C slave value must come from the register state
-     * captured at the beginning of this microcycle, not from
-     * the possibly modified CPU C register.
-     */
+    /* F28 approved DIVSTEP equations; localized to this signal block. */
     {
-        uint8_t c_slave_15 =
-            (uint8_t)((old_c >> 15) & 1u);
+        uint8_t m = (uint8_t)(alusel & 1u);
+        uint8_t z_sign = (uint8_t)((datapath->zbus >> 31) & 1u);
+        uint8_t c = (uint8_t)(datapath->alu_carryout & 1u);
+        uint8_t cs = (uint8_t)((old_c >> 31) & 1u);
 
-        uint8_t carryout =
-            (uint8_t)(datapath->alu_carryout & 1u);
-
-        uint8_t not_carryout =
-            (uint8_t)(signals->not_carryout & 1u);
-
-        signals->div_step0 =
-            (uint8_t)(carryout ^ c_slave_15);
-
-        signals->div_step1 =
-            (uint8_t)(not_carryout ^ c_slave_15);
+        signals->div_step0 = m ? z_sign : (uint8_t)(1u ^ (c ^ cs));
+        signals->div_step1 = m ? (uint8_t)(1u ^ z_sign) : (uint8_t)(c ^ cs);
     }
 
     signals->not_alu_prop_all1 =
@@ -1109,4 +992,14 @@ void t425_datapath_execute(
 
     signals->overflow =
         datapath->alu_overflow;
+
+    /*
+     * Experimental F1: capture post-datapath masters after all MIR
+     * destinations, but before core_microcycle commits MemRead /
+     * AregfromDataIn. Reset zeroes masters and Slaves together. Test
+     * fixtures that seed A/B/C seed the corresponding Slaves too.
+     */
+    cpu->ASlave = cpu->A;
+    cpu->BSlave = cpu->B;
+    cpu->CSlave = cpu->C;
 }

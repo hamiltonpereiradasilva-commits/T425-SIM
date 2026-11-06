@@ -11,8 +11,15 @@
 #include "t425_scheduler.h"
 #include "t425_timer.h"
 #include "t425_core_phy.h"
+#include "t425_channel_dma_foundation_01.h"
+#include "t425_channel_admission_21.h"
+#include "t425_channel_dma_shift_05.h"
+#include "t425_channel_dma_rx_adapter_10.h"
+#include "t425_channel_vbc_model_req03_06.h"
 
 #define T425_MAX_PROCESS_CONTEXTS 32u
+
+struct t425_channel_compat_rx_adapter_07;
 
 /*
  * Normal T425 process context.
@@ -83,7 +90,22 @@ typedef struct
     /* T425 VBC internal channel machinery. */
     uint32_t t425_channel_select;
     uint32_t t425_channel_stack;
+    t425_channel_dma_bank_t t425_channel_dma;
+    t425_channel_admission_21_t channel_admission;
+    /* F05 uses the same F17 bank and this CORE instance memory. */
+    t425_channel_dma_memory_04_t channel_dma_memory;
+    t425_channel_dma_shift_05_t channel_dma_shift;
+    t425_channel_dma_rx_adapter_10_t channel_dma_rx_adapter_10;
+    uint8_t channel_dma_rx_adapter_10_initialized;
+    /* Optional REA-08 callbacks; NULL in the legacy/default profile. */
+    void *channel_compat_profile_08_context;
+    void (*channel_compat_profile_08_microstep)(void *context, void *core);
+    uint8_t (*channel_compat_profile_08_reduce)(void *context);
+    bool (*channel_compat_profile_08_clear)(
+        void *context, uint32_t selected_channel, uint16_t mir_control);
+    bool (*channel_compat_profile_08_service)(void *context, void *core);
     uint32_t t425_data_mem_addr;
+    uint8_t experimental_data_mem_addr_from_wdesc;
     uint32_t t425_data_reg;
 
     /*
@@ -101,6 +123,9 @@ typedef struct
     uint8_t  t425_channel_run_req;
     uint8_t  t425_channel_status;
     uint8_t  t425_alt_enabled;
+
+    /* F57: integrated REQ03 channel request/gate state. */
+    channel_vbc_state_t channel_vbc_state;
 
     /* Non-owning optional portable CORE PHY attachment. */
     t425_core_phy_t *phy;
@@ -168,15 +193,21 @@ typedef struct
     /*
      * T425 memory-interface read pipeline.
      *
-     * previous_read_data is the result produced by MemRead.
-     * data_in is the DataIn interface value selected by the
-     * following microinstruction through DataInfromPrevReadReg.
+     * data_in_reg is the authoritative functional DataInReg consumed
+     * by XBUS and ByteUpShifter. data_in is a public compatibility
+     * mirror synchronized by the CORE at interface commits.
+     * previous_read_data is the separate PreviousReadReg value.
      */
     uint32_t previous_read_data;
     uint32_t data_in;
 
     /* F20-10-05D — physical DataInReg. */
     uint32_t data_in_reg;
+
+    /* Experimental delayed MemRead pipeline for F_CORE_PROCESS_RESUME_04. */
+    uint8_t memory_read_pending;
+    uint8_t memory_read_pending_areg;
+    uint32_t memory_read_pending_address;
 
     /* F20-10-05D — physical TwoReadsLatch. */
     uint8_t two_reads_latch;
@@ -191,6 +222,15 @@ typedef struct
      */
     uint8_t byte_write_strobe_latch;
 
+    /* F45: byte transaction staged for the next MemoryInterface boundary. */
+    uint8_t byte_write_pending;
+    uint8_t byte_write_pending_mask;
+    uint8_t byte_write_pending_clear_latch;
+    uint32_t byte_write_pending_address;
+    uint32_t byte_write_pending_data;
+    uint32_t byte_write_pending_iptr;
+    uint16_t byte_write_pending_mpc;
+
     t425_datapath_t datapath;
     t425_memory_t memory;
     t425_scheduler_state_t scheduler;
@@ -198,6 +238,50 @@ typedef struct
     uint64_t cycles;
     uint64_t instructions;
 } t425_core_t;
+
+/* Service ACTIVE F28 -> F10/F05 RX and REQUEST_PENDING -> F05 handoff. */
+bool t425_core_channel_dma_service(t425_core_t *core);
+bool t425_core_channel_compat_profile_08_enable(
+    t425_core_t *core, struct t425_channel_compat_rx_adapter_07 *adapter,
+    const uint8_t lane_ids[4]);
+
+bool t425_core_channel_admission_configure_route(
+    t425_core_t *core, uint32_t architectural_channel,
+    uint8_t endpoint, uint8_t physical_link);
+bool t425_core_channel_admission_get_request(
+    const t425_core_t *core, uint32_t architectural_channel,
+    t425_channel_admission_request_21_t *request);
+/* Validate and snapshot an already ACTIVE F21/F05 session without mutation.
+ * Expected route and operation identity are supplied by the caller so stale
+ * sessions or a changed endpoint/link route fail closed. */
+bool t425_core_channel_admission_get_active_compat_input(
+    const t425_core_t *core, uint32_t architectural_channel,
+    uint32_t expected_request_id, uint32_t expected_operation_generation,
+    uint8_t expected_endpoint, uint8_t expected_physical_link,
+    t425_channel_admission_request_21_t *request);
+bool t425_core_channel_admission_get_active(
+    const t425_core_t *core, uint32_t architectural_channel,
+    uint32_t expected_request_id, uint32_t expected_operation_generation,
+    uint8_t expected_endpoint, uint8_t expected_physical_link,
+    t425_channel_admission_request_21_t *request);
+bool t425_core_channel_admission_report_begin(
+    t425_core_t *core, uint32_t architectural_channel, uint32_t request_id,
+    t425_channel_admission_begin_result_21_t result);
+bool t425_core_channel_admission_report_complete_compat_input(
+    t425_core_t *core, uint32_t architectural_channel,
+    uint32_t operation_generation);
+bool t425_core_channel_admission_retire_compat_input(
+    t425_core_t *core, uint32_t architectural_channel,
+    uint32_t operation_generation);
+bool t425_core_channel_admission_report_complete(
+    t425_core_t *core, uint32_t architectural_channel,
+    uint32_t operation_generation);
+bool t425_core_channel_admission_retire(
+    t425_core_t *core, uint32_t architectural_channel,
+    uint32_t operation_generation);
+bool t425_core_channel_admission_abort(
+    t425_core_t *core, uint32_t architectural_channel,
+    uint32_t operation_generation);
 
 #define T425_STEP_OK        0
 #define T425_STEP_HALTED    1

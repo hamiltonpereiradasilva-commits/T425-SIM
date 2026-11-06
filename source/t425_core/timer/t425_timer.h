@@ -20,9 +20,9 @@ typedef struct
     uint8_t interrupt_low_enabled;
 
     /*
-     * Private simulator metadata.
-     * Indicates that the simulated timer clocks have been started
-     * by STTIMER. This is not a T425 architectural register.
+     * Private simulator metadata enabling periodic clock advancement.
+     * T425 clock dividers run from architectural reset; STTIMER loads
+     * clock values but does not start the periodic clock source.
      */
     uint8_t running;
 
