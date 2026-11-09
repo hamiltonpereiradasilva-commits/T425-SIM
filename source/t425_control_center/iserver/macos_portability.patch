@@ -1,0 +1,75 @@
+--- a/iserver/src/server.h
++++ b/iserver/src/server.h
+@@ -34,6 +34,10 @@
+ #define MAX_BOOT_FILE_LENGTH      256
+ #define MAX_STRING_LENGTH         256
+ 
++/* F296 macOS host definitions */
++#ifdef F296_MACOS
++#include "macos.h"
++#else
+ /* machine specific stuff  */
+ #ifndef MSDOS
+ #ifndef VMS
+@@ -127,6 +131,8 @@
+ #define OS_ID        OS_HELIOS
+ #endif
+ 
++#endif /* F296_MACOS */
++
+ #ifndef HOST_ID
+ #define HOST         "???"
+ #define HOST_ID BOX_X
+--- a/iserver/src/sh.c
++++ b/iserver/src/sh.c
+@@ -64,8 +64,10 @@
+ 
+ static char OptionStr[MAX_STRING_LENGTH];
+ 
+-static int debug;
++int debug;
+ static int LinkValid=1;
++static int execute();
++static int initcmds();
+ 
+ static char StdIn[MAX_STRING_LENGTH], StdOut[MAX_STRING_LENGTH], StdErr[MAX_STRING_LENGTH];
+ 
+@@ -82,7 +84,6 @@
+ char *str;
+ {
+    char  *new;
+-   char  *malloc();
+    
+    new = malloc(strlen(str)+1);
+    if (new == NULL)
+@@ -643,8 +644,6 @@
+    int   cmdnum=1;
+    char  line[MAX_STRING_LENGTH];
+    char  *sp;
+-   char  *malloc();
+-   char  *getenv();
+    FILE  *fd;
+ 
+    extcmds[0].cmdname = "iserver";
+--- a/iserver/src/record.c
++++ b/iserver/src/record.c
+@@ -5,7 +5,7 @@
+ 
+ #include <stdio.h>
+ #ifndef VMS
+-#include <malloc.h>
++#include <stdlib.h>
+ #endif
+ #include "server.h"
+ #include "iserver.h"
+--- a/iserver/src/filec.c
++++ b/iserver/src/filec.c
+@@ -902,8 +902,6 @@
+    FILE  *fd;
+    int   size;
+    int   forg=0;
+-   extern int  sys_nerr;
+-   extern char *sys_errlist[];
+    
+    dbgmsg("SP.ERRSTAT");
+ 

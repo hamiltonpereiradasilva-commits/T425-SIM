@@ -1,0 +1,21 @@
+F296 — Implementação Python
+
+Versão alvo testada: Python 3.9.6 do Command Line Tools, Tk 8.5. O Python 3.14 padrão do shell está sem módulo _tkinter; o instalador usa /usr/bin/python3 e venv local sem alterar Python global.
+
+Dependências venv:
+- PyUSB 1.3.1.
+- PySerial 3.5.
+
+Implementado:
+- Desktop Tkinter/ttk com indicadores T425/LinkUSB/Core1/boot, tabela T425 Link0–3 e LINKUSB Link0–1, DATA/ACK, bytes USB, filas e erros observáveis.
+- Os valores LinkUSB incluem deltas entre snapshots; indicadores refletem B4/CDC e não afirmam captura elétrica.
+- Identificação T425 por 2E8A:000A e serial 50444672C0A3541C. Consulta F271? com 115200, DTR=True e RTS=True.
+- Identificação LINKUSB por 1209:4250 e validação de produto/serial quando apresentados pelo dispositivo, config 1, interface 0, Bulk OUT 02 e Bulk IN 86.
+- B4 é EP0 0xB4, wValue 0, wIndex do link, 56 bytes, magic F271/version 1. O app não lê Bulk IN.
+- Diálogo nativo de arquivo .BTL e validação SHA-256, tamanho e byte inicial; não transmite.
+- Console cronológico com timestamps, origem, job/operação/duração/resultado; salvar console e snapshot como TXT.
+- Configuração local guarda somente último caminho BTL em ~/Library/Application Support/T425-SIM Control Center/config.json.
+- Atualização da GUI ocorre pela fila de eventos na thread Tk; I/O CDC/USB e IServer correm fora da thread gráfica.
+
+Artefato Hello World incluído:
+examples-hello-t425-test.btl, 3267 bytes, SHA-256 36af0ff47e059603b1fd18ca832c668ab519ea7cfa3c9bd8db364f8f8a1b661a, primeiro byte F0. Não é carregado automaticamente.

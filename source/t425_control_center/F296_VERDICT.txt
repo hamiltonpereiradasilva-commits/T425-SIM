@@ -1,0 +1,18 @@
+F296 — Veredito
+
+PASS_CANDIDATE_READY_FOR_F297_REVIEW — SEM VALIDAÇÃO FÍSICA
+
+Aceito nesta etapa:
+- Janela desktop Tkinter/ttk abre e fecha em teste, sem navegador.
+- Tela responsiva por worker/fila; diagnósticos simulados e logs funcionam.
+- Seleção/validação do BTL funciona; hash, tamanho e primeiro byte conferidos.
+- IServer INMOS original 1.50v compilado para macOS x86_64 e executável de help smoke.
+- Backend LinkIO C compila e passa testes unitários com callbacks simulados.
+- Execução real continua desabilitada, sem reset, boot, Bulk ou tráfego físico.
+
+Limitação bloqueadora para operação de produção:
+- Telemetria F271/B4 não possui estado remoto suficiente para TestError. O backend retorna -1 em TestError; portanto o IServer error-detect não é suportado. ResetLink e AnalyseLink também não são implementados. A linha futura configurada usa -sc/-ss e não pede reset/analyse nem error-detect.
+- O BTL completo nunca foi enviado ao T425 nesta etapa; o Hello World físico não foi executado.
+- Para futura operação, o T425 precisa primeiro retornar a WAIT_CONTROL via procedimento F289/F290 autorizado; F294 havia deixado o CORE em LOAD após A5. Nenhum reset ocorreu na F296.
+
+Sem alteração da árvore canônica e sem flash/transmissão. Requer revisão arquitetural e autorização separada antes de habilitar modo EXECUÇÃO em F297.

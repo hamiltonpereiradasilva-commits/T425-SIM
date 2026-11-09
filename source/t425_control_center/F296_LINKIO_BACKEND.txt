@@ -1,0 +1,32 @@
+F296 — Backend LinkIO nativo
+
+Arquivo: iserver/linkusb_linkio.c/.h; compilado para macOS x86_64 e ligado ao IServer INMOS original.
+Transporte: uma sessão libusb, config 1, interface 0, endpoints Link0 OUT 0x02 / IN 0x86. Resource LinkOps: linkusb0.
+
+OpenLink:
+- Aceita somente linkusb0/usb0, toma lock exclusivo, abre VID:PID 1209:4250, exige config 1, valida interface/endpoints Bulk MPS 64, reivindica interface e valida B4 Link0.
+- Não altera o protocolo USB nem envia dados durante a abertura.
+
+WriteLink:
+- Envia um byte Bulk OUT por chamada; aguarda ACK_RX B4 antes de avançar ao byte seguinte.
+- O retorno conta somente bytes com ACK_RX observado; bytes apenas aceitos pelo USB não são contados como progresso LinkIO.
+- Em timeout/erro devolve progresso ACK-confirmado; sem progresso retorna -1. Não repete o byte que ficou sem confirmação.
+- Timeout LinkIO da versão INMOS é em décimos de segundo (LOPS define 30 = 3 s); conversão para libusb ms está implementada.
+- A confirmação é o contador ACK decodificado pelo firmware LINKUSB, não captura elétrica direta.
+
+ReadLink:
+- Bulk IN com timeout convertido de décimos de segundo para ms; timeout sem dados retorna zero, erro de transporte retorna -1 e leitura parcial retorna o número efetivamente recebido.
+- Este caminho só é usado pelo IServer em execução autorizada; não pelo modo de diagnóstico GUI.
+
+TestRead/TestWrite:
+- Consultam filas/tx_ready do B4, sem remover Bulk IN e sem transmitir.
+
+TestError:
+- Retorna -1 (indisponível). B4 atual não expõe erro remoto do transputer; usar B2 como erro do alvo seria incorreto, pois seu estado representa sinais administrativos/subsistema USB. IServer em modo error-detect não é suportado por este backend.
+
+ResetLink/AnalyseLink:
+- Retornam -1 explicitamente. Não controlam RESET/ANALYSE do T425, não usam B3 e não fingem suporte.
+
+Teste C:
+- Callbacks substitutos verificaram escrita completa e parcial, zero progresso/timeouts, leitura parcial, timeout de leitura, erro de leitura, TestError indisponível e Reset/Analyse indisponíveis.
+- LINKIO_BACKEND_TEST_PASS.

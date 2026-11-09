@@ -1,0 +1,23 @@
+F296 — Integração do IServer
+
+Fontes INMOS 1.50v foram copiados sem alteração para iserver/original/ a partir de /work/t425-canonical/third_party/inmos/iserver-1.50v/. Código original Boot(), Serve(), SpCommand, OPS_GetRequest e OPS_SendReply continua sendo usado.
+
+A adaptação local:
+- iserver/linkusb_linkio.c exporta LinkIO comum usado por LOPS.
+- iserver/patch_linkops.py acrescenta uma rota direta para resource linkusb0 em uma cópia de linkops.c; restante de OPS/LOPS e todo SP permanecem INMOS.
+- iserver/build_macos.sh copia fontes originais para build/iserver-src e aplica patches apenas nessa árvore.
+- Ajustes de portabilidade isolados: host header macOS, malloc.h→stdlib.h, declarations de sys_errlist obsoletas removidas, declaração de debug de shell. Não alteram Boot/Serve/SP.
+- A única invocação planejada é -sc <BTL> -ss -sl linkusb0. -sc carrega, -ss serve, -sl seleciona LinkIO.
+- Não usar -sb, pois ativa OPS_Reset além de Load/Serve e ResetLink não é suportado.
+- TestError permanece indisponível; não ativar -se.
+
+IServer process Python:
+- subprocess.Popen com stdout/stderr em pipes.
+- Dois leitores de pipe encaminham cada linha como evento; a UI não espera o processo.
+- terminate() encerra o processo host apenas; não é apresentado como Stop do guest.
+- Por proteção F296, o runner é construído com enabled=False; start() falha antes de executar. O app não iniciou o IServer.
+
+Build:
+- binário build/bin/iserver-linkusb, Mach-O 64-bit x86_64.
+- Smoke sem argumentos imprimiu usage/version do IServer e saiu 252, conforme comportamento original de falta de argumentos. Não abriu USB.
+- Não foi executado Boot, Serve com placa, Hello World ou qualquer tráfego Link0.

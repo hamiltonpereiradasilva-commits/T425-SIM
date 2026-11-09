@@ -1,0 +1,152 @@
+--- a/iserver/sp_reply_diag.h
++++ b/iserver/sp_reply_diag.h
+@@ -8,5 +8,8 @@
+ void sp_reply_diag_record(const char *stage, unsigned long long txn, int rc,
+                           const void *tbuf, const void *outbuf, const void *inbuf,
+                           int outcount, int calculated_length, const void *argbuf);
++void sp_reply_diag_put_count(const char *stage, unsigned long long txn,
++                             unsigned int len, const void *len_address,
++                             const void *tbuf, const void *outbuf, int outcount);
+ 
+ #endif
+--- a/iserver/sp_reply_diag.c
++++ b/iserver/sp_reply_diag.c
+@@ -67,3 +67,21 @@
+     fputc('\n', stderr);
+     fflush(stderr);
+ }
++
++void sp_reply_diag_put_count(const char *stage, unsigned long long txn,
++                             unsigned int len, const void *len_address,
++                             const void *tbuf, const void *outbuf, int outcount)
++{
++    unsigned long long seq = increment(&event_sequence);
++    const unsigned char *tb = (const unsigned char *)tbuf;
++    fprintf(stderr,
++            "[SP_REPLY_DIAG] seq=%llu txn=%llu stage=%s len=%u len_hex=0x%08X "
++            "len_address=%p Tbuf=%p Tbuf4=",
++            seq, txn, stage, len, len, len_address, tbuf);
++    if (tb == NULL)
++        fputs("null", stderr);
++    else
++        fprintf(stderr, "%02X %02X %02X %02X", tb[0], tb[1], tb[2], tb[3]);
++    fprintf(stderr, " OutBuf=%p OutCount=%d\n", outbuf, outcount);
++    fflush(stderr);
++}
+--- a/iserver/patch_sp_reply_diag.py
++++ b/iserver/patch_sp_reply_diag.py
+@@ -7,6 +7,7 @@
+ serve = root / "iserver/src/serve.c"
+ filec = root / "iserver/src/filec.c"
+ lops = root / "linkops/src/lops.c"
++pack = root / "iserver/src/pack.c"
+ 
+ 
+ def replace_once(path, old, new, label):
+@@ -16,7 +17,7 @@
+     path.write_text(text.replace(old, new, 1))
+ 
+ # The diagnostic helper and pack globals are included only in disposable copies.
+-for path in (serve, filec, lops):
++for path in (serve, filec, lops, pack):
+     text = path.read_text()
+     marker = '#include "sp_reply_diag.h"\n'
+     if marker in text:
+@@ -66,10 +67,40 @@
+         '       Tbuf, OutBuf, InBuf, OutCount, -1, Tbuf);\n'
+         '   dbgmsg("SP.PUTS");\n')
+         .replace('   put_count(OutCount);\n',
++        '   sp_reply_diag_put_count("E_SP_PUTS_BEFORE_PUT_COUNT", sp_reply_diag_current(),\n'
++        '       (unsigned int)OutCount, &OutCount, Tbuf, OutBuf, OutCount);\n'
+         '   put_count(OutCount);\n'
++        '   sp_reply_diag_put_count("E_SP_PUTS_AFTER_PUT_COUNT", sp_reply_diag_current(),\n'
++        '       (unsigned int)OutCount, &OutCount, Tbuf, OutBuf, OutCount);\n'
+         '   sp_reply_diag_record("B_SP_PUTS_EXIT", sp_reply_diag_current(), -1,\n'
+         '       Tbuf, OutBuf, InBuf, OutCount, (int)Tbuf[0] + 256*(int)Tbuf[1], Tbuf);\n'),
+     'SpPuts body')
++
++# put_count probes are restricted to the diagnostic build copy and only active
++# while the correlated SP_PUTS transaction is being processed.
++text = pack.read_text()
++start = text.find('void put_count(len)')
++end = text.find('\n/* Pack bottom 16-bits', start)
++if start < 0 or end < 0:
++    raise SystemExit('cannot isolate put_count body')
++part = text[start:end]
++entry_anchor = '   register unsigned char *cp;\n'
++if part.count(entry_anchor) != 1:
++    raise SystemExit('put_count local declaration anchor is not unique')
++part = part.replace(entry_anchor, entry_anchor +
++    '   if (sp_reply_diag_is_puts())\n'
++    '      sp_reply_diag_put_count("E_PUT_COUNT_ENTRY", sp_reply_diag_current(),\n'
++    '          len, &len, Tbuf, OutBuf, OutCount);\n', 1)
++write_anchor = '#endif /* BIG_ENDIAN */\n}'
++if part.count(write_anchor) != 1:
++    raise SystemExit('put_count post-write anchor is not unique')
++part = part.replace(write_anchor,
++    '#endif /* BIG_ENDIAN */\n'
++    '   if (sp_reply_diag_is_puts())\n'
++    '      sp_reply_diag_put_count("E_PUT_COUNT_AFTER_HEADER_WRITE", sp_reply_diag_current(),\n'
++    '          len, &len, Tbuf, OutBuf, OutCount);\n'
++    '}', 1)
++pack.write_text(text[:start] + part + text[end:])
+ 
+ # LOPS_SendReply: observe the actual argument at entry, before header validation.
+ anchor = '  DebugMessage (fprintf (stderr, "[LOPS_SendReply\\n") );\n'
+--- a/services/controller.py
++++ b/services/controller.py
+@@ -8,7 +8,7 @@
+ from pathlib import Path
+ 
+ APP_SUPPORT = Path.home() / "Library" / "Application Support" / "T425-SIM Control Center"
+-DIAGNOSTIC_EXECUTABLE_SHA256 = "d1e330929e3b870f552b6557ee8a2cdce2fc1cb3e84366f025164350864444b4"
++DIAGNOSTIC_EXECUTABLE_SHA256 = "8217db4d5ffc3ab80b86e5699ea54948a65bd907bd7ff070e2aa0d7cffa33137"
+ 
+ 
+ def select_iserver_executable(app_root=None, environ=None):
+--- a/tests/test_f304_2c_command_line.py
++++ b/tests/test_f304_2c_command_line.py
+@@ -14,8 +14,8 @@
+     def test_long_actual_paths_shorten_only_argv0_and_keep_exec_and_cwd(self):
+         before_cwd = os.getcwd()
+         launch = prepare_inmos_argv(DIAG, BTL)
+-        self.assertEqual(launch["original_length"], 265)
+-        self.assertEqual(launch["final_length"], 167)
++        self.assertEqual(launch["original_length"], 269)
++        self.assertEqual(launch["final_length"], 169)
+         self.assertTrue(launch["shortened"])
+         self.assertEqual(launch["argv"][0], DIAG.name)
+         self.assertEqual(launch["argv"][2], str(BTL.resolve()))
+@@ -61,8 +61,8 @@
+             thread.join(timeout=2)
+         shortened = [e for e in events if e[0] == "ISERVER_COMMAND_LINE_SHORTENED"]
+         self.assertEqual(len(shortened), 1)
+-        self.assertEqual(shortened[0][2]["original_length"], 265)
+-        self.assertEqual(shortened[0][2]["final_length"], 167)
++        self.assertEqual(shortened[0][2]["original_length"], 269)
++        self.assertEqual(shortened[0][2]["final_length"], 169)
+         self.assertIsNone(runner.process)
+ 
+ 
+--- /dev/null
++++ b/tests/put_count_diag_local_test.c
+@@ -0,0 +1,19 @@
++#include <stdio.h>
++#include "server.h"
++#include "iserver.h"
++#include "sp_reply_diag.h"
++
++unsigned char Tbuf[TRANSACTION_BUFFER_SIZE];
++extern int OutCount;
++extern void put_count();
++
++int main(void)
++{
++    OutCount = 1;
++    Tbuf[0] = Tbuf[1] = Tbuf[2] = Tbuf[3] = 0;
++    sp_reply_diag_begin(1);
++    put_count(OutCount);
++    printf("LOCAL_RESULT len=1 header=%02X %02X tail=%02X %02X\n",
++           Tbuf[0], Tbuf[1], Tbuf[2], Tbuf[3]);
++    return (Tbuf[0] == 0x02 && Tbuf[1] == 0x00) ? 0 : 1;
++}

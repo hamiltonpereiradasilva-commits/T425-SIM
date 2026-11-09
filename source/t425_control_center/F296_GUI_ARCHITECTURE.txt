@@ -1,0 +1,22 @@
+F296 — Arquitetura da GUI
+
+Aplicativo Tkinter/ttk nativo para macOS; não usa navegador, WebView, HTTP server, Flask, Electron ou Streamlit.
+
+Componentes:
+- main.py: inicia janela Tk.
+- gui/app.py: painéis de dispositivos, links, BTL, diagnósticos e console. Tk recebe eventos por fila e atualiza widgets pela thread principal com after().
+- services/controller.py: fila serial de comandos e dono único de operações USB. A sessão LINKUSB é exclusiva durante todo o tempo em que conectada.
+- linkusb/diagnostics.py e b4.py: identidade USB, configuração/interface/endpoints, EP0 B4 e parser de 56 bytes.
+- t425/cdc.py: descoberta pelo VID:PID e serial T425, consulta CDC F271?.
+- services/btl.py: tamanho/hash/primeiro byte sem carregar o arquivo na memória.
+- iserver/iserver_runner.py: subprocesso IServer, leitura independente de stdout e stderr em threads e eventos para o console.
+- iserver/linkusb_linkio.c: backend nativo LinkIO sobre libusb, integrado ao IServer original na cópia de build.
+- tests/: testes Python e C sem hardware.
+
+Segurança operacional:
+- Inicia desconectado; nenhuma transferência é executada automaticamente.
+- Ao conectar LINKUSB, somente EP0 B4 é consultado periodicamente. Nenhum Bulk OUT é enviado e nenhum Bulk IN é lido; assim, dados de aplicação pendentes não são removidos.
+- Consulta T425 é iniciada somente por botão e envia o comando preexistente F271? pela CDC. Nenhum PEEK/POKE.
+- Load, Run, Stop e Reset aparecem desabilitados. O runner tem enabled=False por padrão e é bloqueado por teste.
+- Não há botão de teste físico e não houve acesso às placas nesta F296.
+- Python e IServer usam o lock local /tmp/t425-sim-linkusb0.lock para impedir duas sessões simultâneas.
