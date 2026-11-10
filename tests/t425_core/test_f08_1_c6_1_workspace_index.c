@@ -1,4 +1,5 @@
 #include <assert.h>
+#include "f1_fixture_compat.h"
 #include <stdint.h>
 #include <stdio.h>
 
@@ -42,9 +43,9 @@ static void test_lb(void)
     const uint32_t addr = CODE_BASE + 0x100u;
     assert(t425_memory_write_byte(&core.memory, addr, 0xA5u) == 0);
 
-    core.cpu.A = addr;
-    core.cpu.B = 0x11223344u;
-    core.cpu.C = 0x55667788u;
+    core.cpu.A = addr; t425_fixture_sync_slaves(&core.cpu);
+    core.cpu.B = 0x11223344u; t425_fixture_sync_slaves(&core.cpu);
+    core.cpu.C = 0x55667788u; t425_fixture_sync_slaves(&core.cpu);
 
     emit_op(&core, 0x01u);
 
@@ -58,25 +59,25 @@ static void test_bsub_wsub_wsubdb(void)
     t425_core_t core;
 
     reset_core(&core);
-    core.cpu.A = 0x80000100u;
-    core.cpu.B = 7u;
-    core.cpu.C = 0x12345678u;
+    core.cpu.A = 0x80000100u; t425_fixture_sync_slaves(&core.cpu);
+    core.cpu.B = 7u; t425_fixture_sync_slaves(&core.cpu);
+    core.cpu.C = 0x12345678u; t425_fixture_sync_slaves(&core.cpu);
     emit_op(&core, 0x02u);
     assert(core.cpu.A == 0x80000107u);
     assert(core.cpu.B == 0x12345678u);
 
     reset_core(&core);
-    core.cpu.A = 0x80000100u;
-    core.cpu.B = 7u;
-    core.cpu.C = 0x12345678u;
+    core.cpu.A = 0x80000100u; t425_fixture_sync_slaves(&core.cpu);
+    core.cpu.B = 7u; t425_fixture_sync_slaves(&core.cpu);
+    core.cpu.C = 0x12345678u; t425_fixture_sync_slaves(&core.cpu);
     emit_op(&core, 0x0Au);
     assert(core.cpu.A == 0x8000011Cu);
     assert(core.cpu.B == 0x12345678u);
 
     reset_core(&core);
-    core.cpu.A = 0x80000100u;
-    core.cpu.B = 7u;
-    core.cpu.C = 0x12345678u;
+    core.cpu.A = 0x80000100u; t425_fixture_sync_slaves(&core.cpu);
+    core.cpu.B = 7u; t425_fixture_sync_slaves(&core.cpu);
+    core.cpu.C = 0x12345678u; t425_fixture_sync_slaves(&core.cpu);
     emit_op(&core, 0x81u);
     assert(core.cpu.A == 0x80000138u);
     assert(core.cpu.B == 0x12345678u);
@@ -89,9 +90,9 @@ static void test_sb(void)
 
     const uint32_t addr = CODE_BASE + 0x120u;
 
-    core.cpu.A = addr;
-    core.cpu.B = 0xDEADBEEFu;
-    core.cpu.C = 0xCAFEBABEu;
+    core.cpu.A = addr; t425_fixture_sync_slaves(&core.cpu);
+    core.cpu.B = 0xDEADBEEFu; t425_fixture_sync_slaves(&core.cpu);
+    core.cpu.C = 0xCAFEBABEu; t425_fixture_sync_slaves(&core.cpu);
 
     emit_op(&core, 0x3Bu);
 
@@ -106,9 +107,9 @@ static void test_bcnt(void)
     t425_core_t core;
     reset_core(&core);
 
-    core.cpu.A = 123u;
-    core.cpu.B = 0x11111111u;
-    core.cpu.C = 0x22222222u;
+    core.cpu.A = 123u; t425_fixture_sync_slaves(&core.cpu);
+    core.cpu.B = 0x11111111u; t425_fixture_sync_slaves(&core.cpu);
+    core.cpu.C = 0x22222222u; t425_fixture_sync_slaves(&core.cpu);
 
     emit_op(&core, 0x34u);
 
@@ -122,9 +123,9 @@ static void test_wcnt(void)
     t425_core_t core;
     reset_core(&core);
 
-    core.cpu.A = 0x80000107u;
-    core.cpu.B = 0x11223344u;
-    core.cpu.C = 0x55667788u;
+    core.cpu.A = 0x80000107u; t425_fixture_sync_slaves(&core.cpu);
+    core.cpu.B = 0x11223344u; t425_fixture_sync_slaves(&core.cpu);
+    core.cpu.C = 0x55667788u; t425_fixture_sync_slaves(&core.cpu);
 
     emit_op(&core, 0x3Fu);
 
@@ -138,22 +139,22 @@ static void test_scheduler_store(void)
     t425_core_t core;
     reset_core(&core);
 
-    core.cpu.A = 0x11111110u;
+    core.cpu.A = 0x11111110u; t425_fixture_sync_slaves(&core.cpu);
     emit_op(&core, 0x18u);
     assert(core.scheduler.high_head == 0x11111110u);
 
     reset_core(&core);
-    core.cpu.A = 0x22222220u;
+    core.cpu.A = 0x22222220u; t425_fixture_sync_slaves(&core.cpu);
     emit_op(&core, 0x50u);
     assert(core.scheduler.high_tail == 0x22222220u);
 
     reset_core(&core);
-    core.cpu.A = 0x33333330u;
+    core.cpu.A = 0x33333330u; t425_fixture_sync_slaves(&core.cpu);
     emit_op(&core, 0x1Cu);
     assert(core.scheduler.low_head == 0x33333330u);
 
     reset_core(&core);
-    core.cpu.A = 0x44444440u;
+    core.cpu.A = 0x44444440u; t425_fixture_sync_slaves(&core.cpu);
     emit_op(&core, 0x17u);
     assert(core.scheduler.low_tail == 0x44444440u);
 }

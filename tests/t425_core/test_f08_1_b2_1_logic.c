@@ -1,4 +1,5 @@
 #include <assert.h>
+#include "f1_fixture_compat.h"
 #include <stdint.h>
 #include <stdio.h>
 
@@ -52,9 +53,9 @@ static void test_and(void)
 
     t425_core_reset(&core);
     core.cpu.Iptr = T425_INTERNAL_RAM_BASE;
-    core.cpu.A = 0xF0F0F0F0u;
-    core.cpu.B = 0x0FF00FF0u;
-    core.cpu.C = 0x12345678u;
+    core.cpu.A = 0xF0F0F0F0u; t425_fixture_sync_slaves(&core.cpu);
+    core.cpu.B = 0x0FF00FF0u; t425_fixture_sync_slaves(&core.cpu);
+    core.cpu.C = 0x12345678u; t425_fixture_sync_slaves(&core.cpu);
 
     execute_opr(&core, 0x46u);
 
@@ -70,9 +71,9 @@ static void test_or(void)
 
     t425_core_reset(&core);
     core.cpu.Iptr = T425_INTERNAL_RAM_BASE;
-    core.cpu.A = 0xF000000Fu;
-    core.cpu.B = 0x0F0000F0u;
-    core.cpu.C = 0x87654321u;
+    core.cpu.A = 0xF000000Fu; t425_fixture_sync_slaves(&core.cpu);
+    core.cpu.B = 0x0F0000F0u; t425_fixture_sync_slaves(&core.cpu);
+    core.cpu.C = 0x87654321u; t425_fixture_sync_slaves(&core.cpu);
 
     execute_opr(&core, 0x4Bu);
 
@@ -88,9 +89,9 @@ static void test_xor(void)
 
     t425_core_reset(&core);
     core.cpu.Iptr = T425_INTERNAL_RAM_BASE;
-    core.cpu.A = 0xFFFF0000u;
-    core.cpu.B = 0x0F0F0F0Fu;
-    core.cpu.C = 0xCAFEBABEu;
+    core.cpu.A = 0xFFFF0000u; t425_fixture_sync_slaves(&core.cpu);
+    core.cpu.B = 0x0F0F0F0Fu; t425_fixture_sync_slaves(&core.cpu);
+    core.cpu.C = 0xCAFEBABEu; t425_fixture_sync_slaves(&core.cpu);
 
     execute_opr(&core, 0x33u);
 
@@ -106,9 +107,9 @@ static void test_not(void)
 
     t425_core_reset(&core);
     core.cpu.Iptr = T425_INTERNAL_RAM_BASE;
-    core.cpu.A = 0x0F0F0F0Fu;
-    core.cpu.B = 0x12345678u;
-    core.cpu.C = 0xCAFEBABEu;
+    core.cpu.A = 0x0F0F0F0Fu; t425_fixture_sync_slaves(&core.cpu);
+    core.cpu.B = 0x12345678u; t425_fixture_sync_slaves(&core.cpu);
+    core.cpu.C = 0xCAFEBABEu; t425_fixture_sync_slaves(&core.cpu);
 
     execute_opr(&core, 0x32u);
 

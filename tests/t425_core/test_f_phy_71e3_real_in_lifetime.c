@@ -1,4 +1,5 @@
 #include <assert.h>
+#include "f1_fixture_compat.h"
 #include <stdint.h>
 #include <stdio.h>
 #include "t425_core.h"
@@ -11,9 +12,9 @@ int main(void)
     (void)t425_memory_write_byte(&c.memory, code, 0x20u);
     (void)t425_memory_write_byte(&c.memory, code + 1u, 0xF7u);
     c.cpu.IptrReg = code;
-    c.cpu.A = 4u;
-    c.cpu.B = 0x80000010u;
-    c.cpu.C = 0x80000200u;
+    c.cpu.A = 4u; t425_fixture_sync_slaves(&c.cpu);
+    c.cpu.B = 0x80000010u; t425_fixture_sync_slaves(&c.cpu);
+    c.cpu.C = 0x80000200u; t425_fixture_sync_slaves(&c.cpu);
     (void)t425_channel_wait(&c.memory, 0x80000010u, 0x80000301u);
     for (unsigned i = 0u; i < 80u; ++i)
         (void)t425_core_step(&c);

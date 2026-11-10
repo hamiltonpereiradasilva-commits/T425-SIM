@@ -1,4 +1,5 @@
 #include <assert.h>
+#include "f1_fixture_compat.h"
 #include <stdint.h>
 #include <stdio.h>
 
@@ -45,9 +46,9 @@ static void test_lmul_basic(void)
      *   A = LSW
      *   B = MSW
      */
-    core.cpu.A = 0x00000003u;
-    core.cpu.B = 0x00000002u;
-    core.cpu.C = 0x00000000u;
+    core.cpu.A = 0x00000003u; t425_fixture_sync_slaves(&core.cpu);
+    core.cpu.B = 0x00000002u; t425_fixture_sync_slaves(&core.cpu);
+    core.cpu.C = 0x00000000u; t425_fixture_sync_slaves(&core.cpu);
 
     execute_opr(&core, 0x31u);
 
@@ -72,9 +73,9 @@ static void test_lmul_carry_in(void)
      *
      * C is a full unsigned word, not merely C&1.
      */
-    core.cpu.A = 0xFFFFFFFFu;
-    core.cpu.B = 0x00000002u;
-    core.cpu.C = 0x00000005u;
+    core.cpu.A = 0xFFFFFFFFu; t425_fixture_sync_slaves(&core.cpu);
+    core.cpu.B = 0x00000002u; t425_fixture_sync_slaves(&core.cpu);
+    core.cpu.C = 0x00000005u; t425_fixture_sync_slaves(&core.cpu);
 
     execute_opr(&core, 0x31u);
 
@@ -101,9 +102,9 @@ static void test_ldiv_basic(void)
      *   A = quotient
      *   B = remainder
      */
-    core.cpu.A = 3u;
-    core.cpu.B = 20u;
-    core.cpu.C = 0u;
+    core.cpu.A = 3u; t425_fixture_sync_slaves(&core.cpu);
+    core.cpu.B = 20u; t425_fixture_sync_slaves(&core.cpu);
+    core.cpu.C = 0u; t425_fixture_sync_slaves(&core.cpu);
 
     execute_opr(&core, 0x1Au);
 
@@ -122,9 +123,9 @@ static void test_ldiv_zero_high_word(void)
      * A zero high word makes this an ordinary unsigned
      * single-word dividend.
      */
-    core.cpu.A = 7u;
-    core.cpu.B = 100u;
-    core.cpu.C = 0u;
+    core.cpu.A = 7u; t425_fixture_sync_slaves(&core.cpu);
+    core.cpu.B = 100u; t425_fixture_sync_slaves(&core.cpu);
+    core.cpu.C = 0u; t425_fixture_sync_slaves(&core.cpu);
 
     execute_opr(&core, 0x1Au);
 
@@ -146,9 +147,9 @@ static void test_ldiv_nonzero_high_word(void)
      * quotient  = 0x55555555
      * remainder = 1
      */
-    core.cpu.A = 3u;
-    core.cpu.B = 0u;
-    core.cpu.C = 1u;
+    core.cpu.A = 3u; t425_fixture_sync_slaves(&core.cpu);
+    core.cpu.B = 0u; t425_fixture_sync_slaves(&core.cpu);
+    core.cpu.C = 1u; t425_fixture_sync_slaves(&core.cpu);
 
     execute_opr(&core, 0x1Au);
 
@@ -174,9 +175,9 @@ static void test_ldiv_maximum_valid_quotient(void)
      * This is the largest possible 32-bit quotient
      * without LDIV overflow.
      */
-    core.cpu.A = 0xFFFFFFFFu;
-    core.cpu.B = 0xFFFFFFFFu;
-    core.cpu.C = 0xFFFFFFFEu;
+    core.cpu.A = 0xFFFFFFFFu; t425_fixture_sync_slaves(&core.cpu);
+    core.cpu.B = 0xFFFFFFFFu; t425_fixture_sync_slaves(&core.cpu);
+    core.cpu.C = 0xFFFFFFFEu; t425_fixture_sync_slaves(&core.cpu);
 
     execute_opr(&core, 0x1Au);
 
@@ -196,9 +197,9 @@ static void test_ldiv_overflow(void)
      * C >= A means the unsigned quotient cannot fit
      * in one 32-bit word.
      */
-    core.cpu.A = 3u;
-    core.cpu.B = 0u;
-    core.cpu.C = 3u;
+    core.cpu.A = 3u; t425_fixture_sync_slaves(&core.cpu);
+    core.cpu.B = 0u; t425_fixture_sync_slaves(&core.cpu);
+    core.cpu.C = 3u; t425_fixture_sync_slaves(&core.cpu);
 
     execute_opr(&core, 0x1Au);
 
@@ -216,9 +217,9 @@ static void test_ldiv_zero_divisor(void)
     /*
      * Division by zero must signal Error.
      */
-    core.cpu.A = 0u;
-    core.cpu.B = 0x12345678u;
-    core.cpu.C = 0u;
+    core.cpu.A = 0u; t425_fixture_sync_slaves(&core.cpu);
+    core.cpu.B = 0x12345678u; t425_fixture_sync_slaves(&core.cpu);
+    core.cpu.C = 0u; t425_fixture_sync_slaves(&core.cpu);
 
     execute_opr(&core, 0x1Au);
 

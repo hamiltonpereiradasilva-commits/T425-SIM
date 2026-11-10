@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include "f1_fixture_compat.h"
 #include <stdint.h>
 #include <string.h>
 
@@ -203,9 +204,9 @@ static void test_taltwt_context_switch(void)
 
     core.timer.high = 100u;
 
-    core.cpu.A = 0x11111111u;
-    core.cpu.B = 0x22222222u;
-    core.cpu.C = 0x33333333u;
+    core.cpu.A = 0x11111111u; t425_fixture_sync_slaves(&core.cpu);
+    core.cpu.B = 0x22222222u; t425_fixture_sync_slaves(&core.cpu);
+    core.cpu.C = 0x33333333u; t425_fixture_sync_slaves(&core.cpu);
 
     /* TALTWT = PFIX 5 + OPR 1. */
     assert(t425_memory_write_byte(
@@ -230,9 +231,9 @@ static void test_taltwt_context_switch(void)
     assert(core.cpu.Iptr == p2_iptr);
 
     /* Give P2 a distinctive context. */
-    core.cpu.A = 0xAAAAAAAAu;
-    core.cpu.B = 0xBBBBBBBBu;
-    core.cpu.C = 0xCCCCCCCCu;
+    core.cpu.A = 0xAAAAAAAAu; t425_fixture_sync_slaves(&core.cpu);
+    core.cpu.B = 0xBBBBBBBBu; t425_fixture_sync_slaves(&core.cpu);
+    core.cpu.C = 0xCCCCCCCCu; t425_fixture_sync_slaves(&core.cpu);
 
     /*
      * Explicitly requeue P1. This isolates context restoration

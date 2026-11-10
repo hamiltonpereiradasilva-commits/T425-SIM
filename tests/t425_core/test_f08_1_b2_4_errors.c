@@ -1,4 +1,5 @@
 #include <assert.h>
+#include "f1_fixture_compat.h"
 #include <stdint.h>
 #include <stdio.h>
 
@@ -30,9 +31,9 @@ static void test_div_zero(void)
 
     t425_core_reset(&core);
     core.cpu.Iptr = T425_INTERNAL_RAM_BASE;
-    core.cpu.A = 0u;
-    core.cpu.B = 20u;
-    core.cpu.C = 0x12345678u;
+    core.cpu.A = 0u; t425_fixture_sync_slaves(&core.cpu);
+    core.cpu.B = 20u; t425_fixture_sync_slaves(&core.cpu);
+    core.cpu.C = 0x12345678u; t425_fixture_sync_slaves(&core.cpu);
 
     assert(execute_opr(&core, 0x2Cu) == T425_STEP_OK);
     assert(core.cpu.error == 1u);
@@ -48,9 +49,9 @@ static void test_div_minint_minus_one(void)
 
     t425_core_reset(&core);
     core.cpu.Iptr = T425_INTERNAL_RAM_BASE;
-    core.cpu.A = 0xFFFFFFFFu; /* -1 */
-    core.cpu.B = 0x80000000u; /* INT32_MIN */
-    core.cpu.C = 0x12345678u;
+    core.cpu.A = 0xFFFFFFFFu; t425_fixture_sync_slaves(&core.cpu); /* -1 */
+    core.cpu.B = 0x80000000u; t425_fixture_sync_slaves(&core.cpu); /* INT32_MIN */
+    core.cpu.C = 0x12345678u; t425_fixture_sync_slaves(&core.cpu);
 
     assert(execute_opr(&core, 0x2Cu) == T425_STEP_OK);
     assert(core.cpu.error == 1u);
@@ -66,9 +67,9 @@ static void test_rem_zero(void)
 
     t425_core_reset(&core);
     core.cpu.Iptr = T425_INTERNAL_RAM_BASE;
-    core.cpu.A = 0u;
-    core.cpu.B = 20u;
-    core.cpu.C = 0x12345678u;
+    core.cpu.A = 0u; t425_fixture_sync_slaves(&core.cpu);
+    core.cpu.B = 20u; t425_fixture_sync_slaves(&core.cpu);
+    core.cpu.C = 0x12345678u; t425_fixture_sync_slaves(&core.cpu);
 
     assert(execute_opr(&core, 0x1Fu) == T425_STEP_OK);
     assert(core.cpu.error == 1u);
@@ -84,9 +85,9 @@ static void test_rem_minint_minus_one(void)
 
     t425_core_reset(&core);
     core.cpu.Iptr = T425_INTERNAL_RAM_BASE;
-    core.cpu.A = 0xFFFFFFFFu; /* -1 */
-    core.cpu.B = 0x80000000u; /* INT32_MIN */
-    core.cpu.C = 0x12345678u;
+    core.cpu.A = 0xFFFFFFFFu; t425_fixture_sync_slaves(&core.cpu); /* -1 */
+    core.cpu.B = 0x80000000u; t425_fixture_sync_slaves(&core.cpu); /* INT32_MIN */
+    core.cpu.C = 0x12345678u; t425_fixture_sync_slaves(&core.cpu);
 
     assert(execute_opr(&core, 0x1Fu) == T425_STEP_OK);
     assert(core.cpu.error == 1u);

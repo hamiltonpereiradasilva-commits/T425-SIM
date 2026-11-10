@@ -1,4 +1,5 @@
 #include <assert.h>
+#include "f1_fixture_compat.h"
 #include <stdint.h>
 #include <stdio.h>
 #include "t425_core.h"
@@ -46,7 +47,7 @@ static void test_runp(void)
     uint32_t wdesc = wptr | T425_PRIORITY_LOW;
 
     t425_core_reset(&c);
-    c.cpu.A = wdesc;
+    c.cpu.A = wdesc; t425_fixture_sync_slaves(&c.cpu);
     assert(t425_memory_write_word(&c.memory, wptr - 4u, iptr) == 0);
 
     exec_opr(&c, 0x39u);
@@ -99,9 +100,9 @@ static void test_stopp_context_switch(void)
 
     c.cpu.Wptr = p1;
     c.cpu.Iptr = p1_iptr;
-    c.cpu.A = 0xAAAAAAAAu;
-    c.cpu.B = 0xBBBBBBBBu;
-    c.cpu.C = 0xCCCCCCCCu;
+    c.cpu.A = 0xAAAAAAAAu; t425_fixture_sync_slaves(&c.cpu);
+    c.cpu.B = 0xBBBBBBBBu; t425_fixture_sync_slaves(&c.cpu);
+    c.cpu.C = 0xCCCCCCCCu; t425_fixture_sync_slaves(&c.cpu);
     c.scheduler.current_wdesc = p1_wdesc;
     c.scheduler.running = 1u;
 
@@ -121,9 +122,9 @@ static void test_stopp_context_switch(void)
     assert(c.cpu.B == 0u);
     assert(c.cpu.C == 0u);
 
-    c.cpu.A = 0x11111111u;
-    c.cpu.B = 0x22222222u;
-    c.cpu.C = 0x33333333u;
+    c.cpu.A = 0x11111111u; t425_fixture_sync_slaves(&c.cpu);
+    c.cpu.B = 0x22222222u; t425_fixture_sync_slaves(&c.cpu);
+    c.cpu.C = 0x33333333u; t425_fixture_sync_slaves(&c.cpu);
 
     /*
      * Requeue P1 explicitly. This is a deterministic test of
@@ -162,7 +163,7 @@ static void test_startp(void)
     t425_core_reset(&c);
 
     c.cpu.Wptr = parent;
-    c.cpu.A = child;
+    c.cpu.A = child; t425_fixture_sync_slaves(&c.cpu);
     c.scheduler.current_wdesc = parent | T425_PRIORITY_HIGH;
     c.scheduler.running = 1u;
 
@@ -170,7 +171,7 @@ static void test_startp(void)
      * put_opr() installs PFIX + STARTP at 'instruction'.
      * At STARTP execution Iptr has advanced past the two bytes.
      */
-    c.cpu.B = child_iptr - (instruction + 2u);
+    c.cpu.B = child_iptr - (instruction + 2u); t425_fixture_sync_slaves(&c.cpu);
 
     put_opr(&c, 0x0Du);
 
@@ -201,7 +202,7 @@ static void test_endp(void)
     uint32_t succ_iptr = T425_INTERNAL_RAM_BASE + 0x300u;
 
     t425_core_reset(&c);
-    c.cpu.A = succ;
+    c.cpu.A = succ; t425_fixture_sync_slaves(&c.cpu);
     c.scheduler.current_wdesc = T425_INTERNAL_RAM_BASE + 0x100u;
     assert(t425_memory_write_word(&c.memory, succ, succ_iptr) == 0);
     assert(t425_memory_write_word(&c.memory, succ + 4u, 1u) == 0);

@@ -1,4 +1,5 @@
 #include <stdint.h>
+#include "f1_fixture_compat.h"
 #include <stdio.h>
 
 #include "t425_core.h"
@@ -24,9 +25,9 @@ int main(void)
 
     core.cpu.Iptr = ip;
     core.cpu.Wptr = wptr;
-    core.cpu.A = old_a;
-    core.cpu.B = old_b;
-    core.cpu.C = 0xCAFEBABEu;
+    core.cpu.A = old_a; t425_fixture_sync_slaves(&core.cpu);
+    core.cpu.B = old_b; t425_fixture_sync_slaves(&core.cpu);
+    core.cpu.C = 0xCAFEBABEu; t425_fixture_sync_slaves(&core.cpu);
 
     /* PFIX 0 + OPR 0x0F = OUTWORD */
     if (t425_memory_write_byte(&core.memory, ip, 0x20u) != 0)

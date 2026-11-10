@@ -1,4 +1,5 @@
 #include <assert.h>
+#include "f1_fixture_compat.h"
 #include <stdio.h>
 #include "t425_core.h"
 
@@ -15,9 +16,9 @@ static void test_j(void)
 
     t425_core_reset(&c);
 
-    c.cpu.A = 0x11111111u;
-    c.cpu.B = 0x22222222u;
-    c.cpu.C = 0x33333333u;
+    c.cpu.A = 0x11111111u; t425_fixture_sync_slaves(&c.cpu);
+    c.cpu.B = 0x22222222u; t425_fixture_sync_slaves(&c.cpu);
+    c.cpu.C = 0x33333333u; t425_fixture_sync_slaves(&c.cpu);
 
     code(&c, 0x02u);
 
@@ -33,9 +34,9 @@ static void test_cj_taken(void)
 
     t425_core_reset(&c);
 
-    c.cpu.A = 0u;
-    c.cpu.B = 0x11111111u;
-    c.cpu.C = 0x22222222u;
+    c.cpu.A = 0u; t425_fixture_sync_slaves(&c.cpu);
+    c.cpu.B = 0x11111111u; t425_fixture_sync_slaves(&c.cpu);
+    c.cpu.C = 0x22222222u; t425_fixture_sync_slaves(&c.cpu);
 
     code(&c, 0xA2u);
 
@@ -54,9 +55,9 @@ static void test_cj_not_taken(void)
 
     t425_core_reset(&c);
 
-    c.cpu.A = 1u;
-    c.cpu.B = 0x11111111u;
-    c.cpu.C = 0x22222222u;
+    c.cpu.A = 1u; t425_fixture_sync_slaves(&c.cpu);
+    c.cpu.B = 0x11111111u; t425_fixture_sync_slaves(&c.cpu);
+    c.cpu.C = 0x22222222u; t425_fixture_sync_slaves(&c.cpu);
 
     code(&c, 0xA2u);
 

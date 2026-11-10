@@ -1,4 +1,5 @@
 #include <stdint.h>
+#include "f1_fixture_compat.h"
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -139,7 +140,7 @@ static void test_conditional_jump(void)
 
     t425_core_reset(&core);
     core.cpu.IptrReg = CODE;
-    core.cpu.A = 0;
+    core.cpu.A = 0; t425_fixture_sync_slaves(&core.cpu);
 
     put8(&core, CODE, 0xa2); /* CJ 2 */
 
@@ -152,9 +153,9 @@ static void test_conditional_jump(void)
 
     t425_core_reset(&core);
     core.cpu.IptrReg = CODE;
-    core.cpu.A = 1;
-    core.cpu.B = 2;
-    core.cpu.C = 3;
+    core.cpu.A = 1; t425_fixture_sync_slaves(&core.cpu);
+    core.cpu.B = 2; t425_fixture_sync_slaves(&core.cpu);
+    core.cpu.C = 3; t425_fixture_sync_slaves(&core.cpu);
 
     put8(&core, CODE, 0xa2);
 
@@ -176,9 +177,9 @@ static void test_call_ret(void)
 
     core.cpu.IptrReg = CODE;
     core.cpu.WptrReg = WORK;
-    core.cpu.A = 0x11111111u;
-    core.cpu.B = 0x22222222u;
-    core.cpu.C = 0x33333333u;
+    core.cpu.A = 0x11111111u; t425_fixture_sync_slaves(&core.cpu);
+    core.cpu.B = 0x22222222u; t425_fixture_sync_slaves(&core.cpu);
+    core.cpu.C = 0x33333333u; t425_fixture_sync_slaves(&core.cpu);
 
     put8(&core, CODE + 0, 0x94); /* CALL 4 */
     put8(&core, CODE + 5, 0x22); /* PFIX #2 */

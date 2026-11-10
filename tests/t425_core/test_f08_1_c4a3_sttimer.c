@@ -1,4 +1,5 @@
 #include <assert.h>
+#include "f1_fixture_compat.h"
 #include <stdint.h>
 #include <stdio.h>
 
@@ -19,7 +20,7 @@ int main(void)
     t425_core_reset(&core);
 
     core.cpu.Iptr = T425_INTERNAL_RAM_BASE;
-    core.cpu.A = 0x12345678u;
+    core.cpu.A = 0x12345678u; t425_fixture_sync_slaves(&core.cpu);
 
     core.timer.high = 0xAAAAAAAAu;
     core.timer.low  = 0x55555555u;

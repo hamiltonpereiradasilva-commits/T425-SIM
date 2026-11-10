@@ -1,4 +1,5 @@
 #include <assert.h>
+#include "f1_fixture_compat.h"
 #include <stdint.h>
 #include <stdio.h>
 
@@ -22,9 +23,9 @@ static void test_prod(void)
     t425_core_t core;
     t425_core_reset(&core);
 
-    core.cpu.A = 7u;
-    core.cpu.B = 6u;
-    core.cpu.C = 0x12345678u;
+    core.cpu.A = 7u; t425_fixture_sync_slaves(&core.cpu);
+    core.cpu.B = 6u; t425_fixture_sync_slaves(&core.cpu);
+    core.cpu.C = 0x12345678u; t425_fixture_sync_slaves(&core.cpu);
 
     execute_opr(&core, 0x08u);
 
@@ -43,9 +44,9 @@ static void test_ladd(void)
     t425_core_t core;
     t425_core_reset(&core);
 
-    core.cpu.A = 10u;
-    core.cpu.B = 20u;
-    core.cpu.C = 0x12345679u;
+    core.cpu.A = 10u; t425_fixture_sync_slaves(&core.cpu);
+    core.cpu.B = 20u; t425_fixture_sync_slaves(&core.cpu);
+    core.cpu.C = 0x12345679u; t425_fixture_sync_slaves(&core.cpu);
 
     execute_opr(&core, 0x16u);
 
@@ -62,9 +63,9 @@ static void test_lsub(void)
     t425_core_t core;
     t425_core_reset(&core);
 
-    core.cpu.A = 10u;
-    core.cpu.B = 20u;
-    core.cpu.C = 0x12345678u;
+    core.cpu.A = 10u; t425_fixture_sync_slaves(&core.cpu);
+    core.cpu.B = 20u; t425_fixture_sync_slaves(&core.cpu);
+    core.cpu.C = 0x12345678u; t425_fixture_sync_slaves(&core.cpu);
 
     execute_opr(&core, 0x38u);
 
@@ -81,9 +82,9 @@ static void test_lsum(void)
     t425_core_t core;
     t425_core_reset(&core);
 
-    core.cpu.A = 0xFFFFFFFFu;
-    core.cpu.B = 1u;
-    core.cpu.C = 0x12345679u;
+    core.cpu.A = 0xFFFFFFFFu; t425_fixture_sync_slaves(&core.cpu);
+    core.cpu.B = 1u; t425_fixture_sync_slaves(&core.cpu);
+    core.cpu.C = 0x12345679u; t425_fixture_sync_slaves(&core.cpu);
 
     execute_opr(&core, 0x37u);
 
@@ -99,9 +100,9 @@ static void test_ldiff(void)
     t425_core_t core;
     t425_core_reset(&core);
 
-    core.cpu.A = 20u;
-    core.cpu.B = 10u;
-    core.cpu.C = 0x12345679u;
+    core.cpu.A = 20u; t425_fixture_sync_slaves(&core.cpu);
+    core.cpu.B = 10u; t425_fixture_sync_slaves(&core.cpu);
+    core.cpu.C = 0x12345679u; t425_fixture_sync_slaves(&core.cpu);
 
     execute_opr(&core, 0x4Fu);
 

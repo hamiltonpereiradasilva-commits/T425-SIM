@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include "f1_fixture_compat.h"
 #include <stdint.h>
 #include <limits.h>
 
@@ -72,7 +73,7 @@ int main(void)
 
     /* GCALL */
     reset_core(&core);
-    core.cpu.A = T425_INTERNAL_RAM_BASE + 100u;
+    core.cpu.A = T425_INTERNAL_RAM_BASE + 100u; t425_fixture_sync_slaves(&core.cpu);
 
     check_i("GCALL", run_opr(&core, 0x06u), T425_STEP_OK);
     check_u32("GCALL A", core.cpu.A,
@@ -82,7 +83,7 @@ int main(void)
 
     /* LDPI */
     reset_core(&core);
-    core.cpu.A = 7u;
+    core.cpu.A = 7u; t425_fixture_sync_slaves(&core.cpu);
 
     check_i("LDPI", run_opr(&core, 0x1Bu), T425_STEP_OK);
     check_u32("LDPI A", core.cpu.A,
@@ -90,8 +91,8 @@ int main(void)
 
     /* TESTPRANAL */
     reset_core(&core);
-    core.cpu.A = 0x11111111u;
-    core.cpu.B = 0x22222222u;
+    core.cpu.A = 0x11111111u; t425_fixture_sync_slaves(&core.cpu);
+    core.cpu.B = 0x22222222u; t425_fixture_sync_slaves(&core.cpu);
     core.cpu.analyse = 0u;
 
     check_i("TESTPRANAL",
@@ -105,9 +106,9 @@ int main(void)
     reset_core(&core);
     core.scheduler.high_head = 0x11111111u;
     core.scheduler.high_tail = 0x22222222u;
-    core.cpu.A = T425_INTERNAL_RAM_BASE + 100u;
-    core.cpu.B = 0xAAAAAAAAu;
-    core.cpu.C = 0xBBBBBBBBu;
+    core.cpu.A = T425_INTERNAL_RAM_BASE + 100u; t425_fixture_sync_slaves(&core.cpu);
+    core.cpu.B = 0xAAAAAAAAu; t425_fixture_sync_slaves(&core.cpu);
+    core.cpu.C = 0xBBBBBBBBu; t425_fixture_sync_slaves(&core.cpu);
 
     check_i("SAVEH", run_opr(&core, 0x3Eu), T425_STEP_OK);
 
@@ -130,9 +131,9 @@ int main(void)
     reset_core(&core);
     core.scheduler.low_head = 0x33333333u;
     core.scheduler.low_tail = 0x44444444u;
-    core.cpu.A = T425_INTERNAL_RAM_BASE + 120u;
-    core.cpu.B = 0xCCCCCCCCu;
-    core.cpu.C = 0xDDDDDDDDu;
+    core.cpu.A = T425_INTERNAL_RAM_BASE + 120u; t425_fixture_sync_slaves(&core.cpu);
+    core.cpu.B = 0xCCCCCCCCu; t425_fixture_sync_slaves(&core.cpu);
+    core.cpu.C = 0xDDDDDDDDu; t425_fixture_sync_slaves(&core.cpu);
 
     check_i("SAVEL", run_opr(&core, 0x3Du), T425_STEP_OK);
 
@@ -153,9 +154,9 @@ int main(void)
 
     /* FMUL: 0.5 * 0.5 ~= 0.25 */
     reset_core(&core);
-    core.cpu.A = 0x40000000u;
-    core.cpu.B = 0x40000000u;
-    core.cpu.C = 0x12345678u;
+    core.cpu.A = 0x40000000u; t425_fixture_sync_slaves(&core.cpu);
+    core.cpu.B = 0x40000000u; t425_fixture_sync_slaves(&core.cpu);
+    core.cpu.C = 0x12345678u; t425_fixture_sync_slaves(&core.cpu);
 
     check_i("FMUL", run_opr(&core, 0x72u), T425_STEP_OK);
     check_u32("FMUL A", core.cpu.A, 0x20000000u);
@@ -163,8 +164,8 @@ int main(void)
 
     /* FMUL overflow */
     reset_core(&core);
-    core.cpu.A = (uint32_t)INT32_MIN;
-    core.cpu.B = (uint32_t)INT32_MIN;
+    core.cpu.A = (uint32_t)INT32_MIN; t425_fixture_sync_slaves(&core.cpu);
+    core.cpu.B = (uint32_t)INT32_MIN; t425_fixture_sync_slaves(&core.cpu);
 
     check_i("FMUL overflow",
             run_opr(&core, 0x72u),
@@ -202,9 +203,9 @@ int main(void)
 
     /* LDMEMSTARTVAL */
     reset_core(&core);
-    core.cpu.A = 0x11111111u;
-    core.cpu.B = 0x22222222u;
-    core.cpu.C = 0x33333333u;
+    core.cpu.A = 0x11111111u; t425_fixture_sync_slaves(&core.cpu);
+    core.cpu.B = 0x22222222u; t425_fixture_sync_slaves(&core.cpu);
+    core.cpu.C = 0x33333333u; t425_fixture_sync_slaves(&core.cpu);
 
     check_i("LDMEMSTARTVAL",
             run_opr(&core, 0x7Eu),

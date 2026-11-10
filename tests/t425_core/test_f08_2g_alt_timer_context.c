@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include "f1_fixture_compat.h"
 #include <stdint.h>
 #include <stdlib.h>
 
@@ -202,9 +203,9 @@ int main(void)
     /*
      * Establish an architectural execution context in A.
      */
-    core.cpu.A = A_VALUE;
-    core.cpu.B = B_VALUE;
-    core.cpu.C = C_VALUE;
+    core.cpu.A = A_VALUE; t425_fixture_sync_slaves(&core.cpu);
+    core.cpu.B = B_VALUE; t425_fixture_sync_slaves(&core.cpu);
+    core.cpu.C = C_VALUE; t425_fixture_sync_slaves(&core.cpu);
     core.cpu.Ereg = E_VALUE;
     core.cpu.StatusReg = STATUS_VALUE;
 
@@ -225,7 +226,7 @@ int main(void)
      * ENBT with deadline 200.
      * ENBT consumes B as the deadline operand.
      */
-    core.cpu.B = 200u;
+    core.cpu.B = 200u; t425_fixture_sync_slaves(&core.cpu);
 
     
     run_pfix_opr(&core, 4u, 7u);
@@ -234,9 +235,9 @@ int main(void)
     /*
      * Restore the context values that must survive the wait.
      */
-    core.cpu.A = A_VALUE;
-    core.cpu.B = B_VALUE;
-    core.cpu.C = C_VALUE;
+    core.cpu.A = A_VALUE; t425_fixture_sync_slaves(&core.cpu);
+    core.cpu.B = B_VALUE; t425_fixture_sync_slaves(&core.cpu);
+    core.cpu.C = C_VALUE; t425_fixture_sync_slaves(&core.cpu);
     core.cpu.Ereg = E_VALUE;
     core.cpu.StatusReg = STATUS_VALUE;
 

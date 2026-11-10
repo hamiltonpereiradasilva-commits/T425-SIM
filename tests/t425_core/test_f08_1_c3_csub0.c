@@ -1,4 +1,5 @@
 #include <assert.h>
+#include "f1_fixture_compat.h"
 #include <stdint.h>
 #include <stdio.h>
 
@@ -31,9 +32,9 @@ static void test_in_range(void)
     t425_core_t c;
 
     t425_core_reset(&c);
-    c.cpu.A = 20u;
-    c.cpu.B = 7u;
-    c.cpu.C = 123u;
+    c.cpu.A = 20u; t425_fixture_sync_slaves(&c.cpu);
+    c.cpu.B = 7u; t425_fixture_sync_slaves(&c.cpu);
+    c.cpu.C = 123u; t425_fixture_sync_slaves(&c.cpu);
 
     exec_opr(&c, 0x13u);
 
@@ -48,9 +49,9 @@ static void test_equal(void)
     t425_core_t c;
 
     t425_core_reset(&c);
-    c.cpu.A = 20u;
-    c.cpu.B = 20u;
-    c.cpu.C = 123u;
+    c.cpu.A = 20u; t425_fixture_sync_slaves(&c.cpu);
+    c.cpu.B = 20u; t425_fixture_sync_slaves(&c.cpu);
+    c.cpu.C = 123u; t425_fixture_sync_slaves(&c.cpu);
 
     exec_opr(&c, 0x13u);
 
@@ -65,9 +66,9 @@ static void test_out_of_range(void)
     t425_core_t c;
 
     t425_core_reset(&c);
-    c.cpu.A = 20u;
-    c.cpu.B = 21u;
-    c.cpu.C = 123u;
+    c.cpu.A = 20u; t425_fixture_sync_slaves(&c.cpu);
+    c.cpu.B = 21u; t425_fixture_sync_slaves(&c.cpu);
+    c.cpu.C = 123u; t425_fixture_sync_slaves(&c.cpu);
 
     exec_opr(&c, 0x13u);
 

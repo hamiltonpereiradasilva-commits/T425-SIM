@@ -1,4 +1,5 @@
 #include <assert.h>
+#include "f1_fixture_compat.h"
 #include <stdint.h>
 #include <stdio.h>
 
@@ -81,9 +82,9 @@ int main(void)
     core.scheduler.running = 1u;
     core.cpu.Wptr = p_in_wptr;
     core.cpu.Iptr = p_in_iptr;
-    core.cpu.A = 4u;
-    core.cpu.B = channel;
-    core.cpu.C = destination;
+    core.cpu.A = 4u; t425_fixture_sync_slaves(&core.cpu);
+    core.cpu.B = channel; t425_fixture_sync_slaves(&core.cpu);
+    core.cpu.C = destination; t425_fixture_sync_slaves(&core.cpu);
 
     assert(t425_memory_write_word(&core.memory,
                                   source, 0x44332211u) == 0);
@@ -101,9 +102,9 @@ int main(void)
     /*
      * OUT completes the waiting IN.
      */
-    core.cpu.A = 4u;
-    core.cpu.B = channel;
-    core.cpu.C = source;
+    core.cpu.A = 4u; t425_fixture_sync_slaves(&core.cpu);
+    core.cpu.B = channel; t425_fixture_sync_slaves(&core.cpu);
+    core.cpu.C = source; t425_fixture_sync_slaves(&core.cpu);
 
     assert(t425_core_step(&core) == T425_STEP_OK);
     assert(t425_core_step(&core) == T425_STEP_OK);
@@ -148,18 +149,18 @@ int main(void)
     core.scheduler.running = 1u;
     core.cpu.Wptr = p_out_wptr;
     core.cpu.Iptr = p_out_iptr;
-    core.cpu.A = 0u;
-    core.cpu.B = channel;
-    core.cpu.C = source;
+    core.cpu.A = 0u; t425_fixture_sync_slaves(&core.cpu);
+    core.cpu.B = channel; t425_fixture_sync_slaves(&core.cpu);
+    core.cpu.C = source; t425_fixture_sync_slaves(&core.cpu);
 
     assert(t425_core_step(&core) == T425_STEP_OK);
     assert(t425_core_step(&core) == T425_STEP_OK);
 
     assert(core.scheduler.current_wdesc == in_wdesc);
 
-    core.cpu.A = 0u;
-    core.cpu.B = channel;
-    core.cpu.C = destination;
+    core.cpu.A = 0u; t425_fixture_sync_slaves(&core.cpu);
+    core.cpu.B = channel; t425_fixture_sync_slaves(&core.cpu);
+    core.cpu.C = destination; t425_fixture_sync_slaves(&core.cpu);
 
     assert(t425_core_step(&core) == T425_STEP_OK);
     assert(t425_core_step(&core) == T425_STEP_OK);

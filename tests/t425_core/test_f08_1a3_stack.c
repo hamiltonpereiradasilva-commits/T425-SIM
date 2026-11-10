@@ -1,4 +1,5 @@
 #include <assert.h>
+#include "f1_fixture_compat.h"
 #include <stdio.h>
 #include "t425_core.h"
 
@@ -27,7 +28,7 @@ static void test_eqc(void)
     t425_core_t c;
 
     t425_core_reset(&c);
-    c.cpu.A = 5u;
+    c.cpu.A = 5u; t425_fixture_sync_slaves(&c.cpu);
     code(&c, 0xC5u);
 
     assert(t425_core_step(&c) == T425_STEP_OK);
@@ -35,7 +36,7 @@ static void test_eqc(void)
     assert(c.cpu.Oreg == 0u);
 
     t425_core_reset(&c);
-    c.cpu.A = 7u;
+    c.cpu.A = 7u; t425_fixture_sync_slaves(&c.cpu);
     code(&c, 0xC5u);
 
     assert(t425_core_step(&c) == T425_STEP_OK);
@@ -49,9 +50,9 @@ static void test_stl(void)
 
     t425_core_reset(&c);
     c.cpu.Wptr = 0x80000040u;
-    c.cpu.A = 0x11111111u;
-    c.cpu.B = 0x22222222u;
-    c.cpu.C = 0x33333333u;
+    c.cpu.A = 0x11111111u; t425_fixture_sync_slaves(&c.cpu);
+    c.cpu.B = 0x22222222u; t425_fixture_sync_slaves(&c.cpu);
+    c.cpu.C = 0x33333333u; t425_fixture_sync_slaves(&c.cpu);
 
     code(&c, 0xD2u);
 
@@ -72,9 +73,9 @@ static void test_stnl(void)
     uint32_t value;
 
     t425_core_reset(&c);
-    c.cpu.A = 0x80000040u;
-    c.cpu.B = 0x11111111u;
-    c.cpu.C = 0x22222222u;
+    c.cpu.A = 0x80000040u; t425_fixture_sync_slaves(&c.cpu);
+    c.cpu.B = 0x11111111u; t425_fixture_sync_slaves(&c.cpu);
+    c.cpu.C = 0x22222222u; t425_fixture_sync_slaves(&c.cpu);
 
     code(&c, 0xE2u);
 

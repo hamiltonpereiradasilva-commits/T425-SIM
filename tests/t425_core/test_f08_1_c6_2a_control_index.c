@@ -1,4 +1,5 @@
 #include <assert.h>
+#include "f1_fixture_compat.h"
 #include <stdint.h>
 #include <stdio.h>
 
@@ -60,8 +61,8 @@ static void test_norm(void)
 
     reset_code(&core);
 
-    core.cpu.A = 1u;
-    core.cpu.B = 0u;
+    core.cpu.A = 1u; t425_fixture_sync_slaves(&core.cpu);
+    core.cpu.B = 0u; t425_fixture_sync_slaves(&core.cpu);
 
     emit_op(&core, 0x19u);
 
@@ -71,8 +72,8 @@ static void test_norm(void)
 
     reset_code(&core);
 
-    core.cpu.A = 0u;
-    core.cpu.B = 0u;
+    core.cpu.A = 0u; t425_fixture_sync_slaves(&core.cpu);
+    core.cpu.B = 0u; t425_fixture_sync_slaves(&core.cpu);
 
     emit_op(&core, 0x19u);
 
@@ -91,8 +92,8 @@ static void test_lend(void)
     write_word(&core, block, 10u);
     write_word(&core, block + 4u, 2u);
 
-    core.cpu.A = 2u;
-    core.cpu.B = block;
+    core.cpu.A = 2u; t425_fixture_sync_slaves(&core.cpu);
+    core.cpu.B = block; t425_fixture_sync_slaves(&core.cpu);
 
     emit_op(&core, 0x21u);
 
@@ -108,8 +109,8 @@ static void test_lend(void)
     write_word(&core, block, 10u);
     write_word(&core, block + 4u, 1u);
 
-    core.cpu.A = 2u;
-    core.cpu.B = block;
+    core.cpu.A = 2u; t425_fixture_sync_slaves(&core.cpu);
+    core.cpu.B = block; t425_fixture_sync_slaves(&core.cpu);
 
     emit_op(&core, 0x21u);
 
@@ -123,10 +124,10 @@ static void test_gajw(void)
 
     reset_code(&core);
 
-    core.cpu.A = CODE_BASE + 0x123u;
+    core.cpu.A = CODE_BASE + 0x123u; t425_fixture_sync_slaves(&core.cpu);
     core.cpu.Wptr = CODE_BASE + 0x300u;
-    core.cpu.B = 0x11111111u;
-    core.cpu.C = 0x22222222u;
+    core.cpu.B = 0x11111111u; t425_fixture_sync_slaves(&core.cpu);
+    core.cpu.C = 0x22222222u; t425_fixture_sync_slaves(&core.cpu);
 
     emit_op(&core, 0x3Cu);
 
@@ -154,9 +155,9 @@ static void test_move(void)
                                       (uint8_t)(0xA0u + i)) == 0);
     }
 
-    core.cpu.A = 13u;
-    core.cpu.B = dst;
-    core.cpu.C = src;
+    core.cpu.A = 13u; t425_fixture_sync_slaves(&core.cpu);
+    core.cpu.B = dst; t425_fixture_sync_slaves(&core.cpu);
+    core.cpu.C = src; t425_fixture_sync_slaves(&core.cpu);
 
     emit_op(&core, 0x4Au);
 
@@ -176,9 +177,9 @@ static void test_ccnt1(void)
 
     reset_code(&core);
 
-    core.cpu.A = 10u;
-    core.cpu.B = 7u;
-    core.cpu.C = 0x12345678u;
+    core.cpu.A = 10u; t425_fixture_sync_slaves(&core.cpu);
+    core.cpu.B = 7u; t425_fixture_sync_slaves(&core.cpu);
+    core.cpu.C = 0x12345678u; t425_fixture_sync_slaves(&core.cpu);
 
     emit_op(&core, 0x4Du);
 
@@ -188,9 +189,9 @@ static void test_ccnt1(void)
 
     reset_code(&core);
 
-    core.cpu.A = 10u;
-    core.cpu.B = 0u;
-    core.cpu.C = 0xCAFEBABEu;
+    core.cpu.A = 10u; t425_fixture_sync_slaves(&core.cpu);
+    core.cpu.B = 0u; t425_fixture_sync_slaves(&core.cpu);
+    core.cpu.C = 0xCAFEBABEu; t425_fixture_sync_slaves(&core.cpu);
 
     emit_op(&core, 0x4Du);
 
@@ -200,9 +201,9 @@ static void test_ccnt1(void)
 
     reset_code(&core);
 
-    core.cpu.A = 10u;
-    core.cpu.B = 11u;
-    core.cpu.C = 0xCAFEBABEu;
+    core.cpu.A = 10u; t425_fixture_sync_slaves(&core.cpu);
+    core.cpu.B = 11u; t425_fixture_sync_slaves(&core.cpu);
+    core.cpu.C = 0xCAFEBABEu; t425_fixture_sync_slaves(&core.cpu);
 
     emit_op(&core, 0x4Du);
 

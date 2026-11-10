@@ -1,4 +1,5 @@
 #include <assert.h>
+#include "f1_fixture_compat.h"
 #include <stdint.h>
 #include <stdio.h>
 #include "t425_core.h"
@@ -25,9 +26,9 @@ static void test_lshl_n0(void)
     t425_core_t core;
     t425_core_reset(&core);
 
-    core.cpu.A = 0u;
-    core.cpu.B = 0x89ABCDEFu;
-    core.cpu.C = 0x01234567u;
+    core.cpu.A = 0u; t425_fixture_sync_slaves(&core.cpu);
+    core.cpu.B = 0x89ABCDEFu; t425_fixture_sync_slaves(&core.cpu);
+    core.cpu.C = 0x01234567u; t425_fixture_sync_slaves(&core.cpu);
 
     execute_opr(&core, 0x36u);
 
@@ -41,9 +42,9 @@ static void test_lshl_n1(void)
     t425_core_t core;
     t425_core_reset(&core);
 
-    core.cpu.A = 1u;
-    core.cpu.B = 0x89ABCDEFu;
-    core.cpu.C = 0x01234567u;
+    core.cpu.A = 1u; t425_fixture_sync_slaves(&core.cpu);
+    core.cpu.B = 0x89ABCDEFu; t425_fixture_sync_slaves(&core.cpu);
+    core.cpu.C = 0x01234567u; t425_fixture_sync_slaves(&core.cpu);
 
     execute_opr(&core, 0x36u);
 
@@ -56,9 +57,9 @@ static void test_lshl_n31(void)
     t425_core_t core;
     t425_core_reset(&core);
 
-    core.cpu.A = 31u;
-    core.cpu.B = 0x89ABCDEFu;
-    core.cpu.C = 0x01234567u;
+    core.cpu.A = 31u; t425_fixture_sync_slaves(&core.cpu);
+    core.cpu.B = 0x89ABCDEFu; t425_fixture_sync_slaves(&core.cpu);
+    core.cpu.C = 0x01234567u; t425_fixture_sync_slaves(&core.cpu);
 
     execute_opr(&core, 0x36u);
 
@@ -71,9 +72,9 @@ static void test_lshl_n32(void)
     t425_core_t core;
     t425_core_reset(&core);
 
-    core.cpu.A = 32u;
-    core.cpu.B = 0x89ABCDEFu;
-    core.cpu.C = 0x01234567u;
+    core.cpu.A = 32u; t425_fixture_sync_slaves(&core.cpu);
+    core.cpu.B = 0x89ABCDEFu; t425_fixture_sync_slaves(&core.cpu);
+    core.cpu.C = 0x01234567u; t425_fixture_sync_slaves(&core.cpu);
 
     execute_opr(&core, 0x36u);
 
@@ -86,9 +87,9 @@ static void test_lshl_n33(void)
     t425_core_t core;
     t425_core_reset(&core);
 
-    core.cpu.A = 33u;
-    core.cpu.B = 0x89ABCDEFu;
-    core.cpu.C = 0x01234567u;
+    core.cpu.A = 33u; t425_fixture_sync_slaves(&core.cpu);
+    core.cpu.B = 0x89ABCDEFu; t425_fixture_sync_slaves(&core.cpu);
+    core.cpu.C = 0x01234567u; t425_fixture_sync_slaves(&core.cpu);
 
     execute_opr(&core, 0x36u);
 
@@ -101,9 +102,9 @@ static void test_lshl_n63(void)
     t425_core_t core;
     t425_core_reset(&core);
 
-    core.cpu.A = 63u;
-    core.cpu.B = 0x89ABCDEFu;
-    core.cpu.C = 0x01234567u;
+    core.cpu.A = 63u; t425_fixture_sync_slaves(&core.cpu);
+    core.cpu.B = 0x89ABCDEFu; t425_fixture_sync_slaves(&core.cpu);
+    core.cpu.C = 0x01234567u; t425_fixture_sync_slaves(&core.cpu);
 
     execute_opr(&core, 0x36u);
 
@@ -116,9 +117,9 @@ static void test_lshl_n64(void)
     t425_core_t core;
     t425_core_reset(&core);
 
-    core.cpu.A = 64u;
-    core.cpu.B = 0x89ABCDEFu;
-    core.cpu.C = 0x01234567u;
+    core.cpu.A = 64u; t425_fixture_sync_slaves(&core.cpu);
+    core.cpu.B = 0x89ABCDEFu; t425_fixture_sync_slaves(&core.cpu);
+    core.cpu.C = 0x01234567u; t425_fixture_sync_slaves(&core.cpu);
 
     execute_opr(&core, 0x36u);
 
@@ -131,9 +132,9 @@ static void test_lshr_n0(void)
     t425_core_t core;
     t425_core_reset(&core);
 
-    core.cpu.A = 0u;
-    core.cpu.B = 0x89ABCDEFu;
-    core.cpu.C = 0x81234567u;
+    core.cpu.A = 0u; t425_fixture_sync_slaves(&core.cpu);
+    core.cpu.B = 0x89ABCDEFu; t425_fixture_sync_slaves(&core.cpu);
+    core.cpu.C = 0x81234567u; t425_fixture_sync_slaves(&core.cpu);
 
     execute_opr(&core, 0x35u);
 
@@ -146,9 +147,9 @@ static void test_lshr_n1(void)
     t425_core_t core;
     t425_core_reset(&core);
 
-    core.cpu.A = 1u;
-    core.cpu.B = 0x89ABCDEFu;
-    core.cpu.C = 0x81234567u;
+    core.cpu.A = 1u; t425_fixture_sync_slaves(&core.cpu);
+    core.cpu.B = 0x89ABCDEFu; t425_fixture_sync_slaves(&core.cpu);
+    core.cpu.C = 0x81234567u; t425_fixture_sync_slaves(&core.cpu);
 
     execute_opr(&core, 0x35u);
 
@@ -161,9 +162,9 @@ static void test_lshr_n31(void)
     t425_core_t core;
     t425_core_reset(&core);
 
-    core.cpu.A = 31u;
-    core.cpu.B = 0x89ABCDEFu;
-    core.cpu.C = 0x81234567u;
+    core.cpu.A = 31u; t425_fixture_sync_slaves(&core.cpu);
+    core.cpu.B = 0x89ABCDEFu; t425_fixture_sync_slaves(&core.cpu);
+    core.cpu.C = 0x81234567u; t425_fixture_sync_slaves(&core.cpu);
 
     execute_opr(&core, 0x35u);
 
@@ -176,9 +177,9 @@ static void test_lshr_n32(void)
     t425_core_t core;
     t425_core_reset(&core);
 
-    core.cpu.A = 32u;
-    core.cpu.B = 0x89ABCDEFu;
-    core.cpu.C = 0x81234567u;
+    core.cpu.A = 32u; t425_fixture_sync_slaves(&core.cpu);
+    core.cpu.B = 0x89ABCDEFu; t425_fixture_sync_slaves(&core.cpu);
+    core.cpu.C = 0x81234567u; t425_fixture_sync_slaves(&core.cpu);
 
     execute_opr(&core, 0x35u);
 
@@ -191,9 +192,9 @@ static void test_lshr_n33(void)
     t425_core_t core;
     t425_core_reset(&core);
 
-    core.cpu.A = 33u;
-    core.cpu.B = 0x89ABCDEFu;
-    core.cpu.C = 0x81234567u;
+    core.cpu.A = 33u; t425_fixture_sync_slaves(&core.cpu);
+    core.cpu.B = 0x89ABCDEFu; t425_fixture_sync_slaves(&core.cpu);
+    core.cpu.C = 0x81234567u; t425_fixture_sync_slaves(&core.cpu);
 
     execute_opr(&core, 0x35u);
 
@@ -206,9 +207,9 @@ static void test_lshr_n63(void)
     t425_core_t core;
     t425_core_reset(&core);
 
-    core.cpu.A = 63u;
-    core.cpu.B = 0x89ABCDEFu;
-    core.cpu.C = 0x81234567u;
+    core.cpu.A = 63u; t425_fixture_sync_slaves(&core.cpu);
+    core.cpu.B = 0x89ABCDEFu; t425_fixture_sync_slaves(&core.cpu);
+    core.cpu.C = 0x81234567u; t425_fixture_sync_slaves(&core.cpu);
 
     execute_opr(&core, 0x35u);
 
@@ -221,9 +222,9 @@ static void test_lshr_n64(void)
     t425_core_t core;
     t425_core_reset(&core);
 
-    core.cpu.A = 64u;
-    core.cpu.B = 0x89ABCDEFu;
-    core.cpu.C = 0x81234567u;
+    core.cpu.A = 64u; t425_fixture_sync_slaves(&core.cpu);
+    core.cpu.B = 0x89ABCDEFu; t425_fixture_sync_slaves(&core.cpu);
+    core.cpu.C = 0x81234567u; t425_fixture_sync_slaves(&core.cpu);
 
     execute_opr(&core, 0x35u);
 

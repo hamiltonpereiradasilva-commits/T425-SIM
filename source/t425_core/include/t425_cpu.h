@@ -9,6 +9,11 @@ typedef struct
     uint32_t B;
     uint32_t C;
 
+    /* Experimental F1 microarchitectural stack-source registers. */
+    uint32_t ASlave;
+    uint32_t BSlave;
+    uint32_t CSlave;
+
     /* Architectural T425 process-control registers. */
     uint32_t WptrReg;
     uint32_t IptrReg;

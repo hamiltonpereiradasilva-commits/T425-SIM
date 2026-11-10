@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include "f1_fixture_compat.h"
 #include <stdint.h>
 #include <string.h>
 
@@ -125,9 +126,9 @@ static int test_talt_enbt_taltwt(void)
      * A != 0 enables the timer guard.
      * B supplies the requested deadline.
      */
-    core.cpu.A = 1u;
-    core.cpu.B = 120u;
-    core.cpu.C = 777u;
+    core.cpu.A = 1u; t425_fixture_sync_slaves(&core.cpu);
+    core.cpu.B = 120u; t425_fixture_sync_slaves(&core.cpu);
+    core.cpu.C = 777u; t425_fixture_sync_slaves(&core.cpu);
 
     if (!execute_opr(&core, 0x24u, 0xF7u))
     {
@@ -160,9 +161,9 @@ static int test_talt_enbt_taltwt(void)
      * Restore the process operands used only by ENBT.
      * TALTWT itself does not depend on A/B/C here.
      */
-    core.cpu.A = 0u;
-    core.cpu.B = 0u;
-    core.cpu.C = 0u;
+    core.cpu.A = 0u; t425_fixture_sync_slaves(&core.cpu);
+    core.cpu.B = 0u; t425_fixture_sync_slaves(&core.cpu);
+    core.cpu.C = 0u; t425_fixture_sync_slaves(&core.cpu);
 
     if (!execute_opr(&core, 0x25u, 0xF1u))
     {
@@ -224,9 +225,9 @@ static int test_talt_enbt_dist(void)
     /*
      * ENBT installs deadline 130.
      */
-    core.cpu.A = 1u;
-    core.cpu.B = 130u;
-    core.cpu.C = 0u;
+    core.cpu.A = 1u; t425_fixture_sync_slaves(&core.cpu);
+    core.cpu.B = 130u; t425_fixture_sync_slaves(&core.cpu);
+    core.cpu.C = 0u; t425_fixture_sync_slaves(&core.cpu);
 
     if (!execute_opr(&core, 0x24u, 0xF7u))
     {
@@ -237,9 +238,9 @@ static int test_talt_enbt_dist(void)
     /*
      * TALTWT places the process on the timer queue.
      */
-    core.cpu.A = 0u;
-    core.cpu.B = 0u;
-    core.cpu.C = 0u;
+    core.cpu.A = 0u; t425_fixture_sync_slaves(&core.cpu);
+    core.cpu.B = 0u; t425_fixture_sync_slaves(&core.cpu);
+    core.cpu.C = 0u; t425_fixture_sync_slaves(&core.cpu);
 
     if (!execute_opr(&core, 0x25u, 0xF1u))
     {
@@ -265,9 +266,9 @@ static int test_talt_enbt_dist(void)
     core.scheduler.current_wdesc = wdesc;
     core.scheduler.running = 1u;
     core.cpu.Wptr = wptr;
-    core.cpu.A = 0u;
-    core.cpu.B = 1u;
-    core.cpu.C = 130u;
+    core.cpu.A = 0u; t425_fixture_sync_slaves(&core.cpu);
+    core.cpu.B = 1u; t425_fixture_sync_slaves(&core.cpu);
+    core.cpu.C = 130u; t425_fixture_sync_slaves(&core.cpu);
 
     if (!execute_opr(&core, 0x22u, 0xFEu))
     {

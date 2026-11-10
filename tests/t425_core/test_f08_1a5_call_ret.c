@@ -1,4 +1,5 @@
 #include <assert.h>
+#include "f1_fixture_compat.h"
 #include <stdint.h>
 #include <stdio.h>
 
@@ -30,9 +31,9 @@ static void test_call(void)
     c.cpu.Wptr = 0x80000080u;
     c.cpu.Iptr = 0x80000000u;
 
-    c.cpu.A = 0x11111111u;
-    c.cpu.B = 0x22222222u;
-    c.cpu.C = 0x33333333u;
+    c.cpu.A = 0x11111111u; t425_fixture_sync_slaves(&c.cpu);
+    c.cpu.B = 0x22222222u; t425_fixture_sync_slaves(&c.cpu);
+    c.cpu.C = 0x33333333u; t425_fixture_sync_slaves(&c.cpu);
 
     code(&c, 0x91u); /* CALL #1 */
 
@@ -69,9 +70,9 @@ static void test_ret(void)
     t425_core_reset(&c);
 
     c.cpu.Wptr = 0x80000070u;
-    c.cpu.A = 0xAAAAAAAAu;
-    c.cpu.B = 0xBBBBBBBBu;
-    c.cpu.C = 0xCCCCCCCCu;
+    c.cpu.A = 0xAAAAAAAAu; t425_fixture_sync_slaves(&c.cpu);
+    c.cpu.B = 0xBBBBBBBBu; t425_fixture_sync_slaves(&c.cpu);
+    c.cpu.C = 0xCCCCCCCCu; t425_fixture_sync_slaves(&c.cpu);
 
     assert(t425_memory_write_word(
         &c.memory, 0x80000070u, 0x80000123u) == 0);

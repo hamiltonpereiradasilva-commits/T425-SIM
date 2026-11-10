@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include "f1_fixture_compat.h"
 #include <stdint.h>
 
 #include "t425_core.h"
@@ -75,9 +76,9 @@ int main(void)
      * RESETCH consumes A as the architectural channel address.
      * B and C are sentinels to verify preservation.
      */
-    core.cpu.A = channel;
-    core.cpu.B = 0x11223344u;
-    core.cpu.C = 0x55667788u;
+    core.cpu.A = channel; t425_fixture_sync_slaves(&core.cpu);
+    core.cpu.B = 0x11223344u; t425_fixture_sync_slaves(&core.cpu);
+    core.cpu.C = 0x55667788u; t425_fixture_sync_slaves(&core.cpu);
 
     uint64_t cycles_before = core.cycles;
 

@@ -1,4 +1,5 @@
 #include <assert.h>
+#include "f1_fixture_compat.h"
 #include <stdint.h>
 #include <stdio.h>
 
@@ -41,9 +42,9 @@ static void test_add(void)
 
     t425_core_reset(&core);
     core.cpu.Iptr = T425_INTERNAL_RAM_BASE;
-    core.cpu.A = 10u;
-    core.cpu.B = 7u;
-    core.cpu.C = 0x12345678u;
+    core.cpu.A = 10u; t425_fixture_sync_slaves(&core.cpu);
+    core.cpu.B = 7u; t425_fixture_sync_slaves(&core.cpu);
+    core.cpu.C = 0x12345678u; t425_fixture_sync_slaves(&core.cpu);
 
     assert(execute_opr(&core, 0x05u) == T425_STEP_OK);
 
@@ -60,9 +61,9 @@ static void test_sub(void)
 
     t425_core_reset(&core);
     core.cpu.Iptr = T425_INTERNAL_RAM_BASE;
-    core.cpu.A = 3u;
-    core.cpu.B = 10u;
-    core.cpu.C = 0x12345678u;
+    core.cpu.A = 3u; t425_fixture_sync_slaves(&core.cpu);
+    core.cpu.B = 10u; t425_fixture_sync_slaves(&core.cpu);
+    core.cpu.C = 0x12345678u; t425_fixture_sync_slaves(&core.cpu);
 
     assert(execute_opr(&core, 0x0Cu) == T425_STEP_OK);
 
@@ -82,9 +83,9 @@ static void test_diff(void)
 
     t425_core_reset(&core);
     core.cpu.Iptr = T425_INTERNAL_RAM_BASE;
-    core.cpu.A = 3u;
-    core.cpu.B = 10u;
-    core.cpu.C = 0x12345678u;
+    core.cpu.A = 3u; t425_fixture_sync_slaves(&core.cpu);
+    core.cpu.B = 10u; t425_fixture_sync_slaves(&core.cpu);
+    core.cpu.C = 0x12345678u; t425_fixture_sync_slaves(&core.cpu);
 
     assert(execute_opr(&core, 0x04u) == T425_STEP_OK);
 
@@ -104,9 +105,9 @@ static void test_sum(void)
 
     t425_core_reset(&core);
     core.cpu.Iptr = T425_INTERNAL_RAM_BASE;
-    core.cpu.A = 10u;
-    core.cpu.B = 7u;
-    core.cpu.C = 0x12345678u;
+    core.cpu.A = 10u; t425_fixture_sync_slaves(&core.cpu);
+    core.cpu.B = 7u; t425_fixture_sync_slaves(&core.cpu);
+    core.cpu.C = 0x12345678u; t425_fixture_sync_slaves(&core.cpu);
 
     assert(execute_opr(&core, 0x52u) == T425_STEP_OK);
 
@@ -126,9 +127,9 @@ static void test_gt(void)
 
     t425_core_reset(&core);
     core.cpu.Iptr = T425_INTERNAL_RAM_BASE;
-    core.cpu.A = 3u;
-    core.cpu.B = 10u;
-    core.cpu.C = 0x12345678u;
+    core.cpu.A = 3u; t425_fixture_sync_slaves(&core.cpu);
+    core.cpu.B = 10u; t425_fixture_sync_slaves(&core.cpu);
+    core.cpu.C = 0x12345678u; t425_fixture_sync_slaves(&core.cpu);
 
     assert(execute_opr(&core, 0x09u) == T425_STEP_OK);
 
@@ -148,9 +149,9 @@ static void test_gt_false(void)
 
     t425_core_reset(&core);
     core.cpu.Iptr = T425_INTERNAL_RAM_BASE;
-    core.cpu.A = 10u;
-    core.cpu.B = 3u;
-    core.cpu.C = 0x12345678u;
+    core.cpu.A = 10u; t425_fixture_sync_slaves(&core.cpu);
+    core.cpu.B = 3u; t425_fixture_sync_slaves(&core.cpu);
+    core.cpu.C = 0x12345678u; t425_fixture_sync_slaves(&core.cpu);
 
     assert(execute_opr(&core, 0x09u) == T425_STEP_OK);
 
@@ -168,9 +169,9 @@ static void test_add_overflow_positive(void)
     t425_core_reset(&core);
     core.cpu.Iptr = T425_INTERNAL_RAM_BASE;
 
-    core.cpu.A = 0x7FFFFFFFu;
-    core.cpu.B = 1u;
-    core.cpu.C = 0x12345678u;
+    core.cpu.A = 0x7FFFFFFFu; t425_fixture_sync_slaves(&core.cpu);
+    core.cpu.B = 1u; t425_fixture_sync_slaves(&core.cpu);
+    core.cpu.C = 0x12345678u; t425_fixture_sync_slaves(&core.cpu);
 
     assert(execute_opr(&core, 0x05u) == T425_STEP_OK);
 
@@ -189,9 +190,9 @@ static void test_add_overflow_negative(void)
     t425_core_reset(&core);
     core.cpu.Iptr = T425_INTERNAL_RAM_BASE;
 
-    core.cpu.A = 0x80000000u;
-    core.cpu.B = 0xFFFFFFFFu;
-    core.cpu.C = 0x12345678u;
+    core.cpu.A = 0x80000000u; t425_fixture_sync_slaves(&core.cpu);
+    core.cpu.B = 0xFFFFFFFFu; t425_fixture_sync_slaves(&core.cpu);
+    core.cpu.C = 0x12345678u; t425_fixture_sync_slaves(&core.cpu);
 
     assert(execute_opr(&core, 0x05u) == T425_STEP_OK);
 
@@ -210,9 +211,9 @@ static void test_sub_overflow_positive(void)
     t425_core_reset(&core);
     core.cpu.Iptr = T425_INTERNAL_RAM_BASE;
 
-    core.cpu.A = 0xFFFFFFFFu;
-    core.cpu.B = 0x7FFFFFFFu;
-    core.cpu.C = 0x12345678u;
+    core.cpu.A = 0xFFFFFFFFu; t425_fixture_sync_slaves(&core.cpu);
+    core.cpu.B = 0x7FFFFFFFu; t425_fixture_sync_slaves(&core.cpu);
+    core.cpu.C = 0x12345678u; t425_fixture_sync_slaves(&core.cpu);
 
     assert(execute_opr(&core, 0x0Cu) == T425_STEP_OK);
 
@@ -231,9 +232,9 @@ static void test_sub_overflow_negative(void)
     t425_core_reset(&core);
     core.cpu.Iptr = T425_INTERNAL_RAM_BASE;
 
-    core.cpu.A = 1u;
-    core.cpu.B = 0x80000000u;
-    core.cpu.C = 0x12345678u;
+    core.cpu.A = 1u; t425_fixture_sync_slaves(&core.cpu);
+    core.cpu.B = 0x80000000u; t425_fixture_sync_slaves(&core.cpu);
+    core.cpu.C = 0x12345678u; t425_fixture_sync_slaves(&core.cpu);
 
     assert(execute_opr(&core, 0x0Cu) == T425_STEP_OK);
 

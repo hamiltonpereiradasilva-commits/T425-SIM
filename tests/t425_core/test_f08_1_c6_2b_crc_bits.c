@@ -1,4 +1,5 @@
 #include <assert.h>
+#include "f1_fixture_compat.h"
 #include <stdint.h>
 #include <stdio.h>
 
@@ -96,9 +97,9 @@ static void test_crcword(void)
 
     expected = crc_reference(data, crc, generator, 32u);
 
-    core.cpu.A = data;
-    core.cpu.B = crc;
-    core.cpu.C = generator;
+    core.cpu.A = data; t425_fixture_sync_slaves(&core.cpu);
+    core.cpu.B = crc; t425_fixture_sync_slaves(&core.cpu);
+    core.cpu.C = generator; t425_fixture_sync_slaves(&core.cpu);
 
     emit_op(&core, 0x74u);
 
@@ -119,9 +120,9 @@ static void test_crcbyte(void)
 
     expected = crc_reference(data, crc, generator, 8u);
 
-    core.cpu.A = data;
-    core.cpu.B = crc;
-    core.cpu.C = generator;
+    core.cpu.A = data; t425_fixture_sync_slaves(&core.cpu);
+    core.cpu.B = crc; t425_fixture_sync_slaves(&core.cpu);
+    core.cpu.C = generator; t425_fixture_sync_slaves(&core.cpu);
 
     emit_op(&core, 0x75u);
 
@@ -136,9 +137,9 @@ static void test_bitcnt(void)
 
     reset_code(&core);
 
-    core.cpu.A = 0xF0F00001u;
-    core.cpu.B = 10u;
-    core.cpu.C = 0x12345678u;
+    core.cpu.A = 0xF0F00001u; t425_fixture_sync_slaves(&core.cpu);
+    core.cpu.B = 10u; t425_fixture_sync_slaves(&core.cpu);
+    core.cpu.C = 0x12345678u; t425_fixture_sync_slaves(&core.cpu);
 
     emit_op(&core, 0x76u);
 
@@ -153,9 +154,9 @@ static void test_bitrevword(void)
 
     reset_code(&core);
 
-    core.cpu.A = 0x0000000Du;
-    core.cpu.B = 0x11111111u;
-    core.cpu.C = 0x22222222u;
+    core.cpu.A = 0x0000000Du; t425_fixture_sync_slaves(&core.cpu);
+    core.cpu.B = 0x11111111u; t425_fixture_sync_slaves(&core.cpu);
+    core.cpu.C = 0x22222222u; t425_fixture_sync_slaves(&core.cpu);
 
     emit_op(&core, 0x77u);
 
@@ -170,9 +171,9 @@ static void test_bitrevnbits(void)
 
     reset_code(&core);
 
-    core.cpu.A = 4u;
-    core.cpu.B = 0x0000000Du;
-    core.cpu.C = 0xABCDEF01u;
+    core.cpu.A = 4u; t425_fixture_sync_slaves(&core.cpu);
+    core.cpu.B = 0x0000000Du; t425_fixture_sync_slaves(&core.cpu);
+    core.cpu.C = 0xABCDEF01u; t425_fixture_sync_slaves(&core.cpu);
 
     emit_op(&core, 0x78u);
 

@@ -1,4 +1,5 @@
 #include <assert.h>
+#include "f1_fixture_compat.h"
 #include <stdint.h>
 #include <stdio.h>
 #include <string.h>
@@ -101,7 +102,7 @@ static void test_runp(void)
         wptr - 4u,
         T425_INTERNAL_RAM_BASE + 0x300u);
 
-    core.cpu.A = wdesc;
+    core.cpu.A = wdesc; t425_fixture_sync_slaves(&core.cpu);
 
     assert(exec_opr(&core, 0x39u) == T425_STEP_OK);
 
@@ -210,7 +211,7 @@ static void test_endp(void)
     /*
      * ENDP receives successor Wptr in A.
      */
-    core.cpu.A = successor_wptr;
+    core.cpu.A = successor_wptr; t425_fixture_sync_slaves(&core.cpu);
 
     /*
      * Final process in the group.

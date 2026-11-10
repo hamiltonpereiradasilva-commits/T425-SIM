@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include "f1_fixture_compat.h"
 #include <stdint.h>
 #include <stdlib.h>
 
@@ -81,8 +82,8 @@ static void test_enbt(void)
                                T425_TIMER_TIME_NO_SET) != 0)
         fail("ENBT TLink init");
 
-    core.cpu.A = 1u;
-    core.cpu.B = 200u;
+    core.cpu.A = 1u; t425_fixture_sync_slaves(&core.cpu);
+    core.cpu.B = 200u; t425_fixture_sync_slaves(&core.cpu);
 
     put_byte(&core, T425_INTERNAL_RAM_BASE, 0x24u);
     put_byte(&core, T425_INTERNAL_RAM_BASE + 1u, 0xF7u);
@@ -127,8 +128,8 @@ static void test_enbt_earlier(void)
                                200u) != 0)
         fail("ENBT earlier Time init");
 
-    core.cpu.A = 1u;
-    core.cpu.B = 150u;
+    core.cpu.A = 1u; t425_fixture_sync_slaves(&core.cpu);
+    core.cpu.B = 150u; t425_fixture_sync_slaves(&core.cpu);
 
     put_byte(&core, T425_INTERNAL_RAM_BASE, 0x24u);
     put_byte(&core, T425_INTERNAL_RAM_BASE + 1u, 0xF7u);

@@ -1,5 +1,6 @@
 
 #include <assert.h>
+#include "f1_fixture_compat.h"
 #include <stdint.h>
 #include <stdio.h>
 
@@ -96,9 +97,9 @@ static void test_out_then_in(void)
     core.scheduler.running = 1u;
     core.cpu.Wptr = p1;
     core.cpu.Iptr = p1_iptr;
-    core.cpu.A = 4u;
-    core.cpu.B = channel;
-    core.cpu.C = source;
+    core.cpu.A = 4u; t425_fixture_sync_slaves(&core.cpu);
+    core.cpu.B = channel; t425_fixture_sync_slaves(&core.cpu);
+    core.cpu.C = source; t425_fixture_sync_slaves(&core.cpu);
 
     assert(t425_memory_write_byte(
         &core.memory, source + 0u, 0x11u) == 0);
@@ -149,9 +150,9 @@ static void test_out_then_in(void)
     /*
      * P2 executes IN.
      */
-    core.cpu.A = 4u;
-    core.cpu.B = channel;
-    core.cpu.C = destination;
+    core.cpu.A = 4u; t425_fixture_sync_slaves(&core.cpu);
+    core.cpu.B = channel; t425_fixture_sync_slaves(&core.cpu);
+    core.cpu.C = destination; t425_fixture_sync_slaves(&core.cpu);
 
     assert(t425_core_step(&core) == T425_STEP_OK);
     assert(t425_core_step(&core) == T425_STEP_OK);

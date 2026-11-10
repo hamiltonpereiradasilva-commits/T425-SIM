@@ -1,4 +1,5 @@
 #include <assert.h>
+#include "f1_fixture_compat.h"
 #include <stdint.h>
 #include <stdio.h>
 
@@ -18,9 +19,9 @@ static void test_ldlp(void)
     t425_core_reset(&core);
 
     core.cpu.Wptr = 0x80000040u;
-    core.cpu.A = 0x11111111u;
-    core.cpu.B = 0x22222222u;
-    core.cpu.C = 0x33333333u;
+    core.cpu.A = 0x11111111u; t425_fixture_sync_slaves(&core.cpu);
+    core.cpu.B = 0x22222222u; t425_fixture_sync_slaves(&core.cpu);
+    core.cpu.C = 0x33333333u; t425_fixture_sync_slaves(&core.cpu);
     core.cpu.Iptr = 0x80000000u;
 
     put_code(&core, 0x80000000u, 0x12u); /* LDLP #2 */
@@ -40,9 +41,9 @@ static void test_ldnlp(void)
 
     t425_core_reset(&core);
 
-    core.cpu.A = 0x80000040u;
-    core.cpu.B = 0x11111111u;
-    core.cpu.C = 0x22222222u;
+    core.cpu.A = 0x80000040u; t425_fixture_sync_slaves(&core.cpu);
+    core.cpu.B = 0x11111111u; t425_fixture_sync_slaves(&core.cpu);
+    core.cpu.C = 0x22222222u; t425_fixture_sync_slaves(&core.cpu);
     core.cpu.Iptr = 0x80000000u;
 
     put_code(&core, 0x80000000u, 0x52u); /* LDNLP #2 */
@@ -62,9 +63,9 @@ static void test_ldl(void)
     t425_core_reset(&core);
 
     core.cpu.Wptr = 0x80000040u;
-    core.cpu.A = 0xAAAAAAAAu;
-    core.cpu.B = 0xBBBBBBBBu;
-    core.cpu.C = 0xCCCCCCCCu;
+    core.cpu.A = 0xAAAAAAAAu; t425_fixture_sync_slaves(&core.cpu);
+    core.cpu.B = 0xBBBBBBBBu; t425_fixture_sync_slaves(&core.cpu);
+    core.cpu.C = 0xCCCCCCCCu; t425_fixture_sync_slaves(&core.cpu);
     core.cpu.Iptr = 0x80000000u;
 
     assert(t425_memory_write_word(
@@ -87,9 +88,9 @@ static void test_ldnl(void)
 
     t425_core_reset(&core);
 
-    core.cpu.A = 0x80000040u;
-    core.cpu.B = 0xAAAAAAAAu;
-    core.cpu.C = 0xBBBBBBBBu;
+    core.cpu.A = 0x80000040u; t425_fixture_sync_slaves(&core.cpu);
+    core.cpu.B = 0xAAAAAAAAu; t425_fixture_sync_slaves(&core.cpu);
+    core.cpu.C = 0xBBBBBBBBu; t425_fixture_sync_slaves(&core.cpu);
     core.cpu.Iptr = 0x80000000u;
 
     assert(t425_memory_write_word(
@@ -112,9 +113,9 @@ static void test_adc(void)
 
     t425_core_reset(&core);
 
-    core.cpu.A = 100u;
-    core.cpu.B = 0xAAAAAAAAu;
-    core.cpu.C = 0xBBBBBBBBu;
+    core.cpu.A = 100u; t425_fixture_sync_slaves(&core.cpu);
+    core.cpu.B = 0xAAAAAAAAu; t425_fixture_sync_slaves(&core.cpu);
+    core.cpu.C = 0xBBBBBBBBu; t425_fixture_sync_slaves(&core.cpu);
     core.cpu.Iptr = 0x80000000u;
 
     put_code(&core, 0x80000000u, 0x85u); /* ADC #5 */

@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include "f1_fixture_compat.h"
 #include <stdint.h>
 #include <stdlib.h>
 
@@ -73,7 +74,7 @@ static void test_past(void)
     int rc;
 
     setup_core(&core, W0, W0 | T425_PRIORITY_LOW, 100u);
-    core.cpu.A = 90u;
+    core.cpu.A = 90u; t425_fixture_sync_slaves(&core.cpu);
 
     rc = t425_core_step(&core);
     expect_i("TIN past PFIX return", rc, T425_STEP_OK);
@@ -97,7 +98,7 @@ static void test_future_low_single(void)
     int rc;
 
     setup_core(&core, W0, W0 | T425_PRIORITY_LOW, 100u);
-    core.cpu.A = 120u;
+    core.cpu.A = 120u; t425_fixture_sync_slaves(&core.cpu);
 
     core.cpu.Iptr = T425_INTERNAL_RAM_BASE;
 
@@ -167,7 +168,7 @@ static void test_future_low_ordered(void)
     core.scheduler.low_head = W1 | T425_PRIORITY_LOW;
     core.scheduler.low_tail = W2 | T425_PRIORITY_LOW;
 
-    core.cpu.A = 150u;
+    core.cpu.A = 150u; t425_fixture_sync_slaves(&core.cpu);
     rc = t425_core_step(&core);
     expect_i("ordered W0 PFIX return", rc, T425_STEP_OK);
     rc = t425_core_step(&core);
@@ -176,7 +177,7 @@ static void test_future_low_ordered(void)
     expect_u32("ordered after W0 current", core.scheduler.current_wdesc,
                W1 | T425_PRIORITY_LOW);
 
-    core.cpu.A = 200u;
+    core.cpu.A = 200u; t425_fixture_sync_slaves(&core.cpu);
     put_program(&core, 0x80000080u, 0x22u, 0xFBu);
     rc = t425_core_step(&core);
     expect_i("ordered W1 PFIX return", rc, T425_STEP_OK);
@@ -186,7 +187,7 @@ static void test_future_low_ordered(void)
     expect_u32("ordered after W1 current", core.scheduler.current_wdesc,
                W2 | T425_PRIORITY_LOW);
 
-    core.cpu.A = 175u;
+    core.cpu.A = 175u; t425_fixture_sync_slaves(&core.cpu);
     put_program(&core, 0x800000C0u, 0x22u, 0xFBu);
     rc = t425_core_step(&core);
     expect_i("ordered W2 PFIX return", rc, T425_STEP_OK);
@@ -235,7 +236,7 @@ static void test_future_high_single(void)
     if (t425_memory_write_word(&core.memory, W1 - 8u, T425_NOT_PROCESS) != 0) fail("high W1 Link write");
     core.scheduler.high_head = W1 | T425_PRIORITY_HIGH;
     core.scheduler.high_tail = W1 | T425_PRIORITY_HIGH;
-    core.cpu.A = 120u;
+    core.cpu.A = 120u; t425_fixture_sync_slaves(&core.cpu);
     rc = t425_core_step(&core);
     expect_i("high PFIX return", rc, T425_STEP_OK);
     rc = t425_core_step(&core);
